@@ -1,10 +1,10 @@
-const Order = require("../models/orderModel");
+const PurchaseOrder = require("../models/purchaseModel");
 const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
 // Create new Order
-exports.newOrder = catchAsyncErrors(async (req, res, next) => {
+exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
   const {
     shippingInfo,
     orderItems,
@@ -15,7 +15,7 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
     totalPrice,
   } = req.body;
 
-  const order = await Order.create({
+  const purchaseOrder = await PurchaseOrder.create({
     shippingInfo,
     orderItems,
     paymentInfo,
@@ -29,78 +29,79 @@ exports.newOrder = catchAsyncErrors(async (req, res, next) => {
 
   res.status(201).json({
     success: true,
-    order,
+    purchaseOrder,
   });
 });
 
 // get Single Order
-exports.getSingleOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id).populate(
+exports.getSinglePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
+  const purchaseOrder = await PurchaseOrder.findById(req.params.id).populate(
     "user",
     "name email"
   );
 
-  if (!order) {
+  if (!purchaseOrder) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
 
   res.status(200).json({
     success: true,
-    order,
+    purchaseOrder,
   });
 });
 
 // get logged in user  Orders
-exports.myOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await Order.find({ user: req.user._id });
+exports.myPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
+  const userDetails=req.user._id;
+  const purchaseOrders = await PurchaseOrder.find({ user: userDetails });
 
   res.status(200).json({
     success: true,
-    orders,
+    purchaseOrders,
   });
 });
 
 // get all Orders -- Admin
-exports.getAllOrders = catchAsyncErrors(async (req, res, next) => {
-  const orders = await Order.find();
+exports.getAllPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
+  const purchaseOrders = await PurchaseOrder.find();
 
   let totalAmount = 0;
 
-  orders.forEach((order) => {
-    totalAmount += order.totalPrice;
+  purchaseOrders.forEach((purchaseOrder) => {
+    totalAmount += purchaseOrder.totalPrice;
   });
 
   res.status(200).json({
     success: true,
     totalAmount,
-    orders,
+    purchaseOrders,
   });
 });
 
 // update Order Status -- Admin
-exports.updateOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
+exports.updatePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
+  const purchaseOrder = await PurchaseOrder.findById(req.params.id);
 
-  if (!order) {
+  if (!purchaseOrder) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
 
-  if (order.orderStatus === "Delivered") {
+  if (purchaseOrder.orderStatus === "Delivered") {
     return next(new ErrorHandler("You have already delivered this order", 400));
   }
 
   if (req.body.status === "Shipped") {
-    order.orderItems.forEach(async (o) => {
+    purchaseOrder.orderItems.forEach(async (o) => {
       await updateStock(o.inventory, o.quantity);
     });
   }
-  order.orderStatus = req.body.status;
+  purchaseOrder.orderStatus = req.body.status;
 
   if (req.body.status === "Delivered") {
-    order.deliveredAt = Date.now();
+    purchaseOrder.deliveredAt = Date.now();
   }
 
-  await order.save({ validateBeforeSave: false });
+  await purchaseOrder.save({ validateBeforeSave: false });
   res.status(200).json({
     success: true,
   });
@@ -115,14 +116,14 @@ async function updateStock(id, quantity) {
 }
 
 // delete Order -- Admin
-exports.deleteOrder = catchAsyncErrors(async (req, res, next) => {
-  const order = await Order.findById(req.params.id);
+exports.deletePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
+  const purchaseOrder = await PurchaseOrder.findById(req.params.id);
 
-  if (!order) {
+  if (!purchaseOrder) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
 
-  await order.remove();
+  await purchaseOrder.remove();
 
   res.status(200).json({
     success: true,

@@ -5,76 +5,52 @@ const inventorySchema = mongoose.Schema({
     type: String,
     required: [true, "Please Enter inventory Name"],
     trim: true,
+    unique:true,
   },
   description: {
     type: String,
-    required: [true, "Please Enter inventory Description"],
+    // required: [true, "Please Enter inventory Description"],
   },
-  price: {
+  purchasingPrice: {
     type: Number,
-    required: [true, "Please Enter inventory Price"],
+    required: [true, "Please Enter purchasing price of inventory"],
     maxLength: [8, "Price cannot exceed 8 characters"],
   },
-  ratings: {
+  sellingPrice: {
     type: Number,
-    default: 0,
+    required: [true, "Please Enter selling price of inventory"],
+    maxLength: [8, "Price cannot exceed 8 characters"],
   },
-  barCode:{
-    type:String,
-    required:true,
+  barCode: {
+    type: String,
+    required: true,
+    unique:true,
   },
-  images: [
-    {
+  images:     {
       public_id: {
         type: String,
-        // required: true,
+        required: true,
       },
       url: {
         type: String,
-        // required: true,
+        required: true,
       },
     },
-  ],
+  
   category: {
     type: String,
-    required: [true, "Please Enter inventory Category"],
+    // required: [true, "Please Enter inventory Category"],
   },
-  Stock: {
+  quantity: {
     type: Number,
-    required: [true, "Please Enter inventory Stock"],
+    required: [true, "Please Enter quantity of inventory"],
     maxLength: [4, "Stock cannot exceed 4 characters"],
     default: 1,
   },
-  numOfReviews: {
-    type: Number,
-    default: 0,
-  },
-  reviews: [
-    {
-      user: {
-        type: mongoose.Schema.ObjectId,
-        ref: "User",
-        // required: true,
-      },
-      name: {
-        type: String,
-        // required: true,
-      },
-      rating: {
-        type: Number,
-        // required: true,
-      },
-      comment: {
-        type: String,
-        // required: true,
-      },
-    },
-  ],
-
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
-    // required: true,
+    required: true,
   },
   createdAt: {
     type: Date,

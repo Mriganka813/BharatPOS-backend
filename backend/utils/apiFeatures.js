@@ -9,14 +9,16 @@ class ApiFeatures {
       ? {
           name: {
             $regex: this.queryStr.keyword,
-            $options: "i",
+            $options: 'i',
           },
         }
       : {};
 
+      
     this.query = this.query.find({
       ...keyword,
     });
+    // console.log(keyword);
     return this;
   }
 
@@ -32,6 +34,7 @@ class ApiFeatures {
 
     this.query = this.query.find(JSON.parse(queryStr));
 
+    
     return this;
   }
 
