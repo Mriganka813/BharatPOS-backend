@@ -22,17 +22,39 @@ const path = require("path");
 
 const multer = require("multer");
 
-let storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, "uploads");
-  },
-  filename: function (req, file, cb) {
-    console.log(file); // this didn't print anything out so i assumed it was never excuted
-    cb(null, file.fieldname + "-" + Date.now());
-  },
-});
+exports.createProductWithImage = catchAsyncErrors((req, res, next) => {
+  const Storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+      cb(null, 'uploads')
+    },
+    filename: function (req, file, cb) {
+      const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+      cb(null, file.fieldname + '-' + uniqueSuffix)
+    }
+  });
 
-exports.upload = multer({ storage }).single("image");
+  const upload = multer({ storage: Storage }).single('testImage');
+
+  upload(req, res, (err) => {
+    if (err) {
+      console.log(err);
+    } else {
+      const newProduct = new Inventory({
+        name: req.body.name,
+        img: {
+          data: fs.readFileSync(
+            path.join(__dirname + "/uploads/" + req.file.filename)
+          ),
+          contentType: "image/jpeg",
+        },
+      });
+      newProduct
+        .save()
+        .then(() => res.send("Successfully uploaded"))
+        .catch((err) => console.log(err));
+    }
+  });
+});
 
 // define storage for images
 // const storage=multer.diskStorage({
@@ -107,7 +129,7 @@ exports.crInv = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.addImage=catchAsyncErrors(async(req,res,next)=>{
+exports.addImage = catchAsyncErrors(async (req, res, next) => {
   const userDetail = req.user._id;
   // const quantity=req.body.qunatity;
   // const { name, description, purchasingPrice, sellingPrice, barCode, category } = req.body;
@@ -146,9 +168,6 @@ exports.addImage=catchAsyncErrors(async(req,res,next)=>{
     success: true,
     inventory,
   });
-
-
-
 });
 
 // Create Inventory
@@ -270,35 +289,35 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Images Start Here
-  let images = [];
+  // let images = [];
 
-  if (typeof req.body.images === "string") {
-    images.push(req.body.images);
-  } else {
-    images = req.body.images;
-  }
+  // if (typeof req.body.images === "string") {
+  //   images.push(req.body.images);
+  // } else {
+  //   images = req.body.images;
+  // }
 
-  if (images !== undefined) {
-    // Deleting Images From Cloudinary
-    for (let i = 0; i < Inventory.images.length; i++) {
-      await cloudinary.v2.uploader.destroy(Inventory.images[i].public_id);
-    }
+  // if (images !== undefined) {
+  //   // Deleting Images From Cloudinary
+  //   for (let i = 0; i < Inventory.images.length; i++) {
+  //     await cloudinary.v2.uploader.destroy(Inventory.images[i].public_id);
+  //   }
 
-    const imagesLinks = [];
+  //   const imagesLinks = [];
 
-    for (let i = 0; i < images.length; i++) {
-      const result = await cloudinary.v2.uploader.upload(images[i], {
-        folder: "Inventories",
-      });
+  //   for (let i = 0; i < images.length; i++) {
+  //     const result = await cloudinary.v2.uploader.upload(images[i], {
+  //       folder: "Inventories",
+  //     });
 
-      imagesLinks.push({
-        public_id: result.public_id,
-        url: result.secure_url,
-      });
-    }
+  //     imagesLinks.push({
+  //       public_id: result.public_id,
+  //       url: result.secure_url,
+  //     });
+  //   }
 
-    req.body.images = imagesLinks;
-  }
+  //   req.body.images = imagesLinks;
+  // }
 
   inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
@@ -321,9 +340,9 @@ exports.deleteInventory = catchAsyncErrors(async (req, res, next) => {
   }
 
   // Deleting Images From Cloudinary
-  for (let i = 0; i < inventory.images.length; i++) {
-    await cloudinary.v2.uploader.destroy(Inventory.images[i].public_id);
-  }
+  // for (let i = 0; i < inventory.images.length; i++) {
+  //   await cloudinary.v2.uploader.destroy(Inventory.images[i].public_id);
+  // }
 
   await inventory.remove();
 
