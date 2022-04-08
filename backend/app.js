@@ -3,7 +3,9 @@ const app = express();
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
-// const path = require("path");
+const path = require("path");
+const fs = require('fs');
+var busboy = require('connect-busboy');
 // const fs=require("fs");
 
 const errorMiddleware = require("./middleware/error");
@@ -18,6 +20,7 @@ app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(bodyParser.json());
+app.use(busboy());
 
 // Set EJS as templating engine
 app.set("view engine", "ejs");
@@ -41,7 +44,7 @@ app.use("/api/v1", sales);
 app.use("/api/v1", purchase);
 app.use("/api/v1", expense);
 
-// app.use(express.static(path.join(__dirname, "../frontend/build")));
+app.use(express.static(path.join(__dirname, "build")));
 
 app.get("*", (req, res) => {
   res.send("connected");

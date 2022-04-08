@@ -6,10 +6,18 @@ const {
   deleteInventory,
   getInventoryDetails,
   getAllInventoriesAndSearch,
+  upload,
+  crInv,
+  createProduct,
+  createP,
+  addImage,
 } = require("../controllers/inventoryController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
 const router = express.Router();
+
+// router.route("/inventory/create").post(isAuthenticatedUser,createProduct);
+router.route("/inventory/image/:id").put(isAuthenticatedUser,addImage);
 
 router.route("/inventories").get(getAllInventoriesAndSearch);
 router.route("/inventories/all").get(getAllInventories);

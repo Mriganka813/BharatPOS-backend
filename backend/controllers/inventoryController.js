@@ -3,36 +3,183 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 // const ApiFeatures = require("../utils/apiFeatures");
 const cloudinary = require("cloudinary");
+const fs = require("fs");
+const path = require("path");
 // const User = require("../models/userModel");
 
+// exports.createProduct = catchAsyncErrors(async (req, res, next) => {
+//   var fstream;
+//   req.pipe(req.busboy);
+//   req.busboy.on("file", function (fieldname, file, filename) {
+//     console.log("Uploading: " + filename);
+//     fstream = fs.createWriteStream(__dirname + './files/'+ filename);
+//     file.pipe(fstream);
+//     fstream.on("close", function () {
+//       res.redirect("back");
+//     });
+//   });
+// });
+
+const multer = require("multer");
+
+let storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads");
+  },
+  filename: function (req, file, cb) {
+    console.log(file); // this didn't print anything out so i assumed it was never excuted
+    cb(null, file.fieldname + "-" + Date.now());
+  },
+});
+
+exports.upload = multer({ storage }).single("image");
+
+// define storage for images
+// const storage=multer.diskStorage({
+
+//   // destination for images
+//   destination:function(request, file, callback) {
+//     callback(null, "../uploads");
+//   },
+
+//   // add back the extension
+//   filename:function(request,file,callback) {
+//     callback(null,Date.now()+ file.originalname);
+//   },
+
+// });
+
+// // upload parameters for multer
+// exports.upload=multer({
+//   storage:storage,
+//   limit:{
+//     fieldSize:1024*1024*3,
+//   },
+// });
+
+exports.crInv = catchAsyncErrors(async (req, res, next) => {
+  const userDetail = req.user._id;
+  // const image = req.file.filename;
+
+  var image = {
+    data: fs.readFileSync(
+      path.join(__dirname + "/uploads/" + req.file.filename)
+    ),
+    contentType: "image/png",
+  };
+
+  console.log(image);
+
+  // if (!req.file.filename) {
+  //   res.send("File was not found");
+  //   return;
+  // }
+
+  req.body.img = image;
+  req.body.user = userDetail;
+
+  let inventory = await Inventory.findById(req.params.id);
+
+  if (!inventory) {
+    return next(new ErrorHandler("Inventory not found", 404));
+  }
+
+  inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    inventory,
+  });
+
+  // const inventory = await Inventory.create(req.body);
+  // const inventory = await Inventory.findByIdAndUpdate(req.user.id, newUserData, {
+  //   new: true,
+  //   runValidators: true,
+  //   useFindAndModify: false,
+  // });
+  res.status(201).json({
+    success: true,
+    inventory,
+  });
+});
+
+exports.addImage=catchAsyncErrors(async(req,res,next)=>{
+  const userDetail = req.user._id;
+  // const quantity=req.body.qunatity;
+  // const { name, description, purchasingPrice, sellingPrice, barCode, category } = req.body;
+  if (!req.files) {
+    res.send("File was not found");
+    return;
+  }
+
+  // const obj ={
+  //   img:req.files.file,
+  //   name:req.body.name,
+  //   description:req.body.description,
+  //   purchasingPrice:req.body.purchasingPrice,
+  //   sellingPrice:req.body.sellingPrice,
+  //   barCode:req.body.barCode,
+  // }
+
+  const file = req.files.file;
+  // res.send(`${file.name} File Uploaded`);
+  req.body.img = file;
+  req.body.user = userDetail;
+  // const inventory = await Inventory.create(obj);
+  let inventory = await Inventory.findById(req.params.id);
+
+  if (!inventory) {
+    return next(new ErrorHandler("Inventory not found", 404));
+  }
+
+  inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+    useFindAndModify: false,
+  });
+
+  res.status(200).json({
+    success: true,
+    inventory,
+  });
 
 
-// Create Inventory 
+
+});
+
+// Create Inventory
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
-  let images = [];
+  // let images = [];
 
-  if (typeof req.body.images === "string") {
-    images.push(req.body.images);
-  } else {
-    images = req.body.images;
-  }
+  // if (typeof req.body.images === "string") {
+  //   images.push(req.body.images);
+  // } else {
+  //   images = req.body.images;
+  // }
 
-  const imagesLinks = [];
+  // // console.log(typeof(images))
 
-  for (let i = 0; i < images.length; i++) {
-    const result = await cloudinary.v2.uploader.upload(images[i], {
-      folder: "Inventories",
-    });
+  // const imagesLinks = [];
 
-    imagesLinks.push({
-      public_id: result.public_id,
-      url: result.secure_url,
-    });
-  }
+  // for (let i = 0; i < images.length; i++) {
+  //   const result = await cloudinary.v2.uploader.upload(images[i], {
+  //     folder: "Inventories",
+  //     // public_id:"product"
+  //   });
+
+  //   imagesLinks.push({
+  //     public_id: result.public_id,
+  //     url: result.secure_url,
+  //   });
+  // }
 
   const userDetail = req.user._id;
 
-  req.body.images = imagesLinks;
+  // req.body.images = imagesLinks;
   req.body.user = userDetail;
 
   const inventory = await Inventory.create(req.body);
@@ -44,49 +191,53 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Get All Inventory count and search
-exports.getAllInventoriesAndSearch = catchAsyncErrors(async (req, res, next) => {
-  const resultPerPage = 8;
-  const inventoriesCount = await Inventory.countDocuments();
+exports.getAllInventoriesAndSearch = catchAsyncErrors(
+  async (req, res, next) => {
+    const resultPerPage = 8;
+    const inventoriesCount = await Inventory.countDocuments();
 
-  const key = req.query.keyword
-    ? {
-        name: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
-    : {};
+    const key = req.query.keyword
+      ? {
+          name: {
+            $regex: req.query.keyword,
+            $options: "i",
+          },
+        }
+      : {};
 
-  const InventoriesRes = await Inventory.find({ ...key });
+    const InventoriesRes = await Inventory.find({ ...key });
 
-  const queryCopy = { ...req.query };
+    const queryCopy = { ...req.query };
 
-  const removeFields = ["keyword", "page", "limit"];
+    const removeFields = ["keyword", "page", "limit"];
 
-  removeFields.forEach((key) => delete queryCopy[key]);
+    removeFields.forEach((key) => delete queryCopy[key]);
 
-  let queryStr = JSON.stringify(queryCopy);
-  queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
+    let queryStr = JSON.stringify(queryCopy);
+    queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
 
-  let filteredInventories = await Inventory.find(JSON.parse(queryStr));
+    let filteredInventories = await Inventory.find(JSON.parse(queryStr));
 
-  let filteredInventoriesCount = InventoriesRes.length;
-  const currentPage = Number(req.query.page) || 1;
-  const skip = resultPerPage * (currentPage - 1);
-  let InventoriesPage = await Inventory.find().limit(resultPerPage).skip(skip);
+    let filteredInventoriesCount = InventoriesRes.length;
+    const currentPage = Number(req.query.page) || 1;
+    const skip = resultPerPage * (currentPage - 1);
+    let InventoriesPage = await Inventory.find()
+      .limit(resultPerPage)
+      .skip(skip);
 
-  res.status(200).json({
-    success: true,
-    InventoriesRes,
-    inventoriesCount,
-    resultPerPage,
-    filteredInventoriesCount,
-    filteredInventories,
-    InventoriesPage,
-  });
-});
+    res.status(200).json({
+      success: true,
+      InventoriesRes,
+      inventoriesCount,
+      resultPerPage,
+      filteredInventoriesCount,
+      filteredInventories,
+      InventoriesPage,
+    });
+  }
+);
 
-// Get All Inventory 
+// Get All Inventory
 exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
   const Inventories = await Inventory.find();
 
@@ -110,7 +261,7 @@ exports.getInventoryDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Update Inventory 
+// Update Inventory
 exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   let inventory = await Inventory.findById(req.params.id);
 
