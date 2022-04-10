@@ -1,4 +1,4 @@
-// const ErrorHandler = require("../utils/errorhandler");
+const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const ExpenseModel = require("../models/expenseModel");
 
@@ -15,7 +15,6 @@ exports.addExpense = catchAsyncErrors(async (req, res, next) => {
     expense,
   });
 });
-
 
 exports.getAllExpense = catchAsyncErrors(async (req, res, next) => {
   const allExpense = await ExpenseModel.find();
@@ -57,10 +56,10 @@ exports.updateExpense = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.deleteExpense=catchAsyncErrors(async (req,res,next)=> {
-  const expense=await ExpenseModel.findById(req.params.id);
+exports.deleteExpense = catchAsyncErrors(async (req, res, next) => {
+  const expense = await ExpenseModel.findById(req.params.id);
 
-  if(!expense) {
+  if (!expense) {
     return next(new ErrorHandler("Expense not found", 404));
   }
 
@@ -69,4 +68,4 @@ exports.deleteExpense=catchAsyncErrors(async (req,res,next)=> {
     success: true,
     message: "Expense Deleted Successfully",
   });
-})
+});

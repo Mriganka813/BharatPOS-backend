@@ -18,8 +18,10 @@ const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 const router = express.Router();
 
 // router.route("/inventory/create").post(isAuthenticatedUser,createProduct);
-router.route("/inventory/image/:id").put(isAuthenticatedUser,addImage);
-router.route("/inventory/add").post(isAuthenticatedUser,createProductWithImage);
+router.route("/inventory/image/:id").put(isAuthenticatedUser, addImage);
+router
+  .route("/inventory/add")
+  .post(isAuthenticatedUser, createProductWithImage);
 
 router.route("/inventories").get(getAllInventoriesAndSearch);
 router.route("/inventories/all").get(getAllInventories);

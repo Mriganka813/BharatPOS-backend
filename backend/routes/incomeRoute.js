@@ -14,7 +14,7 @@ router.route("/add/income").post(isAuthenticatedUser, addIncome);
 
 router.route("/income/all").get(isAuthenticatedUser, getAllIncome);
 
-router.route("/income/:id").get(isAuthenticatedUser,getSingleIncome);
+router.route("/income/:id").get(isAuthenticatedUser, getSingleIncome);
 
 router.route("/update/income/:id").put(isAuthenticatedUser, updateIncome);
 

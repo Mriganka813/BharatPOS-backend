@@ -45,9 +45,9 @@ const userSchema = new mongoose.Schema({
     $in: ["business1, business2"],
   },
   phoneNumber: {
-    type:Number,
-    required:[true, "Please enter your phone Number"],
-    maxlength:[10, "Phone number cannot exceed more than 10"],
+    type: Number,
+    required: [true, "Please enter your phone Number"],
+    maxlength: [10, "Phone number cannot exceed more than 10"],
   },
   createdAt: {
     type: Date,

@@ -20,11 +20,11 @@ const partySchema = new mongoose.Schema({
     required: [true, "Please enter your phone Number"],
     maxlength: [10, "Phone number cannot exceed more than 10"],
   },
-  receivedAmount:{
-    type:Number,
+  receivedAmount: {
+    type: Number,
   },
-  givenAmount:{
-    type:Number,
+  givenAmount: {
+    type: Number,
   },
   createdAt: {
     type: Date,
@@ -34,9 +34,9 @@ const partySchema = new mongoose.Schema({
 
 // JWT TOKEN
 partySchema.methods.getJWTToken = function () {
-    return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE,
-    });
-  };
+  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE,
+  });
+};
 
 module.exports = mongoose.model("Party", partySchema);

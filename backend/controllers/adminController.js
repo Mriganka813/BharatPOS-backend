@@ -2,11 +2,8 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const Admin = require("../models/adminModel");
 const sendToken = require("../utils/jwtToken");
-// const sendEmail = require("../utils/sendEmail");
 const crypto = require("crypto");
 const User = require("../models/userModel");
-
-
 
 // creating admin
 exports.createAdmin = catchAsyncErrors(async (req, res, next) => {
@@ -67,7 +64,6 @@ exports.getAllUserDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 // get single user details
 exports.getSingleUserDetail = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.params.id);
@@ -103,7 +99,7 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// / Delete User 
+// / Delete User
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.params.id);
 
@@ -112,10 +108,6 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
       new ErrorHandler(`User does not exist with Id: ${req.params.id}`, 400)
     );
   }
-
-  // const imageId = user.avatar.public_id;
-
-  // await cloudinary.v2.uploader.destroy(imageId);
 
   await user.remove();
 

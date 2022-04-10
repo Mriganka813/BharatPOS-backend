@@ -9,12 +9,11 @@ class ApiFeatures {
       ? {
           name: {
             $regex: this.queryStr.keyword,
-            $options: 'i',
+            $options: "i",
           },
         }
       : {};
 
-      
     this.query = this.query.find({
       ...keyword,
     });
@@ -34,11 +33,9 @@ class ApiFeatures {
 
     this.query = this.query.find(JSON.parse(queryStr));
 
-    
     return this;
   }
 
- 
   pagination(resultPerPage) {
     const currentPage = Number(this.queryStr.page) || 1;
 
@@ -48,7 +45,6 @@ class ApiFeatures {
 
     return this;
   }
-
 }
 
-module.exports=ApiFeatures;
+module.exports = ApiFeatures;

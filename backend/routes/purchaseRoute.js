@@ -28,7 +28,9 @@ router
   .route("/admin/purchaseOrders")
   .get(isAuthenticatedAdmin, authorizeRoles("admin"), getAllPurchaseOrders);
 
-  router.route("/purchaseOrder/:id").delete(isAuthenticatedUser, deletePurchaseOrder);
+router
+  .route("/purchaseOrder/:id")
+  .delete(isAuthenticatedUser, deletePurchaseOrder);
 
 router
   .route("/admin/purchaseOrder/:id")

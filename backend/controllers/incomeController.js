@@ -1,7 +1,7 @@
-// const ErrorHandler = require("../utils/errorhandler");
+const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const IncomeModel = require("../models/incomeModel");
-const ErrorHandler = require("../utils/errorhandler");
+// const ErrorHandler = require("../utils/errorhandler");
 
 exports.addIncome = catchAsyncErrors(async (req, res, next) => {
   // const income=req.body;
@@ -51,22 +51,24 @@ exports.updateIncome = catchAsyncErrors(async (req, res, next) => {
     runValidators: true,
     useFindAndModify: false,
   });
+
   res.status(200).json({
     success: true,
     income,
   });
 });
 
-exports.deleteIncome=catchAsyncErrors(async (req,res,next)=> {
-  const income=await IncomeModel.findById(req.params.id);
+exports.deleteIncome = catchAsyncErrors(async (req, res, next) => {
+  const income = await IncomeModel.findById(req.params.id);
 
-  if(!income) {
+  if (!income) {
     return next(new ErrorHandler("Income not found", 404));
   }
 
   await income.remove();
+
   res.status(200).json({
     success: true,
     message: "Income Deleted Successfully",
   });
-})
+});

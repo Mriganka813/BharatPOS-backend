@@ -52,7 +52,7 @@ exports.getSinglePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
 
 // get logged in user  Orders
 exports.myPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
-  const userDetails=req.user._id;
+  const userDetails = req.user._id;
   const purchaseOrders = await PurchaseOrder.find({ user: userDetails });
 
   res.status(200).json({

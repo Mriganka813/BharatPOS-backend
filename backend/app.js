@@ -4,8 +4,8 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const path = require("path");
-const fs = require('fs');
-var busboy = require('connect-busboy');
+const fs = require("fs");
+var busboy = require("connect-busboy");
 // const fs=require("fs");
 
 const errorMiddleware = require("./middleware/error");
@@ -33,7 +33,7 @@ const party = require("./routes/partyRoute");
 const income = require("./routes/incomeRoute");
 const purchase = require("./routes/purchaseRoute");
 const sales = require("./routes/salesRoute");
-const expense=require("./routes/expenseRoute");
+const expense = require("./routes/expenseRoute");
 
 app.use("/api/v1", product);
 app.use("/api/v1", user);

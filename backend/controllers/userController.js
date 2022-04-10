@@ -8,8 +8,6 @@ const sendToken = require("../utils/jwtToken");
 
 // register user
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
- 
-
   const { email, password, businessName, businessType, address, phoneNumber } =
     req.body;
 
@@ -20,7 +18,6 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     businessType,
     address,
     phoneNumber,
-
   });
 
   sendToken(user, 201, res);
@@ -62,8 +59,6 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
-
 // Get User Detail
 exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id);
@@ -73,7 +68,6 @@ exports.getUserDetails = catchAsyncErrors(async (req, res, next) => {
     user,
   });
 });
-
 
 exports.updatePassword = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(req.user.id).select("+password");
@@ -101,7 +95,6 @@ exports.updateProfile = catchAsyncErrors(async (req, res, next) => {
     email: req.body.email,
   };
 
- 
   const user = await User.findByIdAndUpdate(req.user.id, newUserData, {
     new: true,
     runValidators: true,
@@ -122,8 +115,6 @@ exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
-
 // update User Role -- Admin
 // exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
 //   const newUserData = {
@@ -142,5 +133,3 @@ exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
 //     success: true,
 //   });
 // });
-
-
