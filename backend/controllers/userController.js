@@ -2,6 +2,7 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
 const sendToken = require("../utils/jwtToken");
+const fast2sms = require("fast-two-sms");
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
@@ -133,3 +134,16 @@ exports.getAllUser = catchAsyncErrors(async (req, res, next) => {
 //     success: true,
 //   });
 // });
+
+exports.sendOtp = catchAsyncErrors(async (req, res, next) => {
+  const response = await fast2sms.sendMessage({
+    authorization: process.env.FAST_TWO_SMS,
+    message: req.body.message,
+    numbers: [req.body.number],
+  });
+
+  res.status(200).json({
+    success: true,
+    response,
+  });
+});

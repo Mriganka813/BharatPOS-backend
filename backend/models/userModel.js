@@ -48,15 +48,22 @@ const userSchema = new mongoose.Schema({
     type: Number,
     required: [true, "Please enter your phone Number"],
     maxlength: [10, "Phone number cannot exceed more than 10"],
+    trim:true,
+    unique:true,
   },
+  phoneOtp:String,
   createdAt: {
     type: Date,
     default: Date.now,
   },
 
+  
   resetPasswordToken: String,
   resetPasswordExpire: Date,
-});
+  
+},
+{timestamps:true}
+);
 
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {

@@ -6,6 +6,7 @@ const {
   getUserDetails,
   updatePassword,
   updateProfile,
+  sendOtp,
 } = require("../controllers/userController");
 const { isAuthenticatedUser } = require("../middleware/auth");
 
@@ -22,5 +23,7 @@ router.route("/me").get(isAuthenticatedUser, getUserDetails);
 router.route("/password/update").put(isAuthenticatedUser, updatePassword);
 
 router.route("/me/update").put(isAuthenticatedUser, updateProfile);
+
+router.route("/sendOtp").post(sendOtp);
 
 module.exports = router;

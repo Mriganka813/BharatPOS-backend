@@ -47,7 +47,8 @@ app.use("/api/v1", expense);
 app.use(express.static(path.join(__dirname, "build")));
 
 app.get("*", (req, res) => {
-  res.send("connected");
+  // res.send("connected");
+  res.render("index.ejs");
 });
 
 // Middleware for Errors
