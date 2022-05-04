@@ -267,7 +267,6 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getInventoryForUser = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.user);
   const inventories = await Inventory.find({ user: req.user._id });
   res.status(200).json({ success: true, inventories });
 });
