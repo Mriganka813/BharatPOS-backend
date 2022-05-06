@@ -266,6 +266,11 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+exports.getInventoryForUser = catchAsyncErrors(async (req, res, next) => {
+  const inventories = await Inventory.find({ user: req.user._id });
+  res.status(200).json({ success: true, inventories });
+});
+
 // Get Single Inventory Details
 exports.getInventoryDetails = catchAsyncErrors(async (req, res, next) => {
   const inventory = await Inventory.findById(req.params.id);

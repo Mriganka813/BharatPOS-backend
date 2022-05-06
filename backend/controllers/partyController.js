@@ -11,6 +11,7 @@ exports.registerParty = catchAsyncErrors(async (req, res, next) => {
     name,
     address,
     phoneNumber,
+    user: req.user._id,
   });
 
   const token = party.getJWTToken();
@@ -32,10 +33,17 @@ exports.registerParty = catchAsyncErrors(async (req, res, next) => {
   // sendToken(party, 201, res);
 });
 
-
 exports.getAllParty = catchAsyncErrors(async (req, res, next) => {
   const allParty = await Party.find();
 
+  res.status(200).json({
+    success: true,
+    allParty,
+  });
+});
+
+exports.getMyParties = catchAsyncErrors(async (req, res, next) => {
+  const allParty = await Party.find({ user: req.user._id });
   res.status(200).json({
     success: true,
     allParty,
@@ -74,7 +82,7 @@ exports.updateParty = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.deleteParty= catchAsyncErrors(async (req, res, next) => {
+exports.deleteParty = catchAsyncErrors(async (req, res, next) => {
   const party = await Party.findById(req.params.id);
 
   if (!party) {

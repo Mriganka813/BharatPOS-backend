@@ -12,6 +12,7 @@ const {
   createP,
   addImage,
   createProductWithImage,
+  getInventoryForUser,
 } = require("../controllers/inventoryController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
@@ -27,6 +28,8 @@ router.route("/inventories").get(getAllInventoriesAndSearch);
 router.route("/inventories/all").get(getAllInventories);
 
 router.route("/inventory/new").post(isAuthenticatedUser, createInventory);
+
+router.route("/inventory/me").get(isAuthenticatedUser, getInventoryForUser);
 
 router.route("/update/inventory/:id").put(isAuthenticatedUser, updateInventory);
 
