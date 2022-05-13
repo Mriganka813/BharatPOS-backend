@@ -5,10 +5,11 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems } = req.body;
-
+  const { orderItems, party } = req.body;
+  console.log(JSON.stringify(orderItems));
   const salesOrder = await SalesOrder.create({
     orderItems,
+    party,
     user: req.user._id,
   });
 
