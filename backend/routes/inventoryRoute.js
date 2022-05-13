@@ -13,6 +13,7 @@ const {
   addImage,
   createProductWithImage,
   getInventoryForUser,
+  findInventoryByBarcode,
 } = require("../controllers/inventoryController");
 const { isAuthenticatedUser, authorizeRoles } = require("../middleware/auth");
 
@@ -20,6 +21,9 @@ const router = express.Router();
 
 // router.route("/inventory/create").post(isAuthenticatedUser,createProduct);
 router.route("/inventory/image/:id").put(isAuthenticatedUser, addImage);
+router
+  .route("/inventory/barcode/:code")
+  .get(isAuthenticatedUser, findInventoryByBarcode);
 router
   .route("/inventory/add")
   .post(isAuthenticatedUser, createProductWithImage);

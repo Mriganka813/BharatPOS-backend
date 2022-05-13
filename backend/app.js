@@ -9,6 +9,7 @@ var busboy = require("connect-busboy");
 // const fs=require("fs");
 
 const errorMiddleware = require("./middleware/error");
+const logFile = fs.createWriteStream("./logfile.log", { flags: "w" }); //use {flags: 'w'} to open in write mode
 
 // Config
 if (process.env.NODE_ENV !== "PRODUCTION") {

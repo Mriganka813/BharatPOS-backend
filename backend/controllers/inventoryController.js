@@ -128,6 +128,14 @@ exports.crInv = catchAsyncErrors(async (req, res, next) => {
     inventory,
   });
 });
+exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
+  const barcode = req.params.code;
+  const inventory = await Inventory.findOne({ barCode: barcode });
+  res.status(200).json({
+    success: true,
+    inventory,
+  });
+});
 
 exports.addImage = catchAsyncErrors(async (req, res, next) => {
   const userDetail = req.user._id;
