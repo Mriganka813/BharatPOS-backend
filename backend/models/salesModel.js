@@ -3,10 +3,6 @@ const mongoose = require("mongoose");
 const salesSchema = new mongoose.Schema({
   orderItems: [
     {
-      name: {
-        type: String,
-        required: true,
-      },
       price: {
         type: Number,
         required: true,
@@ -17,7 +13,7 @@ const salesSchema = new mongoose.Schema({
       },
       image: {
         type: String,
-        required: true,
+        // required: true,
       },
       product: {
         type: mongoose.Schema.ObjectId,
@@ -26,6 +22,13 @@ const salesSchema = new mongoose.Schema({
       },
     },
   ],
+  modeOfPayment: {
+    type: String,
+  },
+  party: {
+    type: mongoose.Schema.ObjectId,
+    ref: "Party",
+  },
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "User",

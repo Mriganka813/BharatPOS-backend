@@ -13,24 +13,37 @@ exports.registerParty = catchAsyncErrors(async (req, res, next) => {
     phoneNumber,
     user: req.user._id,
   });
+  // const token = party.getJWTToken();
 
-  const token = party.getJWTToken();
+  // // options for cookie
+  // const options = {
+  //   expires: new Date(
+  //     Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
+  //   ),
+  //   httpOnly: true,
+  // };
 
-  // options for cookie
-  const options = {
-    expires: new Date(
-      Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-    ),
-    httpOnly: true,
-  };
-
-  res.status(201).cookie("token", token, options).json({
+  res.status(201).json({
     success: true,
     party,
     token,
   });
 
   // sendToken(party, 201, res);
+});
+
+exports.searchParty = catchAsyncErrors(async (req, res, next) => {
+  const { searchQuery, limit } = req.query;
+  const allParty = await Party.find({
+    name: {
+      $regex: searchQuery,
+      $options: "i",
+    },
+  }).limit(limit);
+  res.status(200).json({
+    success: true,
+    allParty,
+  });
 });
 
 exports.getAllParty = catchAsyncErrors(async (req, res, next) => {

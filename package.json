@@ -31,8 +31,5 @@
     "react-scripts": "^5.0.0",
     "stripe": "^8.211.0",
     "validator": "^13.7.0"
-  },
-  "devDependencies": {
-    "morgan": "^1.10.0"
   }
 }
