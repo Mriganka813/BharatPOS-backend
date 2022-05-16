@@ -1,6 +1,7 @@
 const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const lodash = require("lodash");
 // const ApiFeatures = require("../utils/apiFeatures");
 // const cloudinary = require("cloudinary");
 const fs = require("fs");
@@ -203,14 +204,19 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   //     url: result.secure_url,
   //   });
   // }
-
-  const userDetail = req.user._id;
-
   // req.body.images = imagesLinks;
+  const { barCode } = req.body;
+  const userDetail = req.user._id;
   req.body.user = userDetail;
-
+  /// Check if barcode is unique to that particular user
+  const existingInventory = await Inventory.findOne({
+    barCode: barCode,
+    user: req.user._id,
+  });
+  if (!lodash.isEmpty(existingInventory)) {
+    throw Error("Barcode already exists");
+  }
   const inventory = await Inventory.create(req.body);
-
   res.status(201).json({
     success: true,
     inventory,

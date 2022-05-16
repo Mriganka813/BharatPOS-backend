@@ -24,7 +24,6 @@ const inventorySchema = mongoose.Schema({
   barCode: {
     type: String,
     // required: true,
-    unique: true,
   },
   img: {
     // type:String,
