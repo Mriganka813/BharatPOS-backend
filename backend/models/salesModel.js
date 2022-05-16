@@ -24,6 +24,7 @@ const salesSchema = new mongoose.Schema({
   ],
   modeOfPayment: {
     type: String,
+    required: true,
   },
   party: {
     type: mongoose.Schema.ObjectId,

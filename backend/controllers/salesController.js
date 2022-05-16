@@ -2,7 +2,6 @@ const SalesOrder = require("../models/salesModel");
 const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, party } = req.body;
@@ -38,11 +37,26 @@ exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
 
 // get logged in user  Orders
 exports.mySalesOrders = catchAsyncErrors(async (req, res, next) => {
-  const salesOrders = await SalesOrder.find({ user: req.user._id });
+  const pageSize = 10;
+  const page = req.query.page || 1;
+
+  const offset = page * pageSize;
+  const salesOrders = await SalesOrder.find({ user: req.user._id })
+    .limit(10)
+    .skip(offset)
+    .sort({ createdAt: -1 })
+    .populate("party");
+
+  const meta = {
+    currentPage: Number(page),
+    nextPage: salesOrders.length === 10 ? Number(page) + 1 : null,
+    count: salesOrders.length,
+  };
 
   res.status(200).json({
     success: true,
     salesOrders,
+    meta,
   });
 });
 

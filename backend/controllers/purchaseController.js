@@ -52,12 +52,24 @@ exports.getSinglePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
 
 // get logged in user  Orders
 exports.myPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
+  const pageSize = 10;
+  const page = req.query.page || 1;
+  const offset = page * pageSize;
   const userDetails = req.user._id;
-  const purchaseOrders = await PurchaseOrder.find({ user: userDetails });
+  const purchaseOrders = await PurchaseOrder.find({ user: userDetails })
+    .skip(offset)
+    .limit(pageSize)
+    .sort({ createdAt: -1 });
 
+  const meta = {
+    currentPage: Number(page),
+    nextPage: purchaseOrders.length === 10 ? Number(page) + 1 : null,
+    count: purchaseOrders.length,
+  };
   res.status(200).json({
     success: true,
     purchaseOrders,
+    meta,
   });
 });
 
