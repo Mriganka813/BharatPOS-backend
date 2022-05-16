@@ -11,9 +11,9 @@ const partySchema = new mongoose.Schema({
   },
   address: {
     type: String,
-    // required: [true, "Please enter your address"],
-    maxLength: [200, "Name cannot exceed 30 characters"],
-    minLength: [5, "Name should have more than 4 characters"],
+    // required: [false, "Please enter your address"],
+    // maxLength: [200, "Name cannot exceed 30 characters"],
+    // minLength: [5, "Name should have more than 4 characters"],
   },
   phoneNumber: {
     type: Number,
