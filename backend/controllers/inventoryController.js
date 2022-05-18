@@ -2,133 +2,8 @@ const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const lodash = require("lodash");
-// const ApiFeatures = require("../utils/apiFeatures");
-// const cloudinary = require("cloudinary");
-const fs = require("fs");
-const path = require("path");
-// const User = require("../models/userModel");
+const upload = require("../services/upload");
 
-// exports.createProduct = catchAsyncErrors(async (req, res, next) => {
-//   var fstream;
-//   req.pipe(req.busboy);
-//   req.busboy.on("file", function (fieldname, file, filename) {
-//     console.log("Uploading: " + filename);
-//     fstream = fs.createWriteStream(__dirname + './files/'+ filename);
-//     file.pipe(fstream);
-//     fstream.on("close", function () {
-//       res.redirect("back");
-//     });
-//   });
-// });
-
-const multer = require("multer");
-
-exports.createProductWithImage = catchAsyncErrors((req, res, next) => {
-  const Storage = multer.diskStorage({
-    destination: function (req, file, cb) {
-      cb(null, "uploads");
-    },
-    filename: function (req, file, cb) {
-      const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
-      cb(null, file.fieldname + "-" + uniqueSuffix);
-    },
-  });
-
-  const upload = multer({ storage: Storage }).single("testImage");
-
-  upload(req, res, (err) => {
-    if (err) {
-      console.log(err);
-    } else {
-      const newProduct = new Inventory({
-        name: req.body.name,
-        img: {
-          data: fs.readFileSync(
-            path.join(__dirname + "/uploads/" + req.file.filename)
-          ),
-          contentType: "image/jpeg",
-        },
-      });
-      newProduct
-        .save()
-        .then(() => res.send("Successfully uploaded"))
-        .catch((err) => console.log(err));
-    }
-  });
-});
-
-// define storage for images
-// const storage=multer.diskStorage({
-
-//   // destination for images
-//   destination:function(request, file, callback) {
-//     callback(null, "../uploads");
-//   },
-
-//   // add back the extension
-//   filename:function(request,file,callback) {
-//     callback(null,Date.now()+ file.originalname);
-//   },
-
-// });
-
-// // upload parameters for multer
-// exports.upload=multer({
-//   storage:storage,
-//   limit:{
-//     fieldSize:1024*1024*3,
-//   },
-// });
-
-exports.crInv = catchAsyncErrors(async (req, res, next) => {
-  const userDetail = req.user._id;
-  // const image = req.file.filename;
-
-  var image = {
-    data: fs.readFileSync(
-      path.join(__dirname + "/uploads/" + req.file.filename)
-    ),
-    contentType: "image/png",
-  };
-
-  console.log(image);
-
-  // if (!req.file.filename) {
-  //   res.send("File was not found");
-  //   return;
-  // }
-
-  req.body.img = image;
-  req.body.user = userDetail;
-
-  let inventory = await Inventory.findById(req.params.id);
-
-  if (!inventory) {
-    return next(new ErrorHandler("Inventory not found", 404));
-  }
-
-  inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
-
-  res.status(200).json({
-    success: true,
-    inventory,
-  });
-
-  // const inventory = await Inventory.create(req.body);
-  // const inventory = await Inventory.findByIdAndUpdate(req.user.id, newUserData, {
-  //   new: true,
-  //   runValidators: true,
-  //   useFindAndModify: false,
-  // });
-  res.status(201).json({
-    success: true,
-    inventory,
-  });
-});
 exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
   const barcode = req.params.code;
   const inventory = await Inventory.findOne({ barCode: barcode });
@@ -138,75 +13,15 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.addImage = catchAsyncErrors(async (req, res, next) => {
-  const userDetail = req.user._id;
-  // const quantity=req.body.qunatity;
-  // const { name, description, purchasingPrice, sellingPrice, barCode, category } = req.body;
-  if (!req.files) {
-    res.send("File was not found");
-    return;
-  }
-
-  // const obj ={
-  //   img:req.files.file,
-  //   name:req.body.name,
-  //   description:req.body.description,
-  //   purchasingPrice:req.body.purchasingPrice,
-  //   sellingPrice:req.body.sellingPrice,
-  //   barCode:req.body.barCode,
-  // }
-
-  const file = req.files.file;
-  // res.send(`${file.name} File Uploaded`);
-  req.body.img = file;
-  req.body.user = userDetail;
-  // const inventory = await Inventory.create(obj);
-  let inventory = await Inventory.findById(req.params.id);
-
-  if (!inventory) {
-    return next(new ErrorHandler("Inventory not found", 404));
-  }
-
-  inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
-
-  res.status(200).json({
-    success: true,
-    inventory,
-  });
-});
-
 // Create Inventory
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
-  // let images = [];
-
-  // if (typeof req.body.images === "string") {
-  //   images.push(req.body.images);
-  // } else {
-  //   images = req.body.images;
-  // }
-
-  // // console.log(typeof(images))
-
-  // const imagesLinks = [];
-
-  // for (let i = 0; i < images.length; i++) {
-  //   const result = await cloudinary.v2.uploader.upload(images[i], {
-  //     folder: "Inventories",
-  //     // public_id:"product"
-  //   });
-
-  //   imagesLinks.push({
-  //     public_id: result.public_id,
-  //     url: result.secure_url,
-  //   });
-  // }
-  // req.body.images = imagesLinks;
   const { barCode } = req.body;
   const userDetail = req.user._id;
+  /// if has image, then create and save on cloudinary
+  if (req.files.image) {
+    const result = await upload(req.files.image);
+    req.body.image = result.url;
+  }
   req.body.user = userDetail;
   /// Check if barcode is unique to that particular user
   const existingInventory = await Inventory.findOne({
@@ -228,7 +43,6 @@ exports.getAllInventoriesAndSearch = catchAsyncErrors(
   async (req, res, next) => {
     const resultPerPage = 8;
     const inventoriesCount = await Inventory.countDocuments();
-
     const key = req.query.keyword
       ? {
           name: {
@@ -273,7 +87,6 @@ exports.getAllInventoriesAndSearch = catchAsyncErrors(
 // Get All Inventory
 exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
   const Inventories = await Inventory.find();
-
   res.status(200).json({
     success: true,
     Inventories,
@@ -318,48 +131,18 @@ exports.incrementQuantity = catchAsyncErrors(async (id, quantity) => {
 // Update Inventory
 exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   let inventory = await Inventory.findById(req.params.id);
-
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
   }
-
-  // Images Start Here
-  // let images = [];
-
-  // if (typeof req.body.images === "string") {
-  //   images.push(req.body.images);
-  // } else {
-  //   images = req.body.images;
-  // }
-
-  // if (images !== undefined) {
-  //   // Deleting Images From Cloudinary
-  //   for (let i = 0; i < Inventory.images.length; i++) {
-  //     await cloudinary.v2.uploader.destroy(Inventory.images[i].public_id);
-  //   }
-
-  //   const imagesLinks = [];
-
-  //   for (let i = 0; i < images.length; i++) {
-  //     const result = await cloudinary.v2.uploader.upload(images[i], {
-  //       folder: "Inventories",
-  //     });
-
-  //     imagesLinks.push({
-  //       public_id: result.public_id,
-  //       url: result.secure_url,
-  //     });
-  //   }
-
-  //   req.body.images = imagesLinks;
-  // }
-
+  if (req.files.image) {
+    const result = await upload(req.files.image);
+    req.body.image = result.rul;
+  }
   inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
     useFindAndModify: false,
   });
-
   res.status(200).json({
     success: true,
     inventory,
@@ -373,14 +156,7 @@ exports.deleteInventory = catchAsyncErrors(async (req, res, next) => {
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
   }
-
-  // Deleting Images From Cloudinary
-  // for (let i = 0; i < inventory.images.length; i++) {
-  //   await cloudinary.v2.uploader.destroy(Inventory.images[i].public_id);
-  // }
-
   await inventory.remove();
-
   res.status(200).json({
     success: true,
     message: "Inventory Delete Successfully",

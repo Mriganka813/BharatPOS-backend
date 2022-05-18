@@ -4,8 +4,10 @@ const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 const fileUpload = require("express-fileupload");
 const path = require("path");
+const cloudinary = require("cloudinary");
 const fs = require("fs");
 var busboy = require("connect-busboy");
+
 // const fs=require("fs");
 
 const errorMiddleware = require("./middleware/error");
@@ -15,6 +17,11 @@ const logFile = fs.createWriteStream("./logfile.log", { flags: "w" }); //use {fl
 if (process.env.NODE_ENV !== "PRODUCTION") {
   require("dotenv").config({ path: "backend/config/config.env" });
 }
+cloudinary.v2.config({
+  cloud_name: process.env.CLOUDINARY_NAME,
+  api_key: process.env.CLOUDINARY_API_KEY,
+  api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
 app.use(express.json());
 app.use(cookieParser());
