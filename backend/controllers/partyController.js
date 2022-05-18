@@ -26,7 +26,6 @@ exports.registerParty = catchAsyncErrors(async (req, res, next) => {
   res.status(201).json({
     success: true,
     party,
-    token,
   });
 
   // sendToken(party, 201, res);

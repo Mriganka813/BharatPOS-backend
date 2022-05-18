@@ -299,6 +299,11 @@ exports.getInventoryDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+exports.decrementQuantity = catchAsyncErrors(async (id) => {
+  const inventory = await Inventory.findById(id);
+  inventory.quantity -= 1;
+  await inventory.save();
+});
 // Update Inventory
 exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   let inventory = await Inventory.findById(req.params.id);

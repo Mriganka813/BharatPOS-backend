@@ -2,13 +2,18 @@ const SalesOrder = require("../models/salesModel");
 const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const inventoryController = require("./inventoryController");
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, party } = req.body;
-  console.log(JSON.stringify(orderItems));
+  const { orderItems, modeOfPayment, party } = req.body;
+  const ids = orderItems.map((item) => item.id);
+  for (const id of ids) {
+    await inventoryController.decrementQuantity(id);
+  }
   const salesOrder = await SalesOrder.create({
     orderItems,
     party,
+    modeOfPayment,
     user: req.user._id,
   });
 

@@ -2,7 +2,7 @@ const PurchaseOrder = require("../models/purchaseModel");
 const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-
+const inventoryController = require("./inventoryController");
 // Create new Order
 exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
   const {
@@ -11,6 +11,7 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     paymentInfo,
     itemsPrice,
     taxPrice,
+    modeOfPayment,
     shippingPrice,
     totalPrice,
   } = req.body;
@@ -20,13 +21,17 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     orderItems,
     paymentInfo,
     itemsPrice,
+    modeOfPayment,
     taxPrice,
     shippingPrice,
     totalPrice,
     paidAt: Date.now(),
     user: req.user._id,
   });
-
+  const ids = orderItems.map((item) => item.id);
+  for (const id of ids) {
+    await inventoryController.decrementQuantity(id);
+  }
   res.status(201).json({
     success: true,
     purchaseOrder,
