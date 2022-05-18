@@ -6,8 +6,6 @@ const {
   deleteInventory,
   getInventoryDetails,
   getAllInventoriesAndSearch,
-  addImage,
-  createProductWithImage,
   getInventoryForUser,
   findInventoryByBarcode,
 } = require("../controllers/inventoryController");

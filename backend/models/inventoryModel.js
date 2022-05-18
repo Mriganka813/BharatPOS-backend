@@ -35,17 +35,10 @@ const inventorySchema = mongoose.Schema({
     // default:
     //   "https://icon-library.com/images/anonymous-avatar-icon/anonymous-avatar-icon-25.jpg",
   },
-  images: {
-    public_id: {
-      type: String,
-      // required: true,
-      // default:"",
-    },
-    url: {
-      type: String,
-      // required: true,
-      // default:"https://res.cloudinary.com/dpzjsgt4s/image/upload/v1649381378/Inventories/download_pfzdir.jpg",
-    },
+  image: {
+    type: String,
+    // required: true,
+    // default:"https://res.cloudinary.com/dpzjsgt4s/image/upload/v1649381378/Inventories/download_pfzdir.jpg",
   },
 
   category: {

@@ -18,7 +18,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const { barCode } = req.body;
   const userDetail = req.user._id;
   /// if has image, then create and save on cloudinary
-  if (req.files.image) {
+  if (req.files?.image) {
     const result = await upload(req.files.image);
     req.body.image = result.url;
   }
@@ -31,7 +31,8 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   if (!lodash.isEmpty(existingInventory)) {
     throw Error("Barcode already exists");
   }
-  const inventory = await Inventory.create(req.body);
+  const inventory = await Inventory.create({ ...req.body });
+  console.log(inventory);
   res.status(201).json({
     success: true,
     inventory,
@@ -134,9 +135,9 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
   }
-  if (req.files.image) {
+  if (req.files?.image) {
     const result = await upload(req.files.image);
-    req.body.image = result.rul;
+    req.body.image = result.url;
   }
   inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
