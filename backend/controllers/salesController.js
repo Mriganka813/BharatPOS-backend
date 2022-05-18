@@ -6,9 +6,12 @@ const inventoryController = require("./inventoryController");
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party } = req.body;
-  const ids = orderItems.map((item) => item.id);
-  for (const id of ids) {
-    await inventoryController.decrementQuantity(id);
+  try {
+    for (const item of orderItems) {
+      inventoryController.decrementQuantity(item.product, item.quantity);
+    }
+  } catch (err) {
+    return next(new ErrorHandler("Could not create order", 401));
   }
   const salesOrder = await SalesOrder.create({
     orderItems,

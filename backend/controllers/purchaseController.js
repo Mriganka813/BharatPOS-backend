@@ -16,6 +16,9 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     totalPrice,
   } = req.body;
 
+  for (const item of orderItems) {
+    inventoryController.incrementQuantity(item.product, item.quantity);
+  }
   const purchaseOrder = await PurchaseOrder.create({
     shippingInfo,
     orderItems,
@@ -28,10 +31,6 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     paidAt: Date.now(),
     user: req.user._id,
   });
-  const ids = orderItems.map((item) => item.id);
-  for (const id of ids) {
-    await inventoryController.decrementQuantity(id);
-  }
   res.status(201).json({
     success: true,
     purchaseOrder,

@@ -299,11 +299,22 @@ exports.getInventoryDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.decrementQuantity = catchAsyncErrors(async (id) => {
+exports.decrementQuantity = catchAsyncErrors(async (id, quantity) => {
   const inventory = await Inventory.findById(id);
-  inventory.quantity -= 1;
+  const newQty = inventory.quantity - quantity;
+  if (newQty < 0) {
+    new ErrorHandler("Cannot purchase more than existing quantity", 400);
+  }
+  inventory.quantity -= quantity ?? 1;
   await inventory.save();
 });
+///
+exports.incrementQuantity = catchAsyncErrors(async (id, quantity) => {
+  const inventory = await Inventory.findById(id);
+  inventory.quantity += quantity ?? 1;
+  await inventory.save();
+});
+
 // Update Inventory
 exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   let inventory = await Inventory.findById(req.params.id);
