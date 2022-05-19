@@ -32,7 +32,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     throw Error("Barcode already exists");
   }
   const inventory = await Inventory.create({ ...req.body });
-  console.log(inventory);
+
   res.status(201).json({
     success: true,
     inventory,
