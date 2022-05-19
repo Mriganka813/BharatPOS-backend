@@ -117,7 +117,7 @@ exports.decrementQuantity = catchAsyncErrors(async (id, quantity) => {
   const inventory = await Inventory.findById(id);
   const newQty = inventory.quantity - quantity;
   if (newQty < 0) {
-    new ErrorHandler("Cannot purchase more than existing quantity", 400);
+    throw new ErrorHandler("Cannot purchase more than existing quantity", 400);
   }
   inventory.quantity -= quantity ?? 1;
   await inventory.save();
