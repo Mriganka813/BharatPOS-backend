@@ -11,7 +11,7 @@ const {
   signUpWithPhoneNumber,
 } = require("../controllers/userController");
 const { isAuthenticatedUser } = require("../middleware/auth");
-
+//
 const router = express.Router();
 
 router.route("/registration").post(registerUser);
@@ -29,6 +29,5 @@ router.route("/me/update").put(isAuthenticatedUser, updateProfile);
 router.route("/signup/verifyotp").post(verifyOtp);
 
 router.route("/signup/otp").post(signUpWithPhoneNumber);
-
 
 module.exports = router;
