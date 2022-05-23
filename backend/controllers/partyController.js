@@ -33,11 +33,13 @@ exports.registerParty = catchAsyncErrors(async (req, res, next) => {
 
 exports.searchParty = catchAsyncErrors(async (req, res, next) => {
   const { searchQuery, limit } = req.query;
+  const user = req.user._id;
   const allParty = await Party.find({
     name: {
       $regex: searchQuery,
       $options: "i",
     },
+    user: user,
   }).limit(limit);
   res.status(200).json({
     success: true,
@@ -47,7 +49,6 @@ exports.searchParty = catchAsyncErrors(async (req, res, next) => {
 
 exports.getAllParty = catchAsyncErrors(async (req, res, next) => {
   const allParty = await Party.find();
-
   res.status(200).json({
     success: true,
     allParty,

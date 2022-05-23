@@ -14,7 +14,7 @@ const {
 const router = express.Router();
 
 router.route("/party/new").post(isAuthenticatedUser, registerParty);
-router.route("/party/search").get(searchParty);
+router.route("/party/search").get(isAuthenticatedUser, searchParty);
 
 router.route("/party/all").get(getAllParty);
 router.route("/party/me").get(isAuthenticatedUser, getMyParties);
