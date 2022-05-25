@@ -17,8 +17,8 @@ exports.addExpense = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getAllExpense = catchAsyncErrors(async (req, res, next) => {
-  const allExpense = await ExpenseModel.find();
-
+  const user = req.user._id;
+  const allExpense = await ExpenseModel.find({ user: user });
   res.status(200).json({
     success: true,
     allExpense,
