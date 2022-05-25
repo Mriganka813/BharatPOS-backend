@@ -6,20 +6,20 @@ const ExpenseModel = require("../models/expenseModel");
 const salesModel = require("../models/salesModel");
 // to get report of user sales , purchase and expense between starting date and end date
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
-  const { id, startDate, endDate, types } = req.query;
+  const { id, startDate, endDate, type } = req.query;
   newStartDate = startDate + "T00:00:00.000Z";
   newEndDate = endDate + "T23:59:59.000Z";
-  if(types === undefined || types.length === 0 ){
+  if(type === undefined){
     res.status(404).json({
       success: false,
       message: "Please provide type of report"
     })
   }
 
-  const arr = types.split(",");
+  
   let responseObj = {}
-  for(let i=0;i<arr.length;i++){
-    if(arr[i]==="sales"){
+  
+    if(type === "sales"){
       const sales = await SalesOrder.find(
         { _id: id,
           createdAt: { $gte: newStartDate, $lte: newEndDate }
@@ -33,7 +33,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     }
 
 
-    if(arr[i]==="purchase"){
+    if(type === "purchase"){
       const purchase = await PurchaseModel.find(
         { _id: id,
           createdAt: { $gte: newStartDate, $lte: newEndDate }
@@ -47,7 +47,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     }
 
     
-    if(arr[i]==="expense"){
+    if(type === "expense"){
        const expense = await ExpenseModel.find(
             { _id: id,
                   createdAt: { $gte: newStartDate, $lte: newEndDate }
@@ -59,7 +59,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
                  }
            }).clone();
        }
-      }
+      
 
       res.status(200).json({
         success: true,
