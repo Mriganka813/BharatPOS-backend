@@ -42,6 +42,7 @@ const income = require("./routes/incomeRoute");
 const purchase = require("./routes/purchaseRoute");
 const sales = require("./routes/salesRoute");
 const expense = require("./routes/expenseRoute");
+const report = require("./routes/reportRoute");
 
 app.use("/api/v1", product);
 app.use("/api/v1", user);
@@ -51,6 +52,7 @@ app.use("/api/v1", income);
 app.use("/api/v1", sales);
 app.use("/api/v1", purchase);
 app.use("/api/v1", expense);
+app.use("/api/v1", report);
 
 app.use(express.static(path.join(__dirname, "build")));
 
