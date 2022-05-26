@@ -6,6 +6,7 @@ const {
   getAllSalesOrders,
   updateSalesOrder,
   deleteSalesOrder,
+  getCreditSaleOrders,
 } = require("../controllers/salesController");
 const router = express.Router();
 
@@ -18,6 +19,7 @@ const {
 router.route("/salesOrder/new").post(isAuthenticatedUser, newSalesOrder);
 
 router.route("/salesOrder/:id").get(isAuthenticatedUser, getSingleSalesOrder);
+router.route("/sales/credit").get(isAuthenticatedUser, getCreditSaleOrders);
 
 router.route("/salesOrders/me").get(isAuthenticatedUser, mySalesOrders);
 

@@ -6,6 +6,7 @@ const {
   getAllPurchaseOrders,
   updatePurchaseOrder,
   deletePurchaseOrder,
+  getCreditPurchaseOrders,
 } = require("../controllers/purchaseController");
 
 const router = express.Router();
@@ -23,6 +24,9 @@ router
   .get(isAuthenticatedUser, getSinglePurchaseOrder);
 
 router.route("/purchaseOrders/me").get(isAuthenticatedUser, myPurchaseOrders);
+router
+  .route("/purchaseOrders/me/credit")
+  .get(isAuthenticatedUser, getCreditPurchaseOrders);
 
 router
   .route("/admin/purchaseOrders")

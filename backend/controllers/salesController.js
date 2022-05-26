@@ -85,35 +85,6 @@ exports.getAllSalesOrders = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// update Order Status -- Admin
-// exports.updateSalesOrder = catchAsyncErrors(async (req, res, next) => {
-//   const salesOrder = await SalesOrder.findById(req.params.id);
-
-//   if (!salesOrder) {
-//     return next(new ErrorHandler("Order not found with this Id", 404));
-//   }
-
-//   // if (salesOrder.orderStatus === "Delivered") {
-//   //   return next(new ErrorHandler("You have already delivered this order", 400));
-//   // }
-
-//   // if (req.body.status === "Shipped") {
-//   //   salesOrder.orderItems.forEach(async (o) => {
-//   //     await updateStock(o.inventory, o.quantity);
-//   //   });
-//   // }
-//   // salesOrder.orderStatus = req.body.status;
-
-//   // if (req.body.status === "Delivered") {
-//   //   salesOrder.deliveredAt = Date.now();
-//   // }
-
-//   await salesOrder.save({ validateBeforeSave: false });
-//   res.status(200).json({
-//     success: true,
-//   });
-// });
-
 async function updateStock(id, quantity) {
   const inventory = await Inventory.findById(id);
 
@@ -134,5 +105,19 @@ exports.deleteSalesOrder = catchAsyncErrors(async (req, res, next) => {
 
   res.status(200).json({
     success: true,
+  });
+});
+exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
+  const user = req.user._id;
+  const data = await SalesOrder.find({
+    user: user,
+    modeOfPayment: "Credit",
+  });
+  if (!data) {
+    return next(new ErrorHandler("Orders not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data,
   });
 });

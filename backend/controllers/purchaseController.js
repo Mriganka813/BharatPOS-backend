@@ -145,3 +145,18 @@ exports.deletePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     success: true,
   });
 });
+
+exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
+  const user = req.user._id;
+  const data = await PurchaseOrder.find({
+    user: user,
+    modeOfPayment: "Credit",
+  });
+  if (!data) {
+    return next(new ErrorHandler("Order not found with this Id", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
