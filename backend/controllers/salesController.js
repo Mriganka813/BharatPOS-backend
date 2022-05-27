@@ -23,6 +23,7 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   res.status(201).json({
     success: true,
     salesOrder,
+    
   });
 });
 
