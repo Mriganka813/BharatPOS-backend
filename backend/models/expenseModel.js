@@ -19,7 +19,7 @@ const expenseSchema = mongoose.Schema({
   modeOfPayment: {
     type: String,
     required: [true, "Please choose your mode of payment"],
-    $in: ["cash", "bank_transfer", "credit"],
+    $in: ["cash", "bank_transfer"],
   },
 
   user: {
