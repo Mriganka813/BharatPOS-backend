@@ -26,6 +26,10 @@ const salesSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  total: {
+    type: Number,
+    required: true,
+  },
   party: {
     type: mongoose.Schema.ObjectId,
     ref: "Party",

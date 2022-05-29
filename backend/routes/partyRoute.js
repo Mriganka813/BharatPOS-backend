@@ -9,10 +9,18 @@ const {
   deleteParty,
   getMyParties,
   searchParty,
+  getCreditSaleParties,
+  getCreditPurchaseParties,
 } = require("../controllers/partyController");
 
 const router = express.Router();
 
+router
+  .route("/party/sale/credit")
+  .get(isAuthenticatedUser, getCreditSaleParties);
+router
+  .route("/party/purchase/credit")
+  .get(isAuthenticatedUser, getCreditPurchaseParties);
 router.route("/party/new").post(isAuthenticatedUser, registerParty);
 router.route("/party/search").get(isAuthenticatedUser, searchParty);
 

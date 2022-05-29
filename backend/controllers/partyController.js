@@ -109,3 +109,76 @@ exports.deleteParty = catchAsyncErrors(async (req, res, next) => {
     message: "party Deleted Successfully",
   });
 });
+
+/**
+ * Get the sum of all the party's total credit amount
+ * Returns only parties whose amounts are greater than zero
+ */
+exports.getCreditSaleParties = catchAsyncErrors(async (req, res, next) => {
+  const user = req.user._id;
+  const data = await Party.aggregate([
+    {
+      $match: { user: user },
+    },
+    {
+      $lookup: {
+        from: "salesmodels",
+        localField: "_id",
+        foreignField: "party",
+        as: "sales",
+      },
+    },
+    {
+      $addFields: {
+        totalCreditAmount: { $sum: "$sales.total" },
+      },
+    },
+    {
+      $unset: ["sales"],
+    },
+    {
+      $match: { totalCreditAmount: { $gt: 0 } },
+    },
+  ]);
+  if (!data) {
+    return next(new ErrorHandler("Orders not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
+  const user = req.user._id;
+  const data = await Party.aggregate([
+    {
+      $match: { user: user },
+    },
+    {
+      $lookup: {
+        from: "purchasemodels",
+        localField: "_id",
+        foreignField: "party",
+        as: "purchase",
+      },
+    },
+    {
+      $addFields: {
+        totalCreditAmount: { $sum: "$purchase.total" },
+      },
+    },
+    {
+      $unset: ["purchase"],
+    },
+    {
+      $match: { totalCreditAmount: { $gt: 0 } },
+    },
+  ]);
+  if (!data) {
+    return next(new ErrorHandler("Orders not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});

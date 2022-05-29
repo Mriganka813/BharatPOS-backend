@@ -18,7 +18,6 @@ const purchaseSchema = new mongoose.Schema({
       },
       image: {
         type: String,
-        // required: true,
       },
       product: {
         type: mongoose.Schema.ObjectId,
@@ -27,6 +26,10 @@ const purchaseSchema = new mongoose.Schema({
       },
     },
   ],
+  total: {
+    type: Number,
+    required: true,
+  },
   modeOfPayment: {
     type: String,
     required: true,

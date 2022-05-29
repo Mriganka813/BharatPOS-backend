@@ -5,30 +5,16 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
 // Create new Order
 exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
-  const {
-    shippingInfo,
-    orderItems,
-    paymentInfo,
-    itemsPrice,
-    taxPrice,
-    modeOfPayment,
-    shippingPrice,
-    totalPrice,
-  } = req.body;
-
+  const { orderItems, modeOfPayment, party } = req.body;
   for (const item of orderItems) {
     inventoryController.incrementQuantity(item.product, item.quantity);
   }
+  const total = await calcTotalAmount(orderItems);
   const purchaseOrder = await PurchaseOrder.create({
-    shippingInfo,
     orderItems,
-    paymentInfo,
-    itemsPrice,
     modeOfPayment,
-    taxPrice,
-    shippingPrice,
-    totalPrice,
-    paidAt: Date.now(),
+    party,
+    total,
     user: req.user._id,
   });
   res.status(201).json({
@@ -131,6 +117,14 @@ async function updateStock(id, quantity) {
   await inventory.save({ validateBeforeSave: false });
 }
 
+async function calcTotalAmount(orderItems) {
+  let totalAmount = 0;
+  orderItems.forEach((item) => {
+    totalAmount += item.price * item.quantity;
+  });
+  return totalAmount;
+}
+
 // delete Order -- Admin
 exports.deletePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
   const purchaseOrder = await PurchaseOrder.findById(req.params.id);
@@ -148,10 +142,11 @@ exports.deletePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
 
 exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
-  const data = await PurchaseOrder.find({
-    user: user,
-    modeOfPayment: "Credit",
-  });
+  const data = await PurchaseOrder.aggregate([
+    {
+      $match: { user: user, modeOfPayment: "Credit" },
+    },
+  ]);
   if (!data) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }

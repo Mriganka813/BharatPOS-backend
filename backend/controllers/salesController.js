@@ -13,19 +13,28 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   } catch (err) {
     return next(new ErrorHandler("Could not create order", 401));
   }
+  const total = calcTotalAmount(orderItems);
   const salesOrder = await SalesOrder.create({
     orderItems,
     party,
     modeOfPayment,
+    total,
     user: req.user._id,
   });
 
   res.status(201).json({
     success: true,
     salesOrder,
-    
   });
 });
+
+const calcTotalAmount = (orderItems) => {
+  let total = 0;
+  for (const item of orderItems) {
+    total += item.price * item.quantity;
+  }
+  return total;
+};
 
 // get Single sales Order
 exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
@@ -110,10 +119,11 @@ exports.deleteSalesOrder = catchAsyncErrors(async (req, res, next) => {
 });
 exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
-  const data = await SalesOrder.find({
-    user: user,
-    modeOfPayment: "Credit",
-  });
+  const data = await SalesOrder.aggregate([
+    {
+      $match: { user: user, modeOfPayment: "Credit" },
+    },
+  ]);
   if (!data) {
     return next(new ErrorHandler("Orders not found", 404));
   }
