@@ -5,7 +5,6 @@ const expenseSchema = mongoose.Schema({
     type: String,
     required: [true, "Please Enter income header"],
     trim: true,
-    unique: true,
   },
   description: {
     type: String,
