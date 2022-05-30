@@ -18,7 +18,7 @@ exports.addExpense = catchAsyncErrors(async (req, res, next) => {
 
 exports.getAllExpense = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
-  const allExpense = await ExpenseModel.find({ user: user });
+  const allExpense = await ExpenseModel.find({ user: user }).sort("-createdAt");
   res.status(200).json({
     success: true,
     allExpense,

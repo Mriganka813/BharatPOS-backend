@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const jwt = require("jsonwebtoken");
 
 const partySchema = new mongoose.Schema({
   name: {
@@ -20,12 +19,6 @@ const partySchema = new mongoose.Schema({
     required: [true, "Please enter your phone Number"],
     maxlength: [10, "Phone number cannot exceed more than 10"],
   },
-  receivedAmount: {
-    type: Number,
-  },
-  givenAmount: {
-    type: Number,
-  },
   createdAt: {
     type: Date,
     default: Date.now,
@@ -36,12 +29,5 @@ const partySchema = new mongoose.Schema({
     required: true,
   },
 });
-
-// JWT TOKEN
-partySchema.methods.getJWTToken = function () {
-  return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
-    expiresIn: process.env.JWT_EXPIRE,
-  });
-};
 
 module.exports = mongoose.model("Party", partySchema);

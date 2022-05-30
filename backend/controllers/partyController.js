@@ -13,22 +13,11 @@ exports.registerParty = catchAsyncErrors(async (req, res, next) => {
     phoneNumber,
     user: req.user._id,
   });
-  // const token = party.getJWTToken();
-
-  // // options for cookie
-  // const options = {
-  //   expires: new Date(
-  //     Date.now() + process.env.COOKIE_EXPIRE * 24 * 60 * 60 * 1000
-  //   ),
-  //   httpOnly: true,
-  // };
 
   res.status(201).json({
     success: true,
     party,
   });
-
-  // sendToken(party, 201, res);
 });
 
 exports.searchParty = catchAsyncErrors(async (req, res, next) => {
