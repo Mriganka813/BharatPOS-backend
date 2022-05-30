@@ -8,7 +8,6 @@ const {
   deletePurchaseOrder,
   getCreditPurchaseOrders,
 } = require("../controllers/purchaseController");
-
 const router = express.Router();
 
 const {
@@ -16,12 +15,17 @@ const {
   authorizeRoles,
   isAuthenticatedAdmin,
 } = require("../middleware/auth");
+const cntlr = require("../controllers/purchaseController");
 
 router.route("/purchaseOrder/new").post(isAuthenticatedUser, newPurchaseOrder);
 
 router
   .route("/purchaseOrder/:id")
   .get(isAuthenticatedUser, getSinglePurchaseOrder);
+
+router
+  .route("/purchase/credit-history/:id")
+  .get(isAuthenticatedUser, cntlr.partyCreditHistory);
 
 router.route("/purchaseOrders/me").get(isAuthenticatedUser, myPurchaseOrders);
 router

@@ -155,3 +155,18 @@ exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
     data,
   });
 });
+
+exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
+  const id = req.params.id;
+  const data = await PurchaseOrder.find({
+    party: id,
+    modeOfPayment: { $in: ["Credit", "Settle"] },
+  }).sort({ createdAt: -1 });
+  if (!data) {
+    return next(new ErrorHandler("Order not found with this Id", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});

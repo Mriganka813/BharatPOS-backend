@@ -100,6 +100,10 @@ exports.deleteParty = catchAsyncErrors(async (req, res, next) => {
 });
 
 /**
+ * Get party credit orders
+ */
+
+/**
  * Get the sum of all the party's total credit amount
  * Returns only parties whose amounts are greater than zero
  */
@@ -114,19 +118,16 @@ exports.getCreditSaleParties = catchAsyncErrors(async (req, res, next) => {
         from: "salesmodels",
         localField: "_id",
         foreignField: "party",
-        as: "sales",
+        as: "sale",
       },
     },
     {
       $addFields: {
-        totalCreditAmount: { $sum: "$sales.total" },
+        totalCreditAmount: { $sum: "$sale.total" },
       },
     },
     {
-      $unset: ["sales"],
-    },
-    {
-      $match: { totalCreditAmount: { $gt: 0 } },
+      $unset: ["sale"],
     },
   ]);
   if (!data) {
@@ -158,9 +159,6 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
     },
     {
       $unset: ["purchase"],
-    },
-    {
-      $match: { totalCreditAmount: { $gt: 0 } },
     },
   ]);
   if (!data) {
