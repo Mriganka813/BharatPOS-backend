@@ -3,6 +3,7 @@ const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
+const mongoose = require("mongoose");
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party } = req.body;
@@ -152,20 +153,6 @@ exports.addCreditSettleTransaction = catchAsyncErrors(
 );
 
 exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
-  const id = req.params.id;
-  const data = await SalesOrder.find({
-    party: id,
-    modeOfPayment: { $in: ["Credit", "Settle"] },
-  }).sort({ createdAt: -1 });
-  if (!data) {
-    return next(new ErrorHandler("Order not found with this Id", 404));
-  }
-  res.status(200).json({
-    success: true,
-    data,
-  });
-});
-exports.partyCreditHistoryTotal = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   const data = await SalesOrder.find({
     party: id,
