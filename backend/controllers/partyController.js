@@ -1,7 +1,9 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const Party = require("../models/partyModel");
+const SalesModel = require("../models/salesModel");
 // const sendToken = require("../utils/jwtToken");
+const mongoose = require("mongoose");
 
 // create new party
 exports.registerParty = catchAsyncErrors(async (req, res, next) => {
@@ -167,5 +169,83 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data,
+  });
+});
+exports.getCreditPurchaseParty = catchAsyncErrors(async (req, res, next) => {
+  const user = req.user._id;
+  const partyId = req.params.id;
+  const id = mongoose.Types.ObjectId(partyId);
+  const data = await Party.aggregate([
+    {
+      $match: { user, _id: id },
+    },
+    { $limit: 1 },
+    {
+      $lookup: {
+        from: "purchasemodels",
+        localField: "_id",
+        foreignField: "party",
+        as: "purchase",
+      },
+    },
+    {
+      $addFields: {
+        totalCreditAmount: { $sum: "$purchase.total" },
+      },
+    },
+    {
+      $unset: ["purchase"],
+    },
+  ]);
+  if (!data) {
+    return next(new ErrorHandler("Orders not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data: data[0],
+  });
+});
+
+exports.getCreditSaleParty = catchAsyncErrors(async (req, res, next) => {
+  const user = req.user._id;
+  const partyId = req.params.id;
+  const id = mongoose.Types.ObjectId(partyId);
+  const data = await Party.aggregate([
+    {
+      $match: { user, _id: id },
+    },
+    { $limit: 1 },
+    {
+      $lookup: {
+        from: SalesModel.collection.name,
+        localField: "_id",
+        foreignField: "party",
+        as: "sale",
+        pipeline: [
+          {
+            $match: {
+              $expr: {
+                $in: ["Settle", "Credit"],
+              },
+            },
+          },
+        ],
+      },
+    },
+    {
+      $addFields: {
+        totalCreditAmount: { $sum: "$sale.total" },
+      },
+    },
+    {
+      $unset: ["sale"],
+    },
+  ]);
+  if (!data) {
+    return next(new ErrorHandler("Orders not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data: data[0],
   });
 });

@@ -12,7 +12,7 @@ const {
   getCreditSaleParties,
   getCreditPurchaseParties,
 } = require("../controllers/partyController");
-
+const cntlr = require("../controllers/partyController");
 const router = express.Router();
 
 router
@@ -21,6 +21,12 @@ router
 router
   .route("/party/purchase/credit")
   .get(isAuthenticatedUser, getCreditPurchaseParties);
+router
+  .route("/party/purchase/credit/:id")
+  .get(isAuthenticatedUser, cntlr.getCreditPurchaseParty);
+router
+  .route("/party/sale/credit/:id")
+  .get(isAuthenticatedUser, cntlr.getCreditSaleParty);
 router.route("/party/new").post(isAuthenticatedUser, registerParty);
 router.route("/party/search").get(isAuthenticatedUser, searchParty);
 

@@ -25,7 +25,8 @@ router
 
 router
   .route("/purchase/credit-history/:id")
-  .get(isAuthenticatedUser, cntlr.partyCreditHistory);
+  .get(isAuthenticatedUser, cntlr.partyCreditHistory)
+  .post(isAuthenticatedUser, cntlr.addCreditHistoryTransaction);
 
 router.route("/purchaseOrders/me").get(isAuthenticatedUser, myPurchaseOrders);
 router
@@ -39,10 +40,6 @@ router
 router
   .route("/purchaseOrder/:id")
   .delete(isAuthenticatedUser, deletePurchaseOrder);
-
-router
-  .route("/purchase/credit")
-  .post(isAuthenticatedUser, cntlr.addPurchaseTransaction);
 
 router
   .route("/admin/purchaseOrder/:id")

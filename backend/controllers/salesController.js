@@ -134,8 +134,8 @@ exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
 });
 exports.addCreditSettleTransaction = catchAsyncErrors(
   async (req, res, next) => {
-    const { partyId, amount, modeOfPayment } = req.body;
-
+    const partyId = req.params.id;
+    const { amount, modeOfPayment } = req.body;
     const order = {
       party: partyId,
       total: amount,
@@ -152,6 +152,20 @@ exports.addCreditSettleTransaction = catchAsyncErrors(
 );
 
 exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
+  const id = req.params.id;
+  const data = await SalesOrder.find({
+    party: id,
+    modeOfPayment: { $in: ["Credit", "Settle"] },
+  }).sort({ createdAt: -1 });
+  if (!data) {
+    return next(new ErrorHandler("Order not found with this Id", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data,
+  });
+});
+exports.partyCreditHistoryTotal = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   const data = await SalesOrder.find({
     party: id,
