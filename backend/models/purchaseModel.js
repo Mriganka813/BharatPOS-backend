@@ -32,6 +32,7 @@ const purchaseSchema = new mongoose.Schema({
   },
   modeOfPayment: {
     type: String,
+    enum: ["Cash", "Credit", "Bank Transfer", "Settle"],
     required: true,
   },
   party: {

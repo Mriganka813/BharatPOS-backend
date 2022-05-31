@@ -4,10 +4,10 @@ const {
   getSingleSalesOrder,
   mySalesOrders,
   getAllSalesOrders,
-  updateSalesOrder,
   deleteSalesOrder,
   getCreditSaleOrders,
 } = require("../controllers/salesController");
+const cntlr = require("../controllers/salesController");
 const router = express.Router();
 
 const cntrl = require("../controllers/salesController");
@@ -18,10 +18,12 @@ const {
 } = require("../middleware/auth");
 
 router.route("/salesOrder/new").post(isAuthenticatedUser, newSalesOrder);
-
 router
   .route("/sales/credit-history/:id")
   .get(isAuthenticatedUser, cntrl.partyCreditHistory);
+router
+  .route("/sales/credit")
+  .post(isAuthenticatedUser, cntrl.addCreditSettleTransaction);
 router.route("/salesOrder/:id").get(isAuthenticatedUser, getSingleSalesOrder);
 router.route("/sales/credit").get(isAuthenticatedUser, getCreditSaleOrders);
 

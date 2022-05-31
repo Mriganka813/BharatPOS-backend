@@ -41,6 +41,10 @@ router
   .delete(isAuthenticatedUser, deletePurchaseOrder);
 
 router
+  .route("/purchase/credit")
+  .post(isAuthenticatedUser, cntlr.addPurchaseTransaction);
+
+router
   .route("/admin/purchaseOrder/:id")
   .put(isAuthenticatedAdmin, authorizeRoles("admin"), updatePurchaseOrder)
   .delete(isAuthenticatedAdmin, authorizeRoles("admin"), deletePurchaseOrder);

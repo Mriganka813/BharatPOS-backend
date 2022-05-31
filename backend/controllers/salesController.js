@@ -132,6 +132,25 @@ exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
     data,
   });
 });
+exports.addCreditSettleTransaction = catchAsyncErrors(
+  async (req, res, next) => {
+    const { partyId, amount, modeOfPayment } = req.body;
+
+    const order = {
+      party: partyId,
+      total: amount,
+      user: req.user._id,
+      modeOfPayment: modeOfPayment,
+      orderItems: [],
+    };
+    const data = await SalesOrder.create(order);
+    res.status(201).json({
+      success: true,
+      data,
+    });
+  }
+);
+
 exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   const data = await SalesOrder.find({
