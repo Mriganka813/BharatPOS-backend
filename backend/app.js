@@ -7,7 +7,7 @@ const path = require("path");
 const cloudinary = require("cloudinary");
 const fs = require("fs");
 var busboy = require("connect-busboy");
-
+const cors = require("cors");
 // const fs=require("fs");
 
 const errorMiddleware = require("./middleware/error");
@@ -29,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(busboy());
+app.use(cors());
 
 // Set EJS as templating engine
 app.set("view engine", "ejs");
