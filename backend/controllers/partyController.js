@@ -5,7 +5,7 @@ const SalesModel = require("../models/salesModel");
 const PurchaseModel = require("../models/purchaseModel");
 // const sendToken = require("../utils/jwtToken");
 const mongoose = require("mongoose");
-
+const isEmpty = require("lodash").isEmpty;
 // create new party
 exports.registerParty = catchAsyncErrors(async (req, res, next) => {
   const { name, address, type, phoneNumber } = req.body;
@@ -162,7 +162,7 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
       },
     },
     {
-      $unset: ["purchase"],
+      $unset: "purchase",
     },
   ]);
   if (!data) {
@@ -208,6 +208,7 @@ exports.getCreditPurchaseParty = catchAsyncErrors(async (req, res, next) => {
     partyId,
     "Settle"
   );
+
   const data = {
     ...party,
     totalCreditAmount,
@@ -305,7 +306,11 @@ const partyCreditSaleHistoryTotal = async (partyId, modeOfPayment) => {
       },
     },
   ]);
-  return data[0].total;
+  let total = 0;
+  if (!isEmpty(data)) {
+    total = data[0].total ?? 0;
+  }
+  return total;
 };
 /**
  *
@@ -331,5 +336,9 @@ const partyCreditPurchaseHistoryTotal = async (partyId, modeOfPayment) => {
       },
     },
   ]);
-  return data[0].total;
+  let total = 0;
+  if (!isEmpty(data)) {
+    total = data[0].total ?? 0;
+  }
+  return total;
 };
