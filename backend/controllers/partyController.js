@@ -8,12 +8,12 @@ const mongoose = require("mongoose");
 
 // create new party
 exports.registerParty = catchAsyncErrors(async (req, res, next) => {
-  const { name, address, phoneNumber } = req.body;
-
+  const { name, address, type, phoneNumber } = req.body;
   const party = await Party.create({
     name,
     address,
     phoneNumber,
+    type,
     user: req.user._id,
   });
 
@@ -24,7 +24,7 @@ exports.registerParty = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.searchParty = catchAsyncErrors(async (req, res, next) => {
-  const { searchQuery, limit } = req.query;
+  const { searchQuery, type, limit } = req.query;
   const user = req.user._id;
   const allParty = await Party.find({
     name: {
@@ -32,6 +32,7 @@ exports.searchParty = catchAsyncErrors(async (req, res, next) => {
       $options: "i",
     },
     user: user,
+    type: type,
   }).limit(limit);
   res.status(200).json({
     success: true,
@@ -114,7 +115,7 @@ exports.getCreditSaleParties = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
   const data = await Party.aggregate([
     {
-      $match: { user: user },
+      $match: { user: user, type: "customer" },
     },
     {
       $lookup: {
@@ -145,7 +146,7 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
   const data = await Party.aggregate([
     {
-      $match: { user: user },
+      $match: { user: user, type: "supplier" },
     },
     {
       $lookup: {

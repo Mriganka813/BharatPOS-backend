@@ -19,6 +19,11 @@ const partySchema = new mongoose.Schema({
     required: [true, "Please enter your phone Number"],
     maxlength: [10, "Phone number cannot exceed more than 10"],
   },
+  type: {
+    type: String,
+    enum: ["supplier", "customer"],
+    required: true,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
