@@ -82,6 +82,7 @@ exports.mySalesOrders = catchAsyncErrors(async (req, res, next) => {
 
 // get all Orders
 exports.getAllSalesOrders = catchAsyncErrors(async (req, res, next) => {
+  const salesOrders = await SalesOrder.find();
   let totalAmount = 0;
 
   salesOrders.forEach((salesOrder) => {
