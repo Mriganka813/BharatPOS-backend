@@ -3,6 +3,7 @@ const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
+const User = require("../models/userModel");
 const mongoose = require("mongoose");
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
@@ -81,8 +82,6 @@ exports.mySalesOrders = catchAsyncErrors(async (req, res, next) => {
 
 // get all Orders
 exports.getAllSalesOrders = catchAsyncErrors(async (req, res, next) => {
-  const salesOrders = await SalesOrder.find();
-
   let totalAmount = 0;
 
   salesOrders.forEach((salesOrder) => {
@@ -164,5 +163,20 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data,
+  });
+});
+
+exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
+
+  const data = await SalesOrder.findByIdAndUpdate( {_id : req.params.id} , req.body).clone()
+  .then(() => {
+    SalesOrder.findById(req.params.id).then((data) => {
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });
+  }).catch(err => {
+    ErrorHandler(err);
   });
 });
