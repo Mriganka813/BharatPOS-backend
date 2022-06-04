@@ -46,11 +46,19 @@ const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
 
 var corsOptions = {
-  origin:[ 'http://localhost:5500' , 'http://localhost:5000' , 'http://127.0.0.1:5500'],
-  credentials:true,
-  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
-}
+  origin: [
+    "http://localhost:5500",
+    "http://localhost:5000",
+    "http://127.0.0.1:5500",
+  ],
+  credentials: true,
+  optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
+};
 app.use(cors(corsOptions));
+
+app.get("/privacy-policy", (req, res) => {
+  res.sendFile(path.join(__dirname, "templates", "privacy-policy.html"));
+});
 app.use("/api/v1", product);
 app.use("/api/v1", user);
 app.use("/api/v1", admin);
