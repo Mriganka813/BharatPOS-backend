@@ -193,3 +193,17 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
     data,
   });
 });
+
+exports.updatePurchaseOrders = catchAsyncErrors(async (req, res, next) => {
+  const data = await PurchaseOrder.findByIdAndUpdate( {_id : req.params.id} , req.body).clone()
+  .then(() => {
+    PurchaseOrder.findById(req.params.id).then((data) => {
+    res.status(200).json({
+      success: true,
+      data,
+    });
+  });
+  }).catch(err => {
+    ErrorHandler(err);
+  });
+});

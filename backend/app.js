@@ -7,7 +7,7 @@ const path = require("path");
 const cloudinary = require("cloudinary");
 const fs = require("fs");
 var busboy = require("connect-busboy");
-
+const cors = require("cors");
 // const fs=require("fs");
 
 const errorMiddleware = require("./middleware/error");
@@ -29,6 +29,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 app.use(fileUpload());
 app.use(bodyParser.json());
 app.use(busboy());
+app.use(cors());
 
 // Set EJS as templating engine
 app.set("view engine", "ejs");
@@ -44,6 +45,12 @@ const sales = require("./routes/salesRoute");
 const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
 
+var corsOptions = {
+  origin:[ 'http://localhost:5500' , 'http://localhost:5000' , 'http://127.0.0.1:5500'],
+  credentials:true,
+  optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmartTVs) choke on 204
+}
+app.use(cors(corsOptions));
 app.use("/api/v1", product);
 app.use("/api/v1", user);
 app.use("/api/v1", admin);

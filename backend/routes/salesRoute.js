@@ -6,6 +6,7 @@ const {
   getAllSalesOrders,
   deleteSalesOrder,
   getCreditSaleOrders,
+  UpdateSalesOrder,
 } = require("../controllers/salesController");
 const cntlr = require("../controllers/salesController");
 const router = express.Router();
@@ -37,4 +38,7 @@ router
   .route("/admin/salesOrder/:id")
   .delete(isAuthenticatedAdmin, authorizeRoles("admin"), deleteSalesOrder);
 
+router
+  .route("/upd/salesOrder/:id")
+  .put(isAuthenticatedUser , UpdateSalesOrder);
 module.exports = router;

@@ -7,6 +7,7 @@ const {
   updatePurchaseOrder,
   deletePurchaseOrder,
   getCreditPurchaseOrders,
+  updatePurchaseOrders,
 } = require("../controllers/purchaseController");
 const router = express.Router();
 
@@ -40,6 +41,10 @@ router
 router
   .route("/purchaseOrder/:id")
   .delete(isAuthenticatedUser, deletePurchaseOrder);
+
+router
+  .route("/upd/purchaseOrder/:id")
+  .put(isAuthenticatedUser, updatePurchaseOrders);
 
 router
   .route("/admin/purchaseOrder/:id")
