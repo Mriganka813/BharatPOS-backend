@@ -1,6 +1,7 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
+const jwt = require("jsonwebtoken");
 const sendToken = require("../utils/jwtToken");
 const fast2sms = require("fast-two-sms");
 const otpGenerator = require("otp-generator");
@@ -15,7 +16,7 @@ exports.verifyOtp = catchAsyncErrors(async (req, res, next) => {
     phoneNumber: req.body.number,
   });
 
-  console.log("OtpHolder", otpHolder)
+  console.log("OtpHolder", otpHolder);
 
   if (otpHolder.length === 0) {
     return res.status(400).send("You are using an expired OTP");
@@ -26,18 +27,16 @@ exports.verifyOtp = catchAsyncErrors(async (req, res, next) => {
   console.log("right otp", rightOtpFind);
   const validUser = await bcrypt.compare(req.body.otp, rightOtpFind.otp);
 
-  console.log("user ",validUser);
+  console.log("user ", validUser);
 
   if (rightOtpFind.phoneNumber === req.body.number && validUser) {
     const user = await User.findOne({ phoneNumber: req.body.number });
-
-
 
     // console.log(user);
     // const user = new User(_.pick(req.body, ["phoneNumber"]));
     console.log(user);
     // sendToken(user, 201, res);
-    const token =sendToken(user, 201, res);
+    const token = sendToken(user, 201, res);
 
     console.log(token);
 
@@ -94,16 +93,15 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
     otp: otp,
   });
 
-  const { email, password, businessName, businessType, address } =
-    req.body;
-  const user=await User.create({
+  const { email, password, businessName, businessType, address } = req.body;
+  const user = await User.create({
     email,
     password,
     businessName,
     businessType,
     address,
     phoneNumber,
-  })
+  });
 
   // const result=await otp.save();
 
@@ -111,7 +109,7 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
     success: true,
     message: "Otp send successfully",
     Otp,
-    user
+    user,
   });
   // return res.status(200).json("Otp send successfully",Otp);
 });
@@ -144,13 +142,13 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findOne({ email }).select("+password");
 
   if (!user) {
-    return next(new ErrorHandler("Invalid email or password", 401));
+    return next(new ErrorHandler("Invalid email or password", 400));
   }
 
   const isPasswordMatched = await user.comparePassword(password);
 
   if (!isPasswordMatched) {
-    return next(new ErrorHandler("Invalid email or password", 401));
+    return next(new ErrorHandler("Invalid email or password", 400));
   }
 
   sendToken(user, 200, res);
@@ -255,4 +253,14 @@ exports.sendOtp = catchAsyncErrors(async (req, res, next) => {
     success: true,
     response,
   });
+});
+
+exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
+  const { token } = req.cookies;
+  if (!token) {
+    return next(new ErrorHandler("Please login to access this resource", 401));
+  }
+  const data = jwt.decode(token);
+  const user = await User.findById(data.id);
+  sendToken(user, 200, res);
 });

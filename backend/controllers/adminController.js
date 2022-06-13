@@ -29,13 +29,13 @@ exports.loginAdmin = catchAsyncErrors(async (req, res, next) => {
   const admin = await Admin.findOne({ email }).select("+password");
 
   if (!admin) {
-    return next(new ErrorHandler("Invalid email or password", 401));
+    return next(new ErrorHandler("Invalid email or password", 400));
   }
 
   const isPasswordMatched = await admin.comparePassword(password);
 
   if (!isPasswordMatched) {
-    return next(new ErrorHandler("Invalid email or password", 401));
+    return next(new ErrorHandler("Invalid email or password", 400));
   }
 
   sendToken(admin, 200, res);

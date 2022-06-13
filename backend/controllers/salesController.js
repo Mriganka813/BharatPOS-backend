@@ -3,8 +3,6 @@ const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
-const User = require("../models/userModel");
-const mongoose = require("mongoose");
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party } = req.body;
@@ -12,22 +10,21 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
     inventoryController.decrementQuantity(item.product, item.quantity);
   }
   try {
+    const total = calcTotalAmount(orderItems);
+    const salesOrder = await SalesOrder.create({
+      orderItems,
+      party,
+      modeOfPayment,
+      total,
+      user: req.user._id,
+    });
+    res.status(201).json({
+      success: true,
+      salesOrder,
+    });
   } catch (err) {
-    return next(new ErrorHandler("Could not create order", 401));
+    return next(new ErrorHandler("Could not create order", 403));
   }
-  const total = calcTotalAmount(orderItems);
-  const salesOrder = await SalesOrder.create({
-    orderItems,
-    party,
-    modeOfPayment,
-    total,
-    user: req.user._id,
-  });
-
-  res.status(201).json({
-    success: true,
-    salesOrder,
-  });
 });
 
 const calcTotalAmount = (orderItems) => {
@@ -168,16 +165,20 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
-
-  const data = await SalesOrder.findByIdAndUpdate( {_id : req.params.id} , req.body).clone()
-  .then(() => {
-    SalesOrder.findById(req.params.id).then((data) => {
-    res.status(200).json({
-      success: true,
-      data,
+  const data = await SalesOrder.findByIdAndUpdate(
+    { _id: req.params.id },
+    req.body
+  )
+    .clone()
+    .then(() => {
+      SalesOrder.findById(req.params.id).then((data) => {
+        res.status(200).json({
+          success: true,
+          data,
+        });
+      });
+    })
+    .catch((err) => {
+      ErrorHandler(err);
     });
-  });
-  }).catch(err => {
-    ErrorHandler(err);
-  });
 });

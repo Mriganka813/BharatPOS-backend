@@ -4,65 +4,64 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const crypto = require("crypto");
 
-const userSchema = new mongoose.Schema({
-  // name: {
-  //   type: String,
-  //   required: [true, "Please Enter Your Name"],
-  //   maxLength: [30, "Name cannot exceed 30 characters"],
-  //   minLength: [4, "Name should have more than 4 characters"],
-  // },
-  email: {
-    type: String,
-    required: [true, "Please Enter Your Email"],
-    unique: true,
-    validate: [validator.isEmail, "Please Enter a valid Email"],
-  },
-  password: {
-    type: String,
-    required: [true, "Please Enter Your Password"],
-    minLength: [8, "Password should be greater than 8 characters"],
-    select: false,
-  },
-  address: {
-    type: String,
-    required: [true, "Please enter your address"],
-    maxLength: [200, "Name cannot exceed 30 characters"],
-    minLength: [5, "Name should have more than 4 characters"],
-  },
-  role: {
-    type: String,
-    default: "user",
-  },
-  businessName: {
-    type: String,
-    required: [true, "Please Enter Your Business Name"],
-    maxLength: [30, "Business Name cannot exceed 30 characters"],
-    minLength: [4, "Business Name should have more than 4 characters"],
-  },
-  businessType: {
-    type: String,
-    required: [true, "Please choose Your Business Type"],
-    $in: ["business1, business2"],
-  },
-  phoneNumber: {
-    type: Number,
-    required: [true, "Please enter your phone Number"],
-    maxlength: [10, "Phone number cannot exceed more than 10"],
-    trim:true,
-    unique:true,
-  },
-  phoneOtp:String,
-  createdAt: {
-    type: Date,
-    default: Date.now,
-  },
+const userSchema = new mongoose.Schema(
+  {
+    // name: {
+    //   type: String,
+    //   required: [true, "Please Enter Your Name"],
+    //   maxLength: [30, "Name cannot exceed 30 characters"],
+    //   minLength: [4, "Name should have more than 4 characters"],
+    // },
+    email: {
+      type: String,
+      required: [true, "Please Enter Your Email"],
+      unique: true,
+      validate: [validator.isEmail, "Please Enter a valid Email"],
+    },
+    password: {
+      type: String,
+      required: [true, "Please Enter Your Password"],
+      minLength: [8, "Password should be greater than 8 characters"],
+      select: false,
+    },
+    address: {
+      type: String,
+      required: [true, "Please enter your address"],
+      maxLength: [200, "Name cannot exceed 30 characters"],
+      minLength: [5, "Name should have more than 4 characters"],
+    },
+    role: {
+      type: String,
+      default: "user",
+    },
+    businessName: {
+      type: String,
+      required: [true, "Please Enter Your Business Name"],
+      maxLength: [30, "Business Name cannot exceed 30 characters"],
+      minLength: [4, "Business Name should have more than 4 characters"],
+    },
+    businessType: {
+      type: String,
+      required: [true, "Please choose Your Business Type"],
+      $in: ["business1, business2"],
+    },
+    phoneNumber: {
+      type: Number,
+      required: [true, "Please enter your phone Number"],
+      maxlength: [10, "Phone number cannot exceed more than 10"],
+      trim: true,
+      unique: true,
+    },
+    phoneOtp: String,
+    createdAt: {
+      type: Date,
+      default: Date.now,
+    },
 
-  
-  resetPasswordToken: String,
-  resetPasswordExpire: Date,
-  
-},
-{timestamps:true}
+    resetPasswordToken: String,
+    resetPasswordExpire: Date,
+  },
+  { timestamps: true }
 );
 
 userSchema.pre("save", async function (next) {

@@ -9,11 +9,18 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
   }
-
-  const decodedData = jwt.verify(token, process.env.JWT_SECRET);
-
-  req.user = await User.findById(decodedData.id);
-  next();
+  try {
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decodedData.id);
+    next();
+  } catch (err) {
+    return next(
+      new ErrorHandler(
+        "Invalid token, please login again or submit old token",
+        401
+      )
+    );
+  }
 });
 
 exports.isAuthenticatedAdmin = catchAsyncErrors(async (req, res, next) => {
