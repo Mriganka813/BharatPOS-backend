@@ -132,7 +132,7 @@ exports.getCreditSaleParties = catchAsyncErrors(async (req, res, next) => {
             $cond: [
               { $eq: ["$sale.modeOfPayment", "Settle"] },
               0,
-              { $sum: "$sale.total" },
+              '$sale.total',
             ],
           },
         },
@@ -140,7 +140,7 @@ exports.getCreditSaleParties = catchAsyncErrors(async (req, res, next) => {
           $sum: {
             $cond: [
               { $eq: ["$sale.modeOfPayment", "Settle"] },
-              { $sum: "$sale.total" },
+              '$sale.total',
               0,
             ],
           },
@@ -180,7 +180,7 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
             $cond: [
               { $eq: ["$purchase.modeOfPayment", "Settle"] },
               0,
-              { $sum: "$purchase.total" },
+               '$purchase.total',
             ],
           },
         },
@@ -188,7 +188,7 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
           $sum: {
             $cond: [
               { $eq: ["$purchase.modeOfPayment", "Settle"] },
-              { $sum: "$purchase.total" },
+               '$purchase.total' ,
               0,
             ],
           },
