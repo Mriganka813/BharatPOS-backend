@@ -127,7 +127,24 @@ exports.getCreditSaleParties = catchAsyncErrors(async (req, res, next) => {
     },
     {
       $addFields: {
-        totalCreditAmount: { $sum: "$sale.total" },
+        TotalCreditAmount: {
+          $sum: {
+            $cond: [
+              { $eq: ["$sale.modeOfPayment", "Settle"] },
+              0,
+              { $sum: "$sale.total" },
+            ],
+          },
+        },
+        TotalSettledAmount: {
+          $sum: {
+            $cond: [
+              { $eq: ["$sale.modeOfPayment", "Settle"] },
+              { $sum: "$sale.total" },
+              0,
+            ],
+          },
+        },
       },
     },
     {
@@ -158,7 +175,24 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
     },
     {
       $addFields: {
-        totalCreditAmount: { $sum: "$purchase.total" },
+        TotalCreditAmount: {
+          $sum: {
+            $cond: [
+              { $eq: ["$purchase.modeOfPayment", "Settle"] },
+              0,
+              { $sum: "$purchase.total" },
+            ],
+          },
+        },
+        TotalSettledAmount: {
+          $sum: {
+            $cond: [
+              { $eq: ["$purchase.modeOfPayment", "Settle"] },
+              { $sum: "$purchase.total" },
+              0,
+            ],
+          },
+        },
       },
     },
     {
