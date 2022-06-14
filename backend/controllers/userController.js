@@ -94,9 +94,11 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
   });
 
   const { email, password, businessName, businessType, address } = req.body;
-  const data = await User.findOne({phoneNumber:phoneNumber});
-  if(data){
-    return next(new ErrorHandler("Phone Number already registered , Sign In instead", 400));
+  const data = await User.findOne({ phoneNumber: phoneNumber });
+  if (data) {
+    return next(
+      new ErrorHandler("Phone Number already registered , Sign In instead", 400)
+    );
   }
   const user = await User.create({
     email,
