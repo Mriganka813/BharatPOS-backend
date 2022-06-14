@@ -264,3 +264,24 @@ exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(data.id);
   sendToken(user, 200, res);
 });
+
+// implement change password
+exports.changePassword = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.findById(req.user.id).select("+password");
+  const { oldPassword, newPassword, confirmPassword } = req.body;
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+  const isPasswordMatched = await user.comparePassword(oldPassword);
+  if (!isPasswordMatched) {
+    return next(new ErrorHandler("Old password is incorrect", 400));
+  }
+  if (newPassword!== confirmPassword) {
+    return next(new ErrorHandler("password does not match", 400));
+  }
+  user.password = newPassword;
+  await user.save();
+  sendToken(user, 200, res);
+});
+
+  

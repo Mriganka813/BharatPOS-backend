@@ -9,6 +9,7 @@ const {
   sendOtp,
   verifyOtp,
   signUpWithPhoneNumber,
+  changePassword
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser } = require("../middleware/auth");
@@ -32,5 +33,7 @@ router.route("/me/update").put(isAuthenticatedUser, updateProfile);
 router.route("/signup/verifyotp").post(verifyOtp);
 
 router.route("/signup/otp").post(signUpWithPhoneNumber);
+
+router.route("/change-password").post(isAuthenticatedUser, changePassword);
 
 module.exports = router;
