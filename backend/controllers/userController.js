@@ -270,3 +270,20 @@ exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
   const user = await User.findById(data.id);
   sendToken(user, 200, res);
 });
+
+exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
+  const { newPassword, confirmPassword, phoneNumber } = req.body;
+  if (newPassword !== confirmPassword) {
+    return next(new ErrorHandler("password does not match", 400));
+  }
+  const user = await User.findOne({ phoneNumber });
+  if (!user) {
+    return next(new ErrorHandler("User not found", 400));
+  }
+  user.password = newPassword;
+  await user.save();
+  res.status(200).json({
+    success: true,
+    message: "Password updated successfully",
+  });
+});
