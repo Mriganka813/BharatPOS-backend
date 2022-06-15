@@ -94,6 +94,12 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
   });
 
   const { email, password, businessName, businessType, address } = req.body;
+  const data = await User.findOne({ phoneNumber: phoneNumber });
+  if (data) {
+    return next(
+      new ErrorHandler("Phone Number already registered , Sign In instead", 400)
+    );
+  }
   const user = await User.create({
     email,
     password,
@@ -118,6 +124,12 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password, businessName, businessType, address, phoneNumber } =
     req.body;
+  const data = await User.findOne({ phoneNumber: phoneNumber });
+  if (data) {
+    return next(
+      new ErrorHandler("Phone Number already registered , Sign In instead", 400)
+    );
+  }
 
   const user = await User.create({
     email,
@@ -263,4 +275,21 @@ exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
   const data = jwt.decode(token);
   const user = await User.findById(data.id);
   sendToken(user, 200, res);
+});
+
+exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
+  const { newPassword, confirmPassword, phoneNumber } = req.body;
+  if (newPassword !== confirmPassword) {
+    return next(new ErrorHandler("password does not match", 400));
+  }
+  const user = await User.findOne({ phoneNumber });
+  if (!user) {
+    return next(new ErrorHandler("User not found", 400));
+  }
+  user.password = newPassword;
+  await user.save();
+  res.status(200).json({
+    success: true,
+    message: "Password updated successfully",
+  });
 });
