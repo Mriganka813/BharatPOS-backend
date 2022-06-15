@@ -34,6 +34,6 @@ router.route("/signup/verifyotp").post(verifyOtp);
 
 router.route("/signup/otp").post(signUpWithPhoneNumber);
 
-router.route("/password/reset").post(resetPassword);
+router.route("/password/reset").put(resetPassword);
 
 module.exports = router;
