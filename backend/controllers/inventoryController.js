@@ -3,7 +3,7 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const lodash = require("lodash");
 const upload = require("../services/upload");
-
+const ApiFeatures = require("../utils/apiFeatures");
 exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
   const barcode = req.params.code;
   const inventory = await Inventory.findOne({ barCode: barcode });
@@ -95,7 +95,12 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getInventoryForUser = catchAsyncErrors(async (req, res, next) => {
-  const inventories = await Inventory.find({ user: req.user._id });
+  // const inventories = await Inventory.find({ user: req.user._id });
+  const ApiFeature = new ApiFeatures(
+    Inventory.find({ user: req.user._id }),
+    req.query
+  ).search();
+  const inventories = await ApiFeature.query;
   res.status(200).json({ success: true, inventories });
 });
 
