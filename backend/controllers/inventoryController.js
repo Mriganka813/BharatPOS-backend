@@ -96,7 +96,10 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
 
 exports.getInventoryForUser = catchAsyncErrors(async (req, res, next) => {
   // const inventories = await Inventory.find({ user: req.user._id });
-  const ApiFeature= new ApiFeatures(Inventory.find({ user: req.user._id }), req.query).search();
+  const ApiFeature = new ApiFeatures(
+    Inventory.find({ user: req.user._id }),
+    req.query
+  ).search();
   const inventories = await ApiFeature.query;
   res.status(200).json({ success: true, inventories });
 });
