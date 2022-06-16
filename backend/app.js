@@ -59,6 +59,9 @@ app.use(cors(corsOptions));
 app.get("/privacy-policy", (req, res) => {
   res.sendFile(path.join(__dirname, "templates", "privacy-policy.html"));
 });
+app.get("/terms-and-condition", (req, res) => {
+  res.sendFile(path.join(__dirname, "templates", "terms_and_conditions.html"));
+});
 app.use("/api/v1", product);
 app.use("/api/v1", user);
 app.use("/api/v1", admin);
