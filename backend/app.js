@@ -44,6 +44,7 @@ const purchase = require("./routes/purchaseRoute");
 const sales = require("./routes/salesRoute");
 const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
+const consumer = require("./routes/consumerRoute");
 
 var corsOptions = {
   origin: [
@@ -62,6 +63,7 @@ app.get("/privacy-policy", (req, res) => {
 app.get("/terms-and-condition", (req, res) => {
   res.sendFile(path.join(__dirname, "templates", "terms_and_conditions.html"));
 });
+
 app.use("/api/v1", product);
 app.use("/api/v1", user);
 app.use("/api/v1", admin);
@@ -71,6 +73,7 @@ app.use("/api/v1", sales);
 app.use("/api/v1", purchase);
 app.use("/api/v1", expense);
 app.use("/api/v1", report);
+app.use("/api/v1",consumer)
 
 app.use(express.static(path.join(__dirname, "build")));
 

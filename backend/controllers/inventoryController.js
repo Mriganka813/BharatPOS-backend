@@ -24,12 +24,14 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   }
   req.body.user = userDetail;
   /// Check if barcode is unique to that particular user
-  const existingInventory = await Inventory.findOne({
-    barCode: barCode,
-    user: req.user._id,
-  });
-  if (!lodash.isEmpty(existingInventory)) {
-    throw Error("Barcode already exists");
+  if (req.body.barCode !== undefined) {
+    const existingInventory = await Inventory.findOne({
+      barCode: barCode,
+      user: req.user._id,
+    });
+    if (!lodash.isEmpty(existingInventory)) {
+      throw Error("Barcode already exists");
+    }
   }
   const inventory = await Inventory.create({ ...req.body });
 
