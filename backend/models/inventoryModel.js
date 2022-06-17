@@ -13,7 +13,7 @@ const inventorySchema = mongoose.Schema({
   },
   purchasePrice: {
     type: Number,
-    required: true,
+    // required: true,
     // required: [true, "Please Enter purchasing price of inventory"],
     maxLength: [8, "Price cannot exceed 8 characters"],
   },
