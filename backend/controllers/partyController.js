@@ -117,29 +117,24 @@ exports.getCreditSaleParties = catchAsyncErrors(async (req, res, next) => {
     {
       $match: { user: user, type: "customer" },
     },
-    {
-      $lookup: {
-        from: "salesmodels",
-        localField: "_id",
-        foreignField: "party",
-        as: "sale",
-      },
-    },
-    {
-      $addFields: {
-        totalCreditAmount: { $sum: "$sale.total" },
-      },
-    },
-    {
-      $unset: ["sale"],
-    },
   ]);
   if (!data) {
     return next(new ErrorHandler("Orders not found", 404));
   }
+  const parties = await Promise.all(
+    data.map(async (e) => {
+      e.totalCreditAmount =
+        (await partyCreditSaleHistoryTotal(e._id, "Credit")) ?? 0;
+      e.totalSettleAmount =
+        (await partyCreditSaleHistoryTotal(e._id, "Settle")) ?? 0;
+      e.balance = e.totalCreditAmount - e.totalSettleAmount;
+      return e;
+    })
+  );
+
   res.status(200).json({
     success: true,
-    data,
+    data: parties,
   });
 });
 exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
@@ -148,29 +143,24 @@ exports.getCreditPurchaseParties = catchAsyncErrors(async (req, res, next) => {
     {
       $match: { user: user, type: "supplier" },
     },
-    {
-      $lookup: {
-        from: "purchasemodels",
-        localField: "_id",
-        foreignField: "party",
-        as: "purchase",
-      },
-    },
-    {
-      $addFields: {
-        totalCreditAmount: { $sum: "$purchase.total" },
-      },
-    },
-    {
-      $unset: "purchase",
-    },
   ]);
   if (!data) {
     return next(new ErrorHandler("Orders not found", 404));
   }
+  const parties = await Promise.all(
+    data.map(async (e) => {
+      e.totalCreditAmount =
+        (await partyCreditPurchaseHistoryTotal(e._id, "Credit")) ?? 0;
+      e.totalSettleAmount =
+        (await partyCreditPurchaseHistoryTotal(e._id, "Settle")) ?? 0;
+      e.balance = e.totalCreditAmount - e.totalSettleAmount;
+      return e;
+    })
+  );
+
   res.status(200).json({
     success: true,
-    data,
+    data: parties,
   });
 });
 exports.getCreditPurchaseParty = catchAsyncErrors(async (req, res, next) => {
