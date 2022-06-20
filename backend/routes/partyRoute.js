@@ -33,10 +33,10 @@ router.route("/party/search").get(isAuthenticatedUser, searchParty);
 router.route("/party/all").get(getAllParty);
 router.route("/party/me").get(isAuthenticatedUser, getMyParties);
 
-router.route("/party/:id").get(getSingleParty);
+router.route("/party/:id").get(isAuthenticatedUser,getSingleParty);
 
-router.route("/update/party/:id").put(updateParty);
+router.route("/update/party/:id").put(isAuthenticatedUser,updateParty);
 
-router.route("/del/party/:id").delete(deleteParty);
+router.route("/del/party/:id").delete(isAuthenticatedUser,deleteParty);
 
 module.exports = router;

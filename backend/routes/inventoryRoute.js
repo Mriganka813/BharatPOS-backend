@@ -17,8 +17,11 @@ router
   .route("/inventory/barcode/:code")
   .get(isAuthenticatedUser, findInventoryByBarcode);
 
-router.route("/inventories").get(getAllInventoriesAndSearch);
-router.route("/inventories/all").get(getAllInventories);
+router
+  .route("/inventories")
+  .get(isAuthenticatedUser, getAllInventoriesAndSearch);
+
+router.route("/inventories/all").get(isAuthenticatedUser, getAllInventories);
 
 router.route("/inventory/new").post(isAuthenticatedUser, createInventory);
 
@@ -28,6 +31,6 @@ router.route("/update/inventory/:id").put(isAuthenticatedUser, updateInventory);
 
 router.route("/del/inventory/:id").delete(isAuthenticatedUser, deleteInventory);
 
-router.route("/inventory/:id").get(getInventoryDetails);
+router.route("/inventory/:id").get(isAuthenticatedUser, getInventoryDetails);
 
 module.exports = router;
