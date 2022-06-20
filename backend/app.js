@@ -73,7 +73,7 @@ app.use("/api/v1", sales);
 app.use("/api/v1", purchase);
 app.use("/api/v1", expense);
 app.use("/api/v1", report);
-app.use("/api/v1",consumer)
+app.use("/api/v1/consumer",consumer)
 
 app.use(express.static(path.join(__dirname, "build")));
 

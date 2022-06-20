@@ -1,10 +1,47 @@
 const express = require("express");
-const { registerConsumer, loginConsumer, consumerLogout } = require("../controllers/consumerController");
+const {
+  getAllUserDetails,
+  getSingleUserDetail,
+} = require("../controllers/adminController");
+const {
+  registerConsumer,
+  loginConsumer,
+  consumerLogout,
+  getContactNumber,
+  getSellersAndSearch,
+} = require("../controllers/consumerController");
+const {
+  getAllInventoriesAndSearch,
+  getInventoryDetails,
+} = require("../controllers/inventoryController");
+const { isAuthenticatedConsumer } = require("../middleware/auth");
+
 const router = express.Router();
 
-router.route("/consumer/register").post(registerConsumer);
+router.route("/register").post(registerConsumer);
 
-router.route("/consumer/login").post(loginConsumer);
+router.route("/login").post(loginConsumer);
 
-router.route("/consumer/logout").get(consumerLogout)
+router.route("/logout").get(consumerLogout);
+
+router
+  .route("/sellers/all")
+  .get(isAuthenticatedConsumer, getAllUserDetails);
+
+router
+  .route("/seller/:id")
+  .get(isAuthenticatedConsumer, getSingleUserDetail);
+
+router
+  .route("/product/:id")
+  .get(isAuthenticatedConsumer, getInventoryDetails);
+router
+  .route("/products/all")
+  .get(isAuthenticatedConsumer, getAllInventoriesAndSearch);
+
+router
+  .route("/sellercontact/:id")
+  .get(isAuthenticatedConsumer, getContactNumber);
+
+router.route("/getSellersAndSearch").get( isAuthenticatedConsumer , getSellersAndSearch)
 module.exports = router;
