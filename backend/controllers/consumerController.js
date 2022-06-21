@@ -7,23 +7,23 @@ const User = require("../models/userModel");
 
 // registering consumer
 exports.registerConsumer = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, password } = req.body;
-  if (!name || !email || !password) {
+  const { name, email, password , phoneNumber } = req.body;
+  if (!name || !email || !password || !phoneNumber) {
     return next(new ErrorHandler("Please provide all the details", 400));
   }
 
-  const consumer = await Consumer.create({ name, email, password });
+  const consumer = await Consumer.create({ name, email, password , phoneNumber });
   const token = consumer.getJWTToken();
   sendToken(consumer, 201, res);
 });
 
 // consumer login
 exports.loginConsumer = catchAsyncErrors(async (req, res, next) => {
-  const { email, password } = req.body;
-  if (!email || !password) {
+  const { phoneNumber, password } = req.body;
+  if (!phoneNumber || !password) {
     return next(new ErrorHandler("Please provide all the details", 400));
   }
-  const consumer = await Consumer.findOne({ email }).select("+password");
+  const consumer = await Consumer.findOne({ phoneNumber }).select("+password");
   if (!consumer) {
     return next(new ErrorHandler("Invalid credentials", 400));
   }

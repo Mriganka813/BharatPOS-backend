@@ -30,7 +30,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
       user: req.user._id,
     });
     if (!lodash.isEmpty(existingInventory)) {
-      throw Error("Barcode already exists");
+      return next(new ErrorHandler("Product with this barcode already exists ", 400))
     }
   }
   const inventory = await Inventory.create({ ...req.body });
@@ -145,6 +145,15 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   if (req.files?.image) {
     const result = await upload(req.files.image);
     req.body.image = result.url;
+  }
+  if (req.body.barCode !== undefined) {
+    const existingInventory = await Inventory.findOne({
+      barCode: req.body.barCode,
+      user: req.user._id,
+    });
+    if (!lodash.isEmpty(existingInventory)) {
+      return next(new ErrorHandler("Product with this barcode already exists ", 400))
+    }
   }
   inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
