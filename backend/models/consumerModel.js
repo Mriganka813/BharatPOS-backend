@@ -18,7 +18,13 @@ const consumerSchema = new mongoose.Schema({
     trim: true,
     validate: [validator.isEmail, "Please provide a valid email"],
   },
-
+  phoneNumber: {
+    type: Number,
+    required: [true, "Please enter your phone Number"],
+    maxlength: [10, "Phone number cannot exceed more than 10"],
+    trim: true,
+    unique: true,
+  },
   password: {
     type: String,
     required: [true, "Please provide a password"],
