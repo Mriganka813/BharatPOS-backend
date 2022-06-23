@@ -56,6 +56,13 @@ var corsOptions = {
   optionsSuccessStatus: 200, // some legacy browsers (IE11, various SmartTVs) choke on 204
 };
 app.use(cors(corsOptions));
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Headers", "X-Requested-With, Accept, Content-Type")
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5500")
+  res.setHeader("Access-Control-Allow-Credentials", true)
+  res.setHeader("Access-Control-Allow-Methods", "GET, HEAD, POST, PUT, DELETE, TRACE, OPTIONS, PATCH")
+  next();
+})
 
 app.get("/privacy-policy", (req, res) => {
   res.sendFile(path.join(__dirname, "templates", "privacy-policy.html"));
