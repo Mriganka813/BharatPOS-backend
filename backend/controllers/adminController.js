@@ -4,7 +4,11 @@ const Admin = require("../models/adminModel");
 const sendToken = require("../utils/jwtToken");
 const crypto = require("crypto");
 const User = require("../models/userModel");
-
+const PurchaseModel = require("../models/purchaseModel");
+const ExpenseModel = require("../models/expenseModel");
+const SalesModel = require("../models/salesModel");
+const InventoryModel = require("../models/inventoryModel");
+const PartyModel = require("../models/partyModel");
 // creating admin
 exports.createAdmin = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password } = req.body;
@@ -113,5 +117,43 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "User Deleted Successfully",
+  });
+});
+
+// get report of users
+exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
+  const user1 = await User.find({ email: req.query.email });
+  if (!user1) {
+    return next(
+      new ErrorHandler("User does not exist with email: " + req.query.email, 400)
+    );
+  }
+  const user = user1[0]._id;
+
+  const sales = await SalesModel.find({
+    user: user,
+  }).populate([
+    {
+      path: "orderItems",
+      populate: { path: "product", model: InventoryModel },
+    },
+  ]);
+
+  const purchase = await PurchaseModel.find({
+    user: user,
+  }).populate({
+    path: "orderItems",
+    populate: { path: "product", model: InventoryModel },
+  });
+
+  const expense = await ExpenseModel.find({
+    user: user,
+  });
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5500")
+  res.status(200).json({
+    success: true,
+    sales,
+    purchase,
+    expense,
   });
 });
