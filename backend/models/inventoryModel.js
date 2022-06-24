@@ -51,6 +51,22 @@ const inventorySchema = mongoose.Schema({
     maxLength: [4, "Stock cannot exceed 4 characters"],
     default: 1,
   },
+  GSTRate:{
+    type:Number,
+    maxLength: [5, "GST Rate cannot exceed 5 characters"],
+  },
+  SGST:{
+    type:Number,
+    maxLength: [5, "SGST Rate cannot exceed 5 characters"],
+  },
+  CGST:{
+    type:Number,
+    maxLength: [5, "CGST Rate cannot exceed 5 characters"],
+  },
+  netSellingPrice:{
+    type:Number,
+    maxLength: [10, "Net Selling Price cannot exceed 10 characters"],
+  },
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
