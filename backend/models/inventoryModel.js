@@ -69,7 +69,7 @@ const inventorySchema = mongoose.Schema({
   },
   IGST:{
     type:Number,
-    maxLength: [10, "IGST Rate cannot exceed 5 characters"],
+    
   },
   user: {
     type: mongoose.Schema.ObjectId,
