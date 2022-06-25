@@ -63,7 +63,7 @@ const inventorySchema = mongoose.Schema({
     type:Number,
     maxLength: [10, "CGST Rate cannot exceed 5 characters"],
   },
-  netSellingPrice:{
+  baseSellingPrice :{
     type:Number,
     maxLength: [10, "Net Selling Price cannot exceed 10 characters"],
   },
