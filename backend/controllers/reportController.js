@@ -59,7 +59,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     // return item names , stock quantity and stock value
     const inventories = await InventoryModel.find({
       user: user,
-    }, {"name":1, "quantity":1, "sellingPrice":1});
+    });
 
     res.status(200).json({
       success: true,
