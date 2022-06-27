@@ -69,7 +69,7 @@ const inventorySchema = mongoose.Schema({
   baseSellingPrice: {
     type: Number,
   },
-  purchasesSGST: {
+  purchaseSGST: {
     type: Number,
     maxLength: [10, "SGST Rate cannot exceed 5 characters"],
   },
@@ -80,7 +80,7 @@ const inventorySchema = mongoose.Schema({
   purchaseIGST: {
     type: Number,
   },
-  basePurchaseprice:{
+  basePurchasePrice:{
     type: Number,
   
   },
