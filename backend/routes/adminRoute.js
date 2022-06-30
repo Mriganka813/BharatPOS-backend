@@ -21,7 +21,7 @@ router.route("/admin/logout").get(logout);
 
 router
   .route("/admin/users/all")
-  .get(isAuthenticatedAdmin, authorizeRoles("admin"), getAllUserDetails);
+  .get(getAllUserDetails);
 
 router
   .route("/admin/user/:id")
@@ -31,6 +31,6 @@ router
 
 router
   .route("/admin/report")
-  .get(isAuthenticatedAdmin, authorizeRoles("admin"), getReportofUserAdmin);
+  .get(getReportofUserAdmin);
 
 module.exports = router;
