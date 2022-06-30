@@ -60,11 +60,21 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 
 // get all user details
 exports.getAllUserDetails = catchAsyncErrors(async (req, res, next) => {
-  const user = await User.find();
-  res.status(200).json({
-    success: true,
-    user,
-  });
+  // take a security key from param and verify it
+  const { securityKey } = req.query;
+  if (!securityKey) {
+    return next(new ErrorHandler("Please enter security key", 400));
+  }
+  if (securityKey !== process.env.SECURITY_KEY) {
+    return next(new ErrorHandler("Invalid security key", 400));
+  }
+  if (securityKey === process.env.SECURITY_KEY) {
+    const user = await User.find();
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  }
 });
 
 // get single user details
@@ -122,38 +132,50 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
 
 // get report of users
 exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
-  const user1 = await User.find({ email: req.query.email });
-  if (!user1) {
-    return next(
-      new ErrorHandler("User does not exist with email: " + req.query.email, 400)
-    );
+  const { securityKey } = req.query;
+  if (!securityKey) {
+    return next(new ErrorHandler("Please enter security key", 400));
   }
-  const user = user1[0]._id;
+  if (securityKey !== process.env.SECURITY_KEY) {
+    return next(new ErrorHandler("Invalid security key", 400));
+  }
+  if (securityKey === process.env.SECURITY_KEY) {
+    const user1 = await User.find({ email: req.query.email });
+    if (!user1) {
+      return next(
+        new ErrorHandler(
+          "User does not exist with email: " + req.query.email,
+          400
+        )
+      );
+    }
+    const user = user1[0]._id;
 
-  const sales = await SalesModel.find({
-    user: user,
-  }).populate([
-    {
+    const sales = await SalesModel.find({
+      user: user,
+    }).populate([
+      {
+        path: "orderItems",
+        populate: { path: "product", model: InventoryModel },
+      },
+    ]);
+
+    const purchase = await PurchaseModel.find({
+      user: user,
+    }).populate({
       path: "orderItems",
       populate: { path: "product", model: InventoryModel },
-    },
-  ]);
+    });
 
-  const purchase = await PurchaseModel.find({
-    user: user,
-  }).populate({
-    path: "orderItems",
-    populate: { path: "product", model: InventoryModel },
-  });
-
-  const expense = await ExpenseModel.find({
-    user: user,
-  });
-  res.setHeader("Access-Control-Allow-Origin", "http://localhost:5500")
-  res.status(200).json({
-    success: true,
-    sales,
-    purchase,
-    expense,
-  });
+    const expense = await ExpenseModel.find({
+      user: user,
+    });
+    res.setHeader("Access-Control-Allow-Origin", "http://localhost:5500");
+    res.status(200).json({
+      success: true,
+      sales,
+      purchase,
+      expense,
+    });
+  }
 });
