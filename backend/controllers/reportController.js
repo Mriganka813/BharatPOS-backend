@@ -4,6 +4,7 @@ const PurchaseModel = require("../models/purchaseModel");
 const ExpenseModel = require("../models/expenseModel");
 const SalesModel = require("../models/salesModel");
 const InventoryModel = require("../models/inventoryModel");
+const PartyModel = require("../models/partyModel");
 // to get report of user sales , purchase and expense between starting date and end date
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
@@ -20,10 +21,13 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     const sales = await SalesModel.find({
       createdAt: { $gte: start_date, $lte: end_date },
       user: user,
-    }).populate({
-      path: "orderItems",
-      populate: { path: "product", model: InventoryModel },
-    });
+    }).populate([
+      {
+        path: "orderItems",
+        populate: { path: "product", model: InventoryModel },
+      },
+      "party",
+    ]);
     res.status(200).json({
       success: true,
       sales,
@@ -34,10 +38,13 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     const purchase = await PurchaseModel.find({
       createdAt: { $gte: start_date, $lte: end_date },
       user: user,
-    }).populate({
-      path: "orderItems",
-      populate: { path: "product", model: InventoryModel },
-    });
+    }).populate([
+      {
+        path: "orderItems",
+        populate: { path: "product", model: InventoryModel },
+      },
+      "party",
+    ]);
 
     res.status(200).json({
       success: true,
@@ -55,7 +62,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       expense,
     });
   }
-  if(type === "report"){
+  if (type === "report") {
     // return item names , stock quantity and stock value
     const inventories = await InventoryModel.find({
       user: user,
@@ -63,7 +70,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      inventories
+      inventories,
     });
   }
 });
