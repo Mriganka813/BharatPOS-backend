@@ -45,7 +45,7 @@ const sales = require("./routes/salesRoute");
 const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
 const consumer = require("./routes/consumerRoute");
-
+const payment = require("./routes/paymentRoutes");
 var corsOptions = {
   origin: [
     "http://localhost:5500",
@@ -80,7 +80,8 @@ app.use("/api/v1", sales);
 app.use("/api/v1", purchase);
 app.use("/api/v1", expense);
 app.use("/api/v1", report);
-app.use("/api/v1/consumer",consumer)
+app.use("/api/v1/consumer",consumer);
+app.use("/api/v1/payment",payment);
 
 app.use(express.static(path.join(__dirname, "build")));
 
