@@ -170,7 +170,6 @@ exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
     const expense = await ExpenseModel.find({
       user: user,
     });
-    res.setHeader("Access-Control-Allow-Origin", "http://localhost:5500");
     res.status(200).json({
       success: true,
       sales,
