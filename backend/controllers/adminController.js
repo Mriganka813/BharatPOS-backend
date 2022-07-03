@@ -59,7 +59,7 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 });
 
 // get all user details
-exports.getAllUserDetails = catchAsyncErrors(async (req, res, next) => {
+exports.getAllUserDetailsAdmin = catchAsyncErrors(async (req, res, next) => {
   // take a security key from param and verify it
   const { securityKey } = req.query;
   if (!securityKey) {
@@ -75,6 +75,14 @@ exports.getAllUserDetails = catchAsyncErrors(async (req, res, next) => {
       user,
     });
   }
+});
+// for consumer
+exports.getAllUserDetails = catchAsyncErrors(async (req, res, next) => {
+  const user = await User.find();
+  res.status(200).json({
+    success: true,
+    user,
+  });
 });
 
 // get single user details
