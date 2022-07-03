@@ -8,6 +8,7 @@ const {
   updateUserRole,
   deleteUser,
   getReportofUserAdmin,
+  getAllUserDetailsAdmin,
 } = require("../controllers/adminController");
 const { authorizeRoles, isAuthenticatedAdmin } = require("../middleware/auth");
 
@@ -21,7 +22,7 @@ router.route("/admin/logout").get(logout);
 
 router
   .route("/admin/users/all")
-  .get(getAllUserDetails);
+  .get(getAllUserDetailsAdmin);
 
 router
   .route("/admin/user/:id")
