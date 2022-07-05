@@ -75,3 +75,46 @@ exports.getSellersAndSearch = catchAsyncErrors(async (req, res, next) => {
     data: sellers,
   });
 });
+
+// get all sellers from inventory where category is matched
+exports.getSellers = catchAsyncErrors(async (req, res, next) => {
+  const { category } = req.query;
+  if (!category) {
+    return next(new ErrorHandler("Please provide category", 400));
+  }
+  const sellers = await User.find({
+    businessType: {
+      $regex: category,
+      $options: "i",
+    },
+  });
+  if (!sellers) {
+    return next(new ErrorHandler("No sellers found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data: sellers,
+  });
+});
+
+// get all products from a user
+exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
+  const id = req.params.id;
+  if (!id) {
+    return next(new ErrorHandler("Please provide id as query param", 400));
+  }
+  const seller = await User.findById(id);
+  if (!seller) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+  const products = await Inventory.find({
+    user: id,
+  });
+  if (!products) {
+    return next(new ErrorHandler("No products found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    data: products,
+  });
+});
