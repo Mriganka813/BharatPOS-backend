@@ -9,6 +9,8 @@ const {
   consumerLogout,
   getContactNumber,
   getSellersAndSearch,
+  getSellers,
+  getProductsOfUser,
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -43,5 +45,9 @@ router
   .route("/sellercontact/:id")
   .get(isAuthenticatedConsumer, getContactNumber);
 
-router.route("/getSellersAndSearch").get( isAuthenticatedConsumer , getSellersAndSearch)
+router.route("/getSellersAndSearch").get( isAuthenticatedConsumer , getSellersAndSearch);
+
+router.route("/sellers").get(isAuthenticatedConsumer , getSellers);
+
+router.route("/sellerProduct/:id").get(isAuthenticatedConsumer , getProductsOfUser);
 module.exports = router;
