@@ -50,4 +50,5 @@ router.route("/getSellersAndSearch").get( isAuthenticatedConsumer , getSellersAn
 router.route("/sellers").get(isAuthenticatedConsumer , getSellers);
 
 router.route("/sellerProduct/:id").get(isAuthenticatedConsumer , getProductsOfUser);
+
 module.exports = router;
