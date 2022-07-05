@@ -4,7 +4,7 @@ const Consumer = require("../models/consumerModel");
 const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const User = require("../models/userModel");
-
+const Inventory = require("../models/inventoryModel");
 // registering consumer
 exports.registerConsumer = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password , phoneNumber } = req.body;
