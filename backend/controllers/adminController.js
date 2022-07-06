@@ -122,20 +122,28 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
 
 // / Delete User
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
-  const user = await User.findById(req.params.id);
-
-  if (!user) {
-    return next(
-      new ErrorHandler(`User does not exist with Id: ${req.params.id}`, 400)
-    );
+  const { securityKey  } = req.query;
+  if (!securityKey) {
+    return next(new ErrorHandler("Please enter security key", 400));
   }
-
-  await user.remove();
-
-  res.status(200).json({
-    success: true,
-    message: "User Deleted Successfully",
-  });
+  if (securityKey !== process.env.SECURITY_KEY) {
+    return next(new ErrorHandler("Invalid security key", 400));
+  }
+  if (securityKey === process.env.SECURITY_KEY) {
+    const user = await User.find({
+      email:req.query.email,
+    });
+    if (!user) {
+      return next(
+        new ErrorHandler(`User does not exist with Id: ${req.params.id}`, 400)
+      );
+    }
+    await user[0].remove();
+    res.status(200).json({
+      success: true,
+      message: "User Deleted Successfully",
+    });
+  }
 });
 
 // get report of users
