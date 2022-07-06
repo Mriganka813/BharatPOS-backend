@@ -140,7 +140,10 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
 
 // get report of users
 exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
-  const { securityKey } = req.query;
+  const { securityKey, type } = req.query;
+  if (!type) {
+    return next(new ErrorHandler("Please enter type", 400));
+  }
   if (!securityKey) {
     return next(new ErrorHandler("Please enter security key", 400));
   }
@@ -158,31 +161,42 @@ exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
       );
     }
     const user = user1[0]._id;
-
-    const sales = await SalesModel.find({
-      user: user,
-    }).populate([
-      {
+    if (type == "sale") {
+      const sales = await SalesModel.find({
+        user: user,
+      }).populate([
+        {
+          path: "orderItems",
+          populate: { path: "product", model: InventoryModel },
+        },
+      ]);
+      res.status(200).json({
+        success: true,
+        sales,
+      });
+    }
+    if (type == "purchase") {
+      const purchase = await PurchaseModel.find({
+        user: user,
+      }).populate({
         path: "orderItems",
         populate: { path: "product", model: InventoryModel },
-      },
-    ]);
+      });
+      res.status(200).json({
+        success: true,
 
-    const purchase = await PurchaseModel.find({
-      user: user,
-    }).populate({
-      path: "orderItems",
-      populate: { path: "product", model: InventoryModel },
-    });
+        purchase,
+      });
+    }
 
-    const expense = await ExpenseModel.find({
-      user: user,
-    });
-    res.status(200).json({
-      success: true,
-      sales,
-      purchase,
-      expense,
-    });
+    if (type == "expense") {
+      const expense = await ExpenseModel.find({
+        user: user,
+      });
+      res.status(200).json({
+        success: true,
+        expense,
+      });
+    }
   }
 });
