@@ -5,14 +5,19 @@ const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const User = require("../models/userModel");
 const Inventory = require("../models/inventoryModel");
+const ApiFeatures = require("../utils/apiFeatures");
 // registering consumer
 exports.registerConsumer = catchAsyncErrors(async (req, res, next) => {
-  const { name, email, password , phoneNumber } = req.body;
+  const { name, email, password, phoneNumber } = req.body;
   if (!name || !email || !password || !phoneNumber) {
     return next(new ErrorHandler("Please provide all the details", 400));
   }
-
-  const consumer = await Consumer.create({ name, email, password , phoneNumber });
+  const consumer = await Consumer.create({
+    name,
+    email,
+    password,
+    phoneNumber,
+  });
   const token = consumer.getJWTToken();
   sendToken(consumer, 201, res);
 });
@@ -63,13 +68,20 @@ exports.getContactNumber = catchAsyncErrors(async (req, res, next) => {
 // get sellers and search according to location
 exports.getSellersAndSearch = catchAsyncErrors(async (req, res, next) => {
   const { city, state, country } = req.body;
-  const sellers = await User.find({
-    address: {
-      $regex: req.query.keyword,
-      $options: "i",
-    },
-  });
 
+  const apiFeature = new ApiFeatures(
+    User.find({
+      address: {
+        $regex: req.query.keyword,
+        $options: "i",
+      },
+    }),
+    req.query
+  ).pagination(50);
+  const sellers = await apiFeature.query;
+  if(!sellers) {
+    return next(new ErrorHandler("No sellers found", 404));
+  }
   res.status(200).json({
     success: true,
     data: sellers,
@@ -82,12 +94,17 @@ exports.getSellers = catchAsyncErrors(async (req, res, next) => {
   if (!category) {
     return next(new ErrorHandler("Please provide category", 400));
   }
-  const sellers = await User.find({
-    businessType: {
-      $regex: category,
-      $options: "i",
-    },
-  });
+
+  const apiFeature = new ApiFeatures(
+    User.find({
+      businessType: {
+        $regex: category,
+        $options: "i",
+      },
+    }),
+    req.query
+  ).pagination(50);
+  const sellers = await apiFeature.query;
   if (!sellers) {
     return next(new ErrorHandler("No sellers found", 404));
   }
@@ -107,9 +124,13 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   if (!seller) {
     return next(new ErrorHandler("User not found", 404));
   }
-  const products = await Inventory.find({
-    user: id,
-  });
+  const apiFeature = new ApiFeatures(
+    Inventory.find({
+      user: id,
+    }),
+    req.query
+  ).pagination(10);
+  const products = await apiFeature.query;
   if (!products) {
     return next(new ErrorHandler("No products found", 404));
   }
