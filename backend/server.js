@@ -1,6 +1,7 @@
 const app = require("./app");
 const cloudinary = require("cloudinary");
 const connectDatabase = require("./config/database");
+const subscribedUsersModel = require("./models/subscribedUsersModel");
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
