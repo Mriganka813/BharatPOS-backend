@@ -81,15 +81,16 @@ exports.isSubscribed = catchAsyncErrors(async (req, res, next) => {
   try {
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await User.findById(decodedData.id);
+    // console.log(req.user.phoneNumber);
     const user = User.findById(decodedData.id);
     if(user === null){
       return next(new ErrorHandler("Please login to access this resource", 401));
     }
     
     const subbedUser = await subscribedUsersModel.find({
-      phoneNumber: user.phoneNumber ,
+      phoneNumber: req.user.phoneNumber ,
     })
-    console.log(subbedUser);
+    // console.log(subbedUser);
     if(subbedUser.length === 0){
       return next(new ErrorHandler("Please subscribe to access this resource", 401));
     }
