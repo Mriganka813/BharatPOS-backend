@@ -46,6 +46,7 @@ const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
 const consumer = require("./routes/consumerRoute");
 const payment = require("./routes/paymentRoutes");
+const subscribedUsersModel = require("./models/subscribedUsersModel");
 
 app.use(cors());
 app.get("/privacy-policy", (req, res) => {
@@ -53,6 +54,40 @@ app.get("/privacy-policy", (req, res) => {
 });
 app.get("/terms-and-condition", (req, res) => {
   res.sendFile(path.join(__dirname, "templates", "terms_and_conditions.html"));
+});
+// this is webhook for razorpay.
+app.post("/verification", (req, res) => {
+  console.log(req.body);
+  const secret = "8432451555";
+  const crypto = require("crypto");
+
+  const shasum = crypto.createHmac("sha256", secret);
+  shasum.update(JSON.stringify(req.body));
+  const digest = shasum.digest("hex");
+  if (digest === req.headers["x-razorpay-signature"]) {
+    console.log("request is legit");
+    const email1 = req.body.payload.payment.entity.email;
+    const phoneNumber1 = req.body.payload.payment.entity.contact;
+    const amount1 = Number(req.body.payload.payment.entity.amount) / 100;
+    // console.log("email1", email1);
+    // console.log("phoneNumber1", phoneNumber1);
+    // console.log("amount1", amount1);
+    // expireAt: new Date(Date.now() + 2419200000),
+    const trimPhone = Number(phoneNumber1.substring(3));
+    subscribedUsersModel.create({
+      email: email1,
+      phoneNumber: trimPhone,
+      expireAt: new Date(Date.now() + 1000*60*10),
+    });
+    res.json({
+      status: "ok",
+    });
+    // require('fs').writeFileSync('payment1.json', JSON.stringify(req.body, null, 4))
+  } else {
+    res.json({
+      status: "error",
+    });
+  }
 });
 
 app.use("/api/v1", product);
@@ -64,8 +99,8 @@ app.use("/api/v1", sales);
 app.use("/api/v1", purchase);
 app.use("/api/v1", expense);
 app.use("/api/v1", report);
-app.use("/api/v1/consumer",consumer);
-app.use("/api/v1/payment",payment);
+app.use("/api/v1/consumer", consumer);
+app.use("/api/v1/payment", payment);
 
 app.use(express.static(path.join(__dirname, "build")));
 

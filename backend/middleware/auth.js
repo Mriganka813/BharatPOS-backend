@@ -4,6 +4,7 @@ const jwt = require("jsonwebtoken");
 const User = require("../models/userModel");
 const Admin = require("../models/adminModel");
 const Consumer = require("../models/consumerModel");
+const subscribedUsersModel = require("../models/subscribedUsersModel");
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.cookies;
   if (!token) {
@@ -67,7 +68,38 @@ exports.authorizeRoles = (...roles) => {
         )
       );
     }
-
     next();
   };
 };
+
+// for subscribed user checking
+exports.isSubscribed = catchAsyncErrors(async (req, res, next) => {
+  const { token } = req.cookies;
+  if (!token) {
+    return next(new ErrorHandler("Please login to access this resource", 401));
+  }
+  try {
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
+    req.user = await User.findById(decodedData.id);
+    const user = User.findById(decodedData.id);
+    if(user === null){
+      return next(new ErrorHandler("Please login to access this resource", 401));
+    }
+    
+    const subbedUser = await subscribedUsersModel.find({
+      phoneNumber: user.phoneNumber ,
+    })
+    console.log(subbedUser);
+    if(subbedUser.length === 0){
+      return next(new ErrorHandler("Please subscribe to access this resource", 401));
+    }
+    next();
+  } catch (err) {
+    return next(
+      new ErrorHandler(
+        "Invalid token, please login again or submit old token",
+        401
+      )
+    );
+  }
+});

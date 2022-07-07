@@ -9,28 +9,28 @@ const {
   getInventoryForUser,
   findInventoryByBarcode,
 } = require("../controllers/inventoryController");
-const { isAuthenticatedUser } = require("../middleware/auth");
+const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
 
 const router = express.Router();
 
 router
   .route("/inventory/barcode/:code")
-  .get(isAuthenticatedUser, findInventoryByBarcode);
+  .get(isAuthenticatedUser,isSubscribed, findInventoryByBarcode);
 
 router
   .route("/inventories")
-  .get(isAuthenticatedUser, getAllInventoriesAndSearch);
+  .get(isAuthenticatedUser,isSubscribed, getAllInventoriesAndSearch);
 
-router.route("/inventories/all").get(isAuthenticatedUser, getAllInventories);
+router.route("/inventories/all").get(isAuthenticatedUser,isSubscribed, getAllInventories);
 
-router.route("/inventory/new").post(isAuthenticatedUser, createInventory);
+router.route("/inventory/new").post(isAuthenticatedUser, isSubscribed ,createInventory);
 
-router.route("/inventory/me").get(isAuthenticatedUser, getInventoryForUser);
+router.route("/inventory/me").get(isAuthenticatedUser,isSubscribed, getInventoryForUser);
 
-router.route("/update/inventory/:id").put(isAuthenticatedUser, updateInventory);
+router.route("/update/inventory/:id").put(isAuthenticatedUser,isSubscribed, updateInventory);
 
-router.route("/del/inventory/:id").delete(isAuthenticatedUser, deleteInventory);
+router.route("/del/inventory/:id").delete(isAuthenticatedUser,isSubscribed, deleteInventory);
 
-router.route("/inventory/:id").get(isAuthenticatedUser, getInventoryDetails);
+router.route("/inventory/:id").get(isAuthenticatedUser,isSubscribed, getInventoryDetails);
 
 module.exports = router;
