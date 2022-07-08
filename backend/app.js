@@ -77,7 +77,7 @@ app.post("/verification", (req, res) => {
     subscribedUsersModel.create({
       email: email1,
       phoneNumber: trimPhone,
-      expireAt: new Date(Date.now() + 1000*60*10),
+      expireAt: new Date(Date.now() + 2419200000),
     });
     res.json({
       status: "ok",

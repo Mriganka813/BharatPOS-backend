@@ -16,29 +16,40 @@ const {
   isAuthenticatedUser,
   authorizeRoles,
   isAuthenticatedAdmin,
+  isSubscribed,
 } = require("../middleware/auth");
 
-router.route("/salesOrder/new").post(isAuthenticatedUser, newSalesOrder);
+router
+  .route("/salesOrder/new")
+  .post(isAuthenticatedUser, isSubscribed, newSalesOrder);
 
 router
   .route("/sales/credit-history/:id")
-  .get(isAuthenticatedUser, cntrl.partyCreditHistory)
-  .post(isAuthenticatedUser, cntrl.addCreditSettleTransaction);
-router.route("/salesOrder/:id").get(isAuthenticatedUser, getSingleSalesOrder);
-router.route("/sales/credit").get(isAuthenticatedUser, getCreditSaleOrders);
+  .get(isAuthenticatedUser, isSubscribed, cntrl.partyCreditHistory)
+  .post(isAuthenticatedUser, isSubscribed, cntrl.addCreditSettleTransaction);
+router
+  .route("/salesOrder/:id")
+  .get(isAuthenticatedUser, isSubscribed, getSingleSalesOrder);
+router
+  .route("/sales/credit")
+  .get(isAuthenticatedUser, isSubscribed, getCreditSaleOrders);
 
-router.route("/salesOrders/me").get(isAuthenticatedUser, mySalesOrders);
+router
+  .route("/salesOrders/me")
+  .get(isAuthenticatedUser, isSubscribed, mySalesOrders);
 
 router
   .route("/admin/salesOrders")
   .get(isAuthenticatedAdmin, authorizeRoles("admin"), getAllSalesOrders);
 
-router.route("/salesOrder/:id").delete(isAuthenticatedUser, deleteSalesOrder);
+router
+  .route("/salesOrder/:id")
+  .delete(isAuthenticatedUser, isSubscribed, deleteSalesOrder);
 router
   .route("/admin/salesOrder/:id")
   .delete(isAuthenticatedAdmin, authorizeRoles("admin"), deleteSalesOrder);
 
 router
   .route("/upd/salesOrder/:id")
-  .put(isAuthenticatedUser , UpdateSalesOrder);
+  .put(isAuthenticatedUser, isSubscribed, UpdateSalesOrder);
 module.exports = router;

@@ -15,24 +15,25 @@ const {
   isAuthenticatedUser,
   authorizeRoles,
   isAuthenticatedAdmin,
+  isSubscribed,
 } = require("../middleware/auth");
 const cntlr = require("../controllers/purchaseController");
 
-router.route("/purchaseOrder/new").post(isAuthenticatedUser, newPurchaseOrder);
+router.route("/purchaseOrder/new").post(isAuthenticatedUser,isSubscribed, newPurchaseOrder);
 
 router
   .route("/purchaseOrder/:id")
-  .get(isAuthenticatedUser, getSinglePurchaseOrder);
+  .get(isAuthenticatedUser,  isSubscribed,getSinglePurchaseOrder);
 
 router
   .route("/purchase/credit-history/:id")
-  .get(isAuthenticatedUser, cntlr.partyCreditHistory)
-  .post(isAuthenticatedUser, cntlr.addCreditHistoryTransaction);
+  .get(isAuthenticatedUser, isSubscribed, cntlr.partyCreditHistory)
+  .post(isAuthenticatedUser, isSubscribed, cntlr.addCreditHistoryTransaction);
 
-router.route("/purchaseOrders/me").get(isAuthenticatedUser, myPurchaseOrders);
+router.route("/purchaseOrders/me").get(isAuthenticatedUser, isSubscribed, myPurchaseOrders);
 router
   .route("/purchaseOrders/me/credit")
-  .get(isAuthenticatedUser, getCreditPurchaseOrders);
+  .get(isAuthenticatedUser,  isSubscribed,getCreditPurchaseOrders);
 
 router
   .route("/admin/purchaseOrders")
@@ -40,11 +41,11 @@ router
 
 router
   .route("/purchaseOrder/:id")
-  .delete(isAuthenticatedUser, deletePurchaseOrder);
+  .delete(isAuthenticatedUser, isSubscribed, deletePurchaseOrder);
 
 router
   .route("/upd/purchaseOrder/:id")
-  .put(isAuthenticatedUser, updatePurchaseOrders);
+  .put(isAuthenticatedUser,  isSubscribed,updatePurchaseOrders);
 
 router
   .route("/admin/purchaseOrder/:id")
