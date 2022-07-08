@@ -23,7 +23,7 @@ const subscribedUserSchema = new mongoose.Schema(
     },
     expireAt: {
         type: Date,
-        default: Date.now + (1000 * 60 * 60 * 24 * 7),
+        default: Date.now + (1000 * 60 * 60 * 24 * 28),
     }
   },
 );
