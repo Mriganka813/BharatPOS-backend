@@ -12,7 +12,7 @@ const {
   resetPassword
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
-const { isAuthenticatedUser } = require("../middleware/auth");
+const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
 //
 const router = express.Router();
 
