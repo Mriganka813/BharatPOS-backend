@@ -103,7 +103,7 @@ exports.getSellers = catchAsyncErrors(async (req, res, next) => {
       },
     }),
     req.query
-  ).pagination(50);
+  ).pagination(10);
   const sellers = await apiFeature.query;
   if (!sellers) {
     return next(new ErrorHandler("No sellers found", 404));
