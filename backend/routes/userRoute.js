@@ -22,13 +22,13 @@ router.route("/login").post(loginUser);
 
 router.route("/logout").get(logout);
 
-router.route("/me").get(isAuthenticatedUser, getUserDetails);
+router.route("/me").get(isAuthenticatedUser, isSubscribed, getUserDetails);
 
 router.route("/get-token").get(cntlr.refreshJwtToken);
 
-router.route("/password/update").put(isAuthenticatedUser, updatePassword);
+router.route("/password/update").put(isAuthenticatedUser, isSubscribed, updatePassword);
 
-router.route("/me/update").put(isAuthenticatedUser, updateProfile);
+router.route("/me/update").put(isAuthenticatedUser, isSubscribed, updateProfile);
 
 router.route("/signup/verifyotp").post(verifyOtp);
 
