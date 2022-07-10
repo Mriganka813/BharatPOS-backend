@@ -171,17 +171,17 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     const result = await upload(req.files.image);
     req.body.image = result.url;
   }
-  if (req.body.barCode !== undefined) {
-    const existingInventory = await Inventory.findOne({
-      barCode: req.body.barCode,
-      user: req.user._id,
-    });
-    if (!lodash.isEmpty(existingInventory)) {
-      return next(
-        new ErrorHandler("Product with this barcode already exists ", 400)
-      );
-    }
-  }
+  // if (req.body.barCode !== undefined) {
+  //   const existingInventory = await Inventory.findOne({
+  //     barCode: req.body.barCode,
+  //     user: req.user._id,
+  //   });
+  //   if (!lodash.isEmpty(existingInventory)) {
+  //     return next(
+  //       new ErrorHandler("Product with this barcode already exists ", 400)
+  //     );
+  //   }
+  // }
   inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,
