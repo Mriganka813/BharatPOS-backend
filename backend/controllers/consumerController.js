@@ -157,3 +157,20 @@ exports.getSellersByName = catchAsyncErrors(async (req, res, next) => {
     sellers,
   });
 });
+
+// get all names of products
+exports.getProductNamesandSearch = catchAsyncErrors(async (req, res, next) => {
+  const key = req.query.keyword
+    ? {
+        name: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
+    : {};
+  const products = await Inventory.find(key);
+  res.status(200).json({
+    success: true,
+    products,
+  });
+});
