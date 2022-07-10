@@ -168,7 +168,7 @@ exports.getProductNamesandSearch = catchAsyncErrors(async (req, res, next) => {
         },
       }
     : {};
-  const products = await Inventory.find(key);
+  const products = await Inventory.find(key).select("name");
   res.status(200).json({
     success: true,
     products,
