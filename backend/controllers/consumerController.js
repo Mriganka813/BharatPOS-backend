@@ -67,7 +67,7 @@ exports.getContactNumber = catchAsyncErrors(async (req, res, next) => {
 
 // get sellers and search according to location
 exports.getSellersAndSearch = catchAsyncErrors(async (req, res, next) => {
-  const { city, state, country } = req.body;
+  // const { city, state, country } = req.body;
 
   const apiFeature = new ApiFeatures(
     User.find({
@@ -79,7 +79,7 @@ exports.getSellersAndSearch = catchAsyncErrors(async (req, res, next) => {
     req.query
   ).pagination(50);
   const sellers = await apiFeature.query;
-  if(!sellers) {
+  if (!sellers) {
     return next(new ErrorHandler("No sellers found", 404));
   }
   res.status(200).json({
@@ -137,5 +137,23 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: products,
+  });
+});
+
+// get all sellers and search by name :
+exports.getSellersByName = catchAsyncErrors(async (req, res, next) => {
+  const key = req.query.keyword
+    ? {
+        businessName: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
+    : {};
+  const apiFeature = new ApiFeatures(User.find(key), req.query).pagination(10);
+  const sellers = await apiFeature.query;
+  res.status(200).json({
+    success: true,
+    sellers,
   });
 });

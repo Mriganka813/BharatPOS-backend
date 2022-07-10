@@ -11,10 +11,12 @@ const {
   getSellersAndSearch,
   getSellers,
   getProductsOfUser,
+  getSellersByName,
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
   getInventoryDetails,
+  getAllInventorieswithSearch,
 } = require("../controllers/inventoryController");
 const { isAuthenticatedConsumer } = require("../middleware/auth");
 
@@ -39,7 +41,7 @@ router
   .get(isAuthenticatedConsumer, getInventoryDetails);
 router
   .route("/products/all")
-  .get(isAuthenticatedConsumer, getAllInventoriesAndSearch);
+  .get(isAuthenticatedConsumer, getAllInventorieswithSearch);
 
 router
   .route("/sellercontact/:id")
@@ -50,5 +52,7 @@ router.route("/getSellersAndSearch").get( isAuthenticatedConsumer , getSellersAn
 router.route("/sellers").get(isAuthenticatedConsumer , getSellers);
 
 router.route("/sellerProduct/:id").get(isAuthenticatedConsumer , getProductsOfUser);
+
+router.route("/sellers/search").get(isAuthenticatedConsumer , getSellersByName);
 
 module.exports = router;

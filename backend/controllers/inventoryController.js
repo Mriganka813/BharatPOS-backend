@@ -30,7 +30,9 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
       user: req.user._id,
     });
     if (!lodash.isEmpty(existingInventory)) {
-      return next(new ErrorHandler("Product with this barcode already exists ", 400))
+      return next(
+        new ErrorHandler("Product with this barcode already exists ", 400)
+      );
     }
   }
   const inventory = await Inventory.create({ ...req.body });
@@ -87,6 +89,28 @@ exports.getAllInventoriesAndSearch = catchAsyncErrors(
   }
 );
 
+// get all inventries and search
+exports.getAllInventorieswithSearch = catchAsyncErrors(
+  async (req, res, next) => {
+    const ApiFeature = new ApiFeatures(
+      Inventory.find().populate("user", [
+        "phoneNumber",
+        "email",
+        "address",
+        "businessName",
+      ]),
+      req.query
+    )
+      .pagination(10)
+      .search();
+    const inventories = await ApiFeature.query;
+    res.status(200).json({
+      success: true,
+      inventories,
+    });
+  }
+);
+
 // Get All Inventory
 exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
   const Inventories = await Inventory.find();
@@ -129,7 +153,8 @@ exports.decrementQuantity = catchAsyncErrors(async (id, quantity) => {
   inventory.quantity -= quantity ?? 1;
   await inventory.save();
 });
-///
+
+//
 exports.incrementQuantity = catchAsyncErrors(async (id, quantity) => {
   const inventory = await Inventory.findById(id);
   inventory.quantity += quantity ?? 1;
@@ -152,7 +177,9 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
       user: req.user._id,
     });
     if (!lodash.isEmpty(existingInventory)) {
-      return next(new ErrorHandler("Product with this barcode already exists ", 400))
+      return next(
+        new ErrorHandler("Product with this barcode already exists ", 400)
+      );
     }
   }
   inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
