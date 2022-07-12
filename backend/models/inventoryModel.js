@@ -84,6 +84,10 @@ const inventorySchema = mongoose.Schema({
     type: Number,
   
   },
+  clicks: {
+    type: Number,
+    default: 0,
+  },
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "User",

@@ -6,6 +6,10 @@ const sendEmail = require("../utils/sendEmail");
 const User = require("../models/userModel");
 const Inventory = require("../models/inventoryModel");
 const ApiFeatures = require("../utils/apiFeatures");
+
+// variable for global clicks counter
+let allClicksProducts=0;
+let allClicksSeller=0;
 // registering consumer
 exports.registerConsumer = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password, phoneNumber } = req.body;
@@ -169,6 +173,58 @@ exports.getProductNamesandSearch = catchAsyncErrors(async (req, res, next) => {
       }
     : {};
   const products = await Inventory.find(key).select("name");
+  res.status(200).json({
+    success: true,
+    products,
+  });
+});
+
+// tracker 
+exports.addClickProduct = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const product = await Inventory.findById(id);
+  if (!product) {
+    return next(new ErrorHandler("Product not found", 404));
+  }
+  product.clicks = product.clicks + 1;
+  allClicksProducts = allClicksProducts + 1;
+  await product.save();
+  const updProduct = await Inventory.findById(id);
+  res.status(200).json({
+    success: true,
+    message: "Click added",
+    data: updProduct,
+  });
+});
+
+// clicks for sellers
+exports.addClickSeller = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const seller = await User.findById(id);
+  if (!seller) {
+    return next(new ErrorHandler("Seller not found", 404));
+  }
+  seller.clicks = seller.clicks + 1;
+  allClicksSeller = allClicksSeller + 1;
+  await seller.save();
+  const updSeller = await User.findById(id);
+  res.status(200).json({
+    success: true,
+    message: "Click added",
+    data: updSeller,
+  });
+});
+
+// get top clicked products of specific seller 
+exports.getTopClickedProducts = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const seller = await User.findById(id);
+  if (!seller) {
+    return next(new ErrorHandler("Seller not found", 404));
+  }
+  const products = await Inventory.find({
+    user: id,
+  }).sort("-clicks");
   res.status(200).json({
     success: true,
     products,
