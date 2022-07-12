@@ -75,7 +75,7 @@ exports.getSellersAndSearch = catchAsyncErrors(async (req, res, next) => {
         $regex: req.query.keyword,
         $options: "i",
       },
-    }),
+    }).sort("-createdAt"),
     req.query
   ).pagination(50);
   const sellers = await apiFeature.query;
