@@ -13,6 +13,10 @@ const {
   getProductsOfUser,
   getSellersByName,
   getProductNamesandSearch,
+  addClick,
+  addClickProduct,
+  addClickSeller,
+  getTopClickedProducts,
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -58,4 +62,9 @@ router.route("/sellers/search").get(isAuthenticatedConsumer , getSellersByName);
 
 router.route("/productname/search").get(isAuthenticatedConsumer , getProductNamesandSearch);
 
+router.route("/product/click/:id").get(isAuthenticatedConsumer , addClickProduct);
+
+router.route("/seller/click/:id").get(isAuthenticatedConsumer , addClickSeller);
+
+router.route("/products/popular/:id").get(isAuthenticatedConsumer , getTopClickedProducts);
 module.exports = router;
