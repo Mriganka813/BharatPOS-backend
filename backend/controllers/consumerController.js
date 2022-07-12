@@ -230,3 +230,12 @@ exports.getTopClickedProducts = catchAsyncErrors(async (req, res, next) => {
     products,
   });
 });
+
+// get top clicked sellers
+exports.getTopClickedSellers = catchAsyncErrors(async (req, res, next) => {  
+  const sellers = await User.find().sort("-clicks");
+  res.status(200).json({
+    success: true,
+    sellers,
+  });
+});
