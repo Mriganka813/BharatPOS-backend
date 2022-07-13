@@ -6,6 +6,13 @@ const crypto = require("crypto");
 
 const agentSchema = new mongoose.Schema(
   {
+    name:{
+      type: String,
+      required: [true, "Please enter your name"],
+      minlength: [3, "Name must be at least 3 characters"],
+      maxlength: [50, "Name must be less than 50 characters"],
+      trim: true,
+    },
     email: {
       type: String,
       required: [true, "Please Enter Your Email"],
@@ -19,12 +26,6 @@ const agentSchema = new mongoose.Schema(
       minLength: [8, "Password should be greater than 8 characters"],
       select: false,
       trim: true,
-    },
-    address: {
-      type: String,
-      required: [true, "Please enter your address"],
-      maxLength: [200, "Name cannot exceed 30 characters"],
-      minLength: [5, "Name should have more than 4 characters"],
     },
     phoneNumber: {
       type: Number,

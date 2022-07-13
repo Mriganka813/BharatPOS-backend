@@ -8,8 +8,8 @@ const Inventory = require("../models/inventoryModel");
 const ApiFeatures = require("../utils/apiFeatures");
 
 // variable for global clicks counter
-let allClicksProducts=0;
-let allClicksSeller=0;
+let allClicksProducts = 0;
+let allClicksSeller = 0;
 // registering consumer
 exports.registerConsumer = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password, phoneNumber } = req.body;
@@ -179,7 +179,7 @@ exports.getProductNamesandSearch = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// tracker 
+// tracker
 exports.addClickProduct = catchAsyncErrors(async (req, res, next) => {
   const { id } = req.params;
   const product = await Inventory.findById(id);
@@ -215,24 +215,36 @@ exports.addClickSeller = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// get top clicked products of specific seller 
+// get top clicked products of specific seller
 exports.getTopClickedProducts = catchAsyncErrors(async (req, res, next) => {
-  const { id } = req.params;
-  const seller = await User.findById(id);
+  let popularProducts = [];
+  const seller = await User.find({
+    address: {
+      $regex: req.query.keyword,
+      $options: "i",
+    },
+  });
   if (!seller) {
     return next(new ErrorHandler("Seller not found", 404));
   }
-  const products = await Inventory.find({
-    user: id,
-  }).sort("-clicks");
+  for (let i = 0; i < seller.length; i++) {
+    const product = await Inventory.find({
+      user: seller[i]._id,
+    })
+      .sort("-clicks")
+      .limit(1);
+    if(product.length > 0) {
+    popularProducts.push(product[0]);
+    }
+  }
   res.status(200).json({
     success: true,
-    products,
+    popularProducts,
   });
 });
 
 // get top clicked sellers
-exports.getTopClickedSellers = catchAsyncErrors(async (req, res, next) => {  
+exports.getTopClickedSellers = catchAsyncErrors(async (req, res, next) => {
   const sellers = await User.find().sort("-clicks");
   res.status(200).json({
     success: true,

@@ -47,6 +47,7 @@ const report = require("./routes/reportRoute");
 const consumer = require("./routes/consumerRoute");
 const payment = require("./routes/paymentRoutes");
 const subscribedUsersModel = require("./models/subscribedUsersModel");
+const agent = require("./routes/agentRoutes");
 
 app.use(cors());
 app.get("/privacy-policy", (req, res) => {
@@ -99,6 +100,7 @@ app.use("/api/v1", sales);
 app.use("/api/v1", purchase);
 app.use("/api/v1", expense);
 app.use("/api/v1", report);
+app.use("/api/v1/agent", agent);
 app.use("/api/v1/consumer", consumer);
 app.use("/api/v1/payment", payment);
 
