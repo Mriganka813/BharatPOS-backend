@@ -217,6 +217,8 @@ exports.addClickSeller = catchAsyncErrors(async (req, res, next) => {
 
 // get top clicked products of specific seller
 exports.getTopClickedProducts = catchAsyncErrors(async (req, res, next) => {
+  const {page =1 } = req.query;
+  const limit =10;
   let popularProducts = [];
   // check if req.query.keyword is present
   if (!req.query.keyword) {
@@ -236,7 +238,10 @@ exports.getTopClickedProducts = catchAsyncErrors(async (req, res, next) => {
       user: seller[i]._id,
     })
       .sort("-clicks")
-      .limit(1);
+      .limit(1)
+      .populate("user")
+      .limit(limit)
+      .skip((page - 1) * limit);
     if(product.length > 0) {
     popularProducts.push(product[0]);
     }
