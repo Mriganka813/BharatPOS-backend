@@ -67,7 +67,7 @@ router.route("/product/click/:id").get(isAuthenticatedConsumer , addClickProduct
 
 router.route("/seller/click/:id").get(isAuthenticatedConsumer , addClickSeller);
 
-router.route("/products/popular/:id").get(isAuthenticatedConsumer , getTopClickedProducts);
+router.route("/products/popular").get(isAuthenticatedConsumer , getTopClickedProducts);
 
 router.route("/popular/seller").get(isAuthenticatedConsumer , getTopClickedSellers);
 module.exports = router;

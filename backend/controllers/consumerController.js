@@ -218,6 +218,10 @@ exports.addClickSeller = catchAsyncErrors(async (req, res, next) => {
 // get top clicked products of specific seller
 exports.getTopClickedProducts = catchAsyncErrors(async (req, res, next) => {
   let popularProducts = [];
+  // check if req.query.keyword is present
+  if (!req.query.keyword) {
+    return next(new ErrorHandler("Please provide keyword", 400));
+  }
   const seller = await User.find({
     address: {
       $regex: req.query.keyword,
@@ -225,7 +229,7 @@ exports.getTopClickedProducts = catchAsyncErrors(async (req, res, next) => {
     },
   });
   if (!seller) {
-    return next(new ErrorHandler("Seller not found", 404));
+    return next(new ErrorHandler("Sellers not found", 404));
   }
   for (let i = 0; i < seller.length; i++) {
     const product = await Inventory.find({
