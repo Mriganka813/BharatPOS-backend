@@ -16,7 +16,7 @@ exports.registerAgent = catchAsyncErrors(async (req, res, next) => {
       password,
       phoneNumber,
     });
-    const token = consumer.getJWTToken();
+    const token = agent.getJWTToken();
     sendToken(agent, 201, res);
   });
   
