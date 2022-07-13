@@ -49,7 +49,23 @@ const payment = require("./routes/paymentRoutes");
 const subscribedUsersModel = require("./models/subscribedUsersModel");
 const agent = require("./routes/agentRoutes");
 
-app.use(cors());
+const corsConfig = {
+  origin: "http://localhost:5500",
+  credentials: true,
+};
+app.use(cors(corsConfig));
+
+app.use(function (req, res, next) {
+  console.log(req.origin);
+  res.header("Access-Control-Allow-Origin", req.header("origin"));
+  res.header("Access-Control-Allow-Credentials", true);
+  res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
+  res.header(
+    "Access-Control-Allow-Headers",
+    "Content-Type, Authorization, Content-Length, X-Requested-With"
+  );
+  next();
+});
 app.get("/privacy-policy", (req, res) => {
   res.sendFile(path.join(__dirname, "templates", "privacy-policy.html"));
 });

@@ -1,7 +1,6 @@
 // router basic template
 const express = require("express");
-const { loginAgent, logoutAgent, registerAgent } = require("../controllers/agentController");
-
+const { loginAgent, logoutAgent, registerAgent, getUsers } = require("../controllers/agentController");
 const router = express.Router();
 const { isAuthenticatedAgent } = require("../middleware/auth");
 
@@ -11,5 +10,6 @@ router.route("/login").post(loginAgent);
 
 router.route("/logout").get(logoutAgent);
 
+router.route("/getuser").get( isAuthenticatedAgent ,getUsers)
 
 module.exports = router;

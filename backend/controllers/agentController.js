@@ -4,6 +4,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const Consumer = require("../models/consumerModel");
 const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
+const User = require("../models/userModel");
 
 exports.registerAgent = catchAsyncErrors(async (req, res, next) => {
     const { name, email, password, phoneNumber } = req.body;
@@ -22,19 +23,19 @@ exports.registerAgent = catchAsyncErrors(async (req, res, next) => {
   
   // consumer login
   exports.loginAgent = catchAsyncErrors(async (req, res, next) => {
-    const { phoneNumber, password } = req.body;
-    if (!phoneNumber || !password) {
+    const { email, password } = req.body;
+    if (!email || !password) {
       return next(new ErrorHandler("Please provide all the details", 400));
     }
-    const consumer = await Consumer.findOne({ phoneNumber }).select("+password");
-    if (!consumer) {
+    const agent = await Agent.findOne({ email }).select("+password");
+    if (!agent) {
       return next(new ErrorHandler("Invalid credentials", 400));
     }
-    const isMatch = await consumer.comparePassword(password);
+    const isMatch = await agent.comparePassword(password);
     if (!isMatch) {
       return next(new ErrorHandler("Invalid credentials", 400));
     }
-    sendToken(consumer, 200, res);
+    sendToken(agent, 200, res);
   });
   
   // consumer logout
@@ -49,3 +50,17 @@ exports.registerAgent = catchAsyncErrors(async (req, res, next) => {
       message: "Logged Out",
     });
   });
+
+  // get number of users referred by the agent and their details
+  exports.getUsers = catchAsyncErrors(async (req, res, next) => {
+    const users = await User.find({
+      referredBy: req.user.email,
+    })
+    if(!users) {
+      return next(new ErrorHandler("No users Referred yet", 404))
+    }
+    res.status(200).json({
+      success: true,
+      data: users
+    });
+  })
