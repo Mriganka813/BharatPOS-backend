@@ -108,12 +108,14 @@ exports.isSubscribed = catchAsyncErrors(async (req, res, next) => {
 
 // auth for agent
 exports.isAuthenticatedAgent = catchAsyncErrors(async (req, res, next) => {
-  const { cookie } = req.cookies;
-  if (!cookie) {
+  const { token } = req.cookies;
+  // console.log('token ' , token);
+  
+  if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
   }
   try {
-    const decodedData = jwt.verify(cookie, process.env.JWT_SECRET);
+    const decodedData = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await Agent.findById(decodedData.id);
     next();
   } catch (err) {

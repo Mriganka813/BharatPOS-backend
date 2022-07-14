@@ -56,7 +56,6 @@ const corsConfig = {
 app.use(cors(corsConfig));
 
 app.use(function (req, res, next) {
-  // console.log(req.header("origin"));
   res.header("Access-Control-Allow-Origin",req.header("origin"));
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
