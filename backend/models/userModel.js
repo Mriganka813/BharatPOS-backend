@@ -63,7 +63,10 @@ const userSchema = new mongoose.Schema(
       type: Number,
       default: 0,
     },
-
+    referredBy: {
+      type: String,
+      trime: true,
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },

@@ -55,7 +55,7 @@ exports.registerAgent = catchAsyncErrors(async (req, res, next) => {
   exports.getUsers = catchAsyncErrors(async (req, res, next) => {
     const users = await User.find({
       referredBy: req.user.email,
-    })
+    }).select("email phoneNumber");
     if(!users) {
       return next(new ErrorHandler("No users Referred yet", 404))
     }
