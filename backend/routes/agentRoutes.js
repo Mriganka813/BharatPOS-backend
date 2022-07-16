@@ -10,6 +10,6 @@ router.route("/login").post(loginAgent);
 
 router.route("/logout").get(logoutAgent);
 
-router.route("/getuser").get( isAuthenticatedAgent ,getUsers)
+router.route("/getuser").post( isAuthenticatedAgent ,getUsers)
 
 module.exports = router;
