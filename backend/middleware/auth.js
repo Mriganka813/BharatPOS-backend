@@ -109,7 +109,6 @@ exports.isSubscribed = catchAsyncErrors(async (req, res, next) => {
 // auth for agent
 exports.isAuthenticatedAgent = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.body;
-  
   if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
   }
