@@ -7,6 +7,7 @@ const fast2sms = require("fast-two-sms");
 const otpGenerator = require("otp-generator");
 const otpModel = require("../models/otpModel");
 const bcrypt = require("bcryptjs");
+const subscribedUsersModel = require("../models/subscribedUsersModel");
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
@@ -138,6 +139,11 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     businessType,
     address,
     phoneNumber,
+  });
+  const subbed = await subscribedUsersModel.create({
+    email: email,
+    phoneNumber: phoneNumber,
+    expireAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15),
   });
 
   sendToken(user, 201, res);
