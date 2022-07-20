@@ -123,8 +123,12 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
 
 // register user
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  const { email, password, businessName, businessType, address, phoneNumber } =
-    req.body;
+  // const { email, password, businessName, businessType, address, phoneNumber } =
+  //   req.body;
+  if (req.files?.image) {
+    const result = await upload(req.files.image);
+    req.body.image = result.url;
+  }
   const data = await User.findOne({ phoneNumber: phoneNumber });
   if (data) {
     return next(
@@ -132,17 +136,10 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  const user = await User.create({
-    email,
-    password,
-    businessName,
-    businessType,
-    address,
-    phoneNumber,
-  });
+  const user = await User.create({ ...req.body });
   const subbed = await subscribedUsersModel.create({
-    email: email,
-    phoneNumber: phoneNumber,
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber,
     expireAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15),
   });
 

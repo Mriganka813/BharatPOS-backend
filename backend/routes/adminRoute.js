@@ -22,7 +22,7 @@ router.route("/admin/logout").get(logout);
 
 router
   .route("/admin/users/all")
-  .get(getAllUserDetailsAdmin);
+  .post(isAuthenticatedAdmin,getAllUserDetailsAdmin);
 
 router
   .route("/admin/user/:id")
@@ -33,6 +33,6 @@ router.route("/admin/del/user").delete(deleteUser);
 
 router
   .route("/admin/report")
-  .get(getReportofUserAdmin);
+  .post(isAuthenticatedAdmin, getReportofUserAdmin);
 
 module.exports = router;

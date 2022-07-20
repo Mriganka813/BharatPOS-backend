@@ -47,6 +47,9 @@ const userSchema = new mongoose.Schema(
       required: [true, "Please choose Your Business Type"],
       $in: ["business1, business2"],
     },
+    image: {
+      type: String,
+    },
     phoneNumber: {
       type: Number,
       required: [true, "Please enter your phone Number"],

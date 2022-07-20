@@ -60,21 +60,11 @@ exports.logout = catchAsyncErrors(async (req, res, next) => {
 
 // get all user details
 exports.getAllUserDetailsAdmin = catchAsyncErrors(async (req, res, next) => {
-  // take a security key from param and verify it
-  const { securityKey } = req.query;
-  if (!securityKey) {
-    return next(new ErrorHandler("Please enter security key", 400));
-  }
-  if (securityKey !== process.env.SECURITY_KEY) {
-    return next(new ErrorHandler("Invalid security key", 400));
-  }
-  if (securityKey === process.env.SECURITY_KEY) {
-    const user = await User.find();
-    res.status(200).json({
-      success: true,
-      user,
-    });
-  }
+  const user = await User.find();
+  res.status(200).json({
+    success: true,
+    user,
+  });
 });
 // for consumer
 exports.getAllUserDetails = catchAsyncErrors(async (req, res, next) => {
@@ -122,20 +112,12 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
 
 // / Delete User
 exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
-  const { securityKey  } = req.query;
-  if (!securityKey) {
-    return next(new ErrorHandler("Please enter security key", 400));
-  }
-  if (securityKey !== process.env.SECURITY_KEY) {
-    return next(new ErrorHandler("Invalid security key", 400));
-  }
-  if (securityKey === process.env.SECURITY_KEY) {
     const user = await User.find({
-      email:req.query.email,
+      email: req.query.email,
     });
     if (!user) {
       return next(
-        new ErrorHandler(`User does not exist with Id: ${req.params.id}`, 400)
+        new ErrorHandler(`User does not exist with Email: ${req.query.email}`, 400)
       );
     }
     await user[0].remove();
@@ -143,68 +125,59 @@ exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
       success: true,
       message: "User Deleted Successfully",
     });
-  }
 });
 
 // get report of users
 exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
-  const { securityKey, type } = req.query;
+  const { type } = req.query;
   if (!type) {
     return next(new ErrorHandler("Please enter type", 400));
   }
-  if (!securityKey) {
-    return next(new ErrorHandler("Please enter security key", 400));
+  const user1 = await User.find({ email: req.query.email });
+  if (!user1) {
+    return next(
+      new ErrorHandler(
+        "User does not exist with email: " + req.query.email,
+        400
+      )
+    );
   }
-  if (securityKey !== process.env.SECURITY_KEY) {
-    return next(new ErrorHandler("Invalid security key", 400));
-  }
-  if (securityKey === process.env.SECURITY_KEY) {
-    const user1 = await User.find({ email: req.query.email });
-    if (!user1) {
-      return next(
-        new ErrorHandler(
-          "User does not exist with email: " + req.query.email,
-          400
-        )
-      );
-    }
-    const user = user1[0]._id;
-    if (type == "sale") {
-      const sales = await SalesModel.find({
-        user: user,
-      }).populate([
-        {
-          path: "orderItems",
-          populate: { path: "product", model: InventoryModel },
-        },
-      ]);
-      res.status(200).json({
-        success: true,
-        sales,
-      });
-    }
-    if (type == "purchase") {
-      const purchase = await PurchaseModel.find({
-        user: user,
-      }).populate({
+  const user = user1[0]._id;
+  if (type == "sale") {
+    const sales = await SalesModel.find({
+      user: user,
+    }).populate([
+      {
         path: "orderItems",
         populate: { path: "product", model: InventoryModel },
-      });
-      res.status(200).json({
-        success: true,
+      },
+    ]);
+    res.status(200).json({
+      success: true,
+      sales,
+    });
+  }
+  if (type == "purchase") {
+    const purchase = await PurchaseModel.find({
+      user: user,
+    }).populate({
+      path: "orderItems",
+      populate: { path: "product", model: InventoryModel },
+    });
+    res.status(200).json({
+      success: true,
 
-        purchase,
-      });
-    }
+      purchase,
+    });
+  }
 
-    if (type == "expense") {
-      const expense = await ExpenseModel.find({
-        user: user,
-      });
-      res.status(200).json({
-        success: true,
-        expense,
-      });
-    }
+  if (type == "expense") {
+    const expense = await ExpenseModel.find({
+      user: user,
+    });
+    res.status(200).json({
+      success: true,
+      expense,
+    });
   }
 });
