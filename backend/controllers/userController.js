@@ -130,7 +130,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     const result = await upload(req.files.image);
     req.body.image = result.url;
   }
-  const data = await User.findOne({ phoneNumber: phoneNumber });
+  const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
   if (data) {
     return next(
       new ErrorHandler("Phone Number already registered , Sign In instead", 400)
