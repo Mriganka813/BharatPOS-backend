@@ -8,6 +8,7 @@ const otpGenerator = require("otp-generator");
 const otpModel = require("../models/otpModel");
 const bcrypt = require("bcryptjs");
 const subscribedUsersModel = require("../models/subscribedUsersModel");
+const upload = require("../services/upload");
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
