@@ -18,6 +18,8 @@ const {
   addClickSeller,
   getTopClickedProducts,
   getTopClickedSellers,
+  getConsumerDetails,
+  updateConsumerDetails,
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -34,41 +36,38 @@ router.route("/login").post(loginConsumer);
 
 router.route("/logout").get(consumerLogout);
 
-router
-  .route("/sellers/all")
-  .get(isAuthenticatedConsumer, getAllUserDetails);
+router.route("/detail/:id").get(isAuthenticatedConsumer, getConsumerDetails);
 
-router
-  .route("/seller/:id")
-  .get(isAuthenticatedConsumer, getSingleUserDetail);
+router.route("/upd/:id").put(isAuthenticatedConsumer, updateConsumerDetails);
 
-router
-  .route("/product/:id")
-  .get(isAuthenticatedConsumer, getInventoryDetails);
-router
-  .route("/products/all")
-  .get(isAuthenticatedConsumer, getAllInventorieswithSearch);
+router.route("/sellers/all").get(isAuthenticatedConsumer, getAllUserDetails);
 
-router
-  .route("/sellercontact/:id")
-  .get(isAuthenticatedConsumer, getContactNumber);
+router.route("/seller/:id").get(isAuthenticatedConsumer, getSingleUserDetail);
 
-router.route("/getSellersAndSearch").get( isAuthenticatedConsumer , getSellersAndSearch);
+router.route("/product/:id").get(isAuthenticatedConsumer, getInventoryDetails);
 
-router.route("/sellers").get(isAuthenticatedConsumer , getSellers);
+router.route("/products/all").get(isAuthenticatedConsumer, getAllInventorieswithSearch);
 
-router.route("/sellerProduct/:id").get(isAuthenticatedConsumer , getProductsOfUser);
+router.route("/sellercontact/:id").get(isAuthenticatedConsumer, getContactNumber);
 
-router.route("/sellers/search").get(isAuthenticatedConsumer , getSellersByName);
+router.route("/getSellersAndSearch").get(isAuthenticatedConsumer, getSellersAndSearch);
 
-router.route("/productname/search").get(isAuthenticatedConsumer , getProductNamesandSearch);
+router.route("/sellers").get(isAuthenticatedConsumer, getSellers);
 
-router.route("/product/click/:id").get(isAuthenticatedConsumer , addClickProduct);
+router.route("/sellerProduct/:id").get(isAuthenticatedConsumer, getProductsOfUser);
 
-router.route("/seller/click/:id").get(isAuthenticatedConsumer , addClickSeller);
+router.route("/sellers/search").get(isAuthenticatedConsumer, getSellersByName);
 
-router.route("/products/popular").get(isAuthenticatedConsumer , getTopClickedProducts);
+router.route("/productname/search").get(isAuthenticatedConsumer, getProductNamesandSearch);
 
-router.route("/popular/seller").get(isAuthenticatedConsumer , getTopClickedSellers);
+router.route("/product/click/:id").get(isAuthenticatedConsumer, addClickProduct);
+
+router.route("/seller/click/:id").get(isAuthenticatedConsumer, addClickSeller);
+
+router.route("/products/popular").get(isAuthenticatedConsumer, getTopClickedProducts);
+
+router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSellers);
+
+router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSellers);
 
 module.exports = router;

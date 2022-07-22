@@ -260,3 +260,31 @@ exports.getTopClickedSellers = catchAsyncErrors(async (req, res, next) => {
     sellers,
   });
 });
+
+// get consumer details from id
+exports.getConsumerDetails = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const consumer = await Consumer.findById(id);
+  if (!consumer) {
+    return next(new ErrorHandler("Consumer not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    consumer,
+  });
+});
+
+// update consumer details
+exports.updateConsumerDetails = catchAsyncErrors(async (req, res, next) => {
+  const { id } = req.params;
+  const consumer = await Consumer.findByIdAndUpdate(id, req.body, {
+    new: true,
+  });
+  if (!consumer) {
+    return next(new ErrorHandler("consumer not found", 404));
+  }
+  res.status(200).json({
+    success: true,
+    consumer,
+  });
+});
