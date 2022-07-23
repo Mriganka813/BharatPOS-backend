@@ -68,7 +68,18 @@ const userSchema = new mongoose.Schema(
     },
     referredBy: {
       type: String,
-      trime: true,
+      trim: true,
+    },
+    taxFile: {
+      type: String,
+      trim: true,
+      // create enum of monthly and quarterly
+      enum: ["monthly", "quarterly"]
+    },
+    GstIN : {
+      type: String,
+      trim: true,
+      unique: true,
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
