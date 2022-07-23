@@ -28,6 +28,9 @@ const productList = mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  expiryDate: {
+    type: Date,
+  }
 });
 
 module.exports = mongoose.model("products", productList);
