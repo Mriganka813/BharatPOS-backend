@@ -68,7 +68,11 @@ const userSchema = new mongoose.Schema(
     },
     referredBy: {
       type: String,
-      trime: true,
+      trim: true,
+    },
+    taxFile: {
+      type: String,
+      trim: true,
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
