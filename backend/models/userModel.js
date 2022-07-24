@@ -74,7 +74,8 @@ const userSchema = new mongoose.Schema(
       type: String,
       trim: true,
       // create enum of monthly and quarterly
-      enum: ["monthly", "quarterly"]
+      enum: ["monthly", "quarterly"],
+      default: "monthly"
     },
     GstIN : {
       type: String,
