@@ -124,8 +124,6 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
 
 // register user
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  // const { email, password, businessName, businessType, address, phoneNumber } =
-  //   req.body;
   if (req.files?.image) {
     const result = await upload(req.files.image);
     req.body.image = result.url;
