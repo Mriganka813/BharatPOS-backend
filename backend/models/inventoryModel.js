@@ -93,6 +93,9 @@ const inventorySchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
+  expiryDate: {
+    type: Date,
+  },
   createdAt: {
     type: Date,
     default: Date.now,
