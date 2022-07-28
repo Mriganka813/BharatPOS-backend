@@ -5,11 +5,12 @@ const ExpenseModel = require("../models/expenseModel");
 const SalesModel = require("../models/salesModel");
 const InventoryModel = require("../models/inventoryModel");
 const PartyModel = require("../models/partyModel");
+const User = require("../models/userModel");
 // to get report of user sales , purchase and expense between starting date and end date
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
   const user = req.user._id;
-
+  const userdetail = await User.findById(user).select("businessType");
   if (!type) {
     res.status(404).json({
       success: false,
@@ -31,6 +32,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       sales,
+      userdetail
     });
   }
 
@@ -49,6 +51,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       purchase,
+      userdetail
     });
   }
 
@@ -60,6 +63,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       expense,
+      userdetail
     });
   }
   if (type === "report") {
@@ -71,6 +75,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       inventories,
+      userdetail
     });
   }
 });
