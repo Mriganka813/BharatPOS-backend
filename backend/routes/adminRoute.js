@@ -29,7 +29,7 @@ router
   .get(isAuthenticatedAdmin, authorizeRoles("admin"), getSingleUserDetail)
   .put(isAuthenticatedAdmin, authorizeRoles("admin"), updateUserRole)
 
-router.route("/admin/del/user").delete(deleteUser);
+router.route("/admin/del/user").post(isAuthenticatedAdmin, deleteUser);
 
 router
   .route("/admin/report")
