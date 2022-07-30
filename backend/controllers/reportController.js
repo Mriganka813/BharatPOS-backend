@@ -10,7 +10,6 @@ const User = require("../models/userModel");
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
   const user = req.user._id;
-  const userdetail = await User.findById(user).select("taxFile");
   if (!type) {
     res.status(404).json({
       success: false,
@@ -28,11 +27,11 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
         populate: { path: "product", model: InventoryModel },
       },
       "party",
+      { path: "user", select: "taxFile" },
     ]);
     res.status(200).json({
       success: true,
       sales,
-      userdetail
     });
   }
 
@@ -46,12 +45,12 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
         populate: { path: "product", model: InventoryModel },
       },
       "party",
+      { path: "user", select: "taxFile" },
     ]);
 
     res.status(200).json({
       success: true,
       purchase,
-      userdetail
     });
   }
 
@@ -59,11 +58,12 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     const expense = await ExpenseModel.find({
       createdAt: { $gte: start_date, $lte: end_date },
       user: user,
-    });
+    }).populate(
+      { path: "user", select: "taxFile" },
+    )
     res.status(200).json({
       success: true,
       expense,
-      userdetail
     });
   }
   if (type === "report") {
@@ -75,7 +75,6 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       inventories,
-      userdetail
     });
   }
 });
