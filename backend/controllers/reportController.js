@@ -10,7 +10,7 @@ const User = require("../models/userModel");
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
   const user = req.user._id;
-  const userdetail = await User.findById(user).select("businessType");
+  const userdetail = await User.findById(user).select("taxFile");
   if (!type) {
     res.status(404).json({
       success: false,
