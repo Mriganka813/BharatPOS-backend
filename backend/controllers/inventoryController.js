@@ -18,6 +18,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const { barCode } = req.body;
   const userDetail = req.user._id;
   /// if has image, then create and save on cloudinary
+  console.log(req.files)
   if (req.files?.image) {
     const result = await upload(req.files.image);
     req.body.image = result.url;

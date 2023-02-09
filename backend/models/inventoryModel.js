@@ -47,7 +47,7 @@ const inventorySchema = mongoose.Schema({
   },
   quantity: {
     type: Number,
-    required: [true, "Please Enter quantity of inventory"],
+    required: false,
     maxLength: [4, "Stock cannot exceed 4 characters"],
     default: 1,
   },
