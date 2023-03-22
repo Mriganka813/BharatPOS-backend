@@ -1,17 +1,10 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "lib": ["esnext"],
-    "allowJs": true,
-    "strict": false,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "outDir": "./dist",
-    "rootDir": "./src"
+    "target": "es2018",
+    "module": "commonjs",
+    "outDir": "dist",
+    "sourceMap": true
   },
-  "include": ["src"],
-  "exclude": ["node_modules", "dist", "build"],
-  "ts-node": {
-    "transpileOnly": true
-  }
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
 }

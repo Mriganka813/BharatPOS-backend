@@ -1,12 +1,12 @@
-import { Admin } from "src/models/admin";
+import { Admin } from "models/admin";
 import { Request, Response, NextFunction } from "express";
-import { User } from "src/models/user";
-import { ErrorHandler } from "src/utils/errorhandler";
-import { sendToken } from "src/utils/jwtToken";
-import { Sale } from "src/models/sale";
-import { Inventory } from "src/models/inventory";
-import { Purchase } from "src/models/purchase";
-import { Expense } from "src/models/expense";
+import { User } from "models/user";
+import { ErrorHandler } from "utils/errorhandler";
+import { sendToken } from "utils/jwtToken";
+import { Sale } from "models/sale";
+import { Inventory } from "models/inventory";
+import { Purchase } from "models/purchase";
+import { Expense } from "models/expense";
 import bcryptjs from "bcryptjs";
 // creating admin
 export const createAdmin = async (req: Request, res: Response) => {

@@ -4,10 +4,10 @@
   "description": "",
   "main": "backend/server.js",
   "scripts": {
-    "start": "npm run dev",
     "build": "tsc",
-    "lint": "eslint . & echo 'lint complete'",
-    "dev": "ts-node-dev --respawn --transpile-only ./src/server.ts",
+    "lint": "eslint src/**/*.ts",
+    "format": "eslint src/**/*.ts --fix",
+    "dev": "tsnd --respawn ./src/server.ts",
     "prod": "tsc && node ./built/src/app.js",
     "debug": "tsc && node --inspect ./built/src/app.js"
   },
@@ -37,6 +37,7 @@
     "react-scripts": "^5.0.0",
     "streamifier": "^0.1.1",
     "stripe": "^8.211.0",
+    "typescript": "^5.0.2",
     "validator": "^13.9.0"
   },
   "devDependencies": {
@@ -49,10 +50,19 @@
     "@types/lodash": "^4.14.182",
     "@types/streamifier": "^0.1.0",
     "@types/validator": "^13.7.14",
+    "@typescript-eslint/eslint-plugin": "^5.56.0",
+    "@typescript-eslint/parser": "^5.56.0",
+    "eslint": "^8.36.0",
     "nodemon": "^2.0.16",
+    "prettier": "^2.8.6",
     "prisma": "^4.11.0",
     "ts-node": "^10.9.1",
     "ts-node-dev": "^2.0.0",
     "tsconfig-paths": "^4.1.2"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pnpm lint"
+    }
   }
 }

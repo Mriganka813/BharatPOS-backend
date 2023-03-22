@@ -1,6 +1,6 @@
 import express from "express";
 import * as cntlr from "./controller";
-import { authorizeRoles, isAuthenticatedAdmin } from "src/middleware/auth";
+import { authorizeRoles, isAuthenticatedAdmin } from "middleware/auth";
 
 export const AdminRouter = express
   .Router()
