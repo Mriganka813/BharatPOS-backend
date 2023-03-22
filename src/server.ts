@@ -1,30 +1,23 @@
-import cloudinary from "cloudinary";
-import { connectDatabase } from "./config/database.js";
+import { PrismaClient } from "@prisma/client";
+import * as dotenv from "dotenv";
 import app from "./app.js";
+import { Logger } from "./utils/logger.js";
+dotenv.config();
 
-process.on("uncaughtException", (err) => {
-  console.log(`Error: ${err.message}`);
-  console.log(`Shutting down the server due to uncaught exception`);
-  process.exit(1);
-});
+const prisma = new PrismaClient();
 
-connectDatabase();
+async function main() {
+  app.listen(process.env.PORT, () => {
+    Logger.info(`Server is working on http://localhost:${process.env.PORT}`);
+  });
+}
 
-cloudinary.v2.config({
-  cloud_name: process.env.CLOUDINARY_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
-});
-
-const server = app.listen(process.env.PORT, () => {
-  console.log(`Server is working on http://localhost:${process.env.PORT}`);
-});
-
-process.on("unhandledRejection", (err) => {
-  console.log(`Error: ${err}`);
-  console.log(`Shutting down the server due to Unhandled Promise Rejection`);
-
-  server.close(() => {
+main()
+  .then(async () => {
+    await prisma.$disconnect();
+  })
+  .catch(async (e) => {
+    Logger.info("Closing");
+    await prisma.$disconnect();
     process.exit(1);
   });
-});

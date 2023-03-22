@@ -4,7 +4,7 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
 
-const userSchema = new Schema(
+const UserSchema = new Schema<IUser>(
   {
     // name: {
     //   type: String,
@@ -88,28 +88,27 @@ const userSchema = new Schema(
   { timestamps: true }
 );
 
-userSchema.pre("save", async function (next) {
+UserSchema.pre("save", async function (next) {
   if (!this.isModified("password")) {
     next();
   }
-
   this.password = await bcrypt.hash(this.password, 10);
 });
 
 // JWT TOKEN
-userSchema.methods.getJWTToken = function () {
+UserSchema.methods.getJWTToken = function () {
   return jwt.sign({ id: this._id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRE,
   });
 };
 
 // Compare Password
-userSchema.methods.comparePassword = async function (password: string) {
+UserSchema.methods.comparePassword = async function (password: string) {
   return await bcrypt.compare(password, this.password);
 };
 
 // Generating Password Reset Token
-userSchema.methods.getResetPasswordToken = function () {
+UserSchema.methods.getResetPasswordToken = function () {
   // Generating Token
   const resetToken = crypto.randomBytes(20).toString("hex");
 
@@ -124,4 +123,24 @@ userSchema.methods.getResetPasswordToken = function () {
   return resetToken;
 };
 
-export const User = model("User", userSchema);
+export const User = model("User", UserSchema);
+
+export interface IUser {
+  _id: string;
+  email: string;
+  password: string;
+  address: string;
+  role: string;
+  businessName: string;
+  businessType: string;
+  image: string;
+  phoneNumber: number;
+  phoneOtp: string;
+  createdAt: Date;
+  clicks: number;
+  referredBy: string;
+  taxFile: string;
+  GstIN: string;
+  resetPasswordToken: string;
+  resetPasswordExpire: Date;
+}

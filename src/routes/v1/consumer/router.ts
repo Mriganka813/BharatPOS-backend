@@ -1,9 +1,5 @@
 import express from "express";
-import {
-  getAllUserDetails,
-  getSingleUserDetail,
-} from "../controllers/adminController";
-
+import * as admin_cntlr from "../admin/controller";
 import * as cntlr from "./controller";
 import {
   getAllInventoriesAndSearch,
@@ -28,9 +24,13 @@ router
   .route("/upd/:id")
   .put(isAuthenticatedConsumer, cntlr.updateConsumerDetails);
 
-router.route("/sellers/all").get(isAuthenticatedConsumer, getAllUserDetails);
+router
+  .route("/sellers/all")
+  .get(isAuthenticatedConsumer, admin_cntlr.getAllUserDetails);
 
-router.route("/seller/:id").get(isAuthenticatedConsumer, getSingleUserDetail);
+router
+  .route("/seller/:id")
+  .get(isAuthenticatedConsumer, admin_cntlr.getSingleUserDetail);
 
 router.route("/product/:id").get(isAuthenticatedConsumer, getInventoryDetails);
 

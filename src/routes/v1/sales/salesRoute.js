@@ -7,17 +7,17 @@ const {
   deleteSalesOrder,
   getCreditSaleOrders,
   UpdateSalesOrder,
-} = require("../../controllers/salesController");
-const cntlr = require("../../controllers/salesController");
+} = require("../../../controllers/salesController");
+const cntlr = require("../../../controllers/salesController");
 const router = express.Router();
 
-const cntrl = require("../../controllers/salesController");
+const cntrl = require("../../../controllers/salesController");
 const {
   isAuthenticatedUser,
   authorizeRoles,
   isAuthenticatedAdmin,
   isSubscribed,
-} = require("../../middleware/auth");
+} = require("../../../middleware/auth");
 
 router
   .route("/salesOrder/new")
