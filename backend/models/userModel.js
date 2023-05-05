@@ -77,10 +77,15 @@ const userSchema = new mongoose.Schema(
       enum: ["monthly", "quarterly"],
       default: "monthly"
     },
-    GstIN : {
+    GstIN: {
       type: String,
       trim: true,
       unique: true,
+    },
+    upi_id: {
+      type: String,
+      required: false
+
     },
     resetPasswordToken: String,
     resetPasswordExpire: Date,

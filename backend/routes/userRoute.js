@@ -9,7 +9,9 @@ const {
   sendOtp,
   verifyOtp,
   signUpWithPhoneNumber,
-  resetPassword
+  resetPassword,
+  getUpi,
+  updateUpi
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -35,5 +37,13 @@ router.route("/signup/verifyotp").post(verifyOtp);
 router.route("/signup/otp").post(signUpWithPhoneNumber);
 
 router.route("/password/reset").put(resetPassword);
+
+
+router.route("/getupi").get(isAuthenticatedUser, isSubscribed, getUpi);
+
+router.route("/upi/updateupi").put(isAuthenticatedUser, isSubscribed, updateUpi);
+
+
+
 
 module.exports = router;

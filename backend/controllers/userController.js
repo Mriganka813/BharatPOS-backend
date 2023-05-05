@@ -295,3 +295,46 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
     message: "Password updated successfully",
   });
 });
+
+
+// GetUser UPi
+
+exports.getUpi = catchAsyncErrors(async (req, res, next) => {
+
+  const user = await User.findById(req.user.id);
+  const upi = user.upi_id
+  res.status(200).json({
+    success: true,
+    upi,
+  });
+
+})
+// Update user UPI
+
+exports.updateUpi = catchAsyncErrors(async (req, res, next) => {
+
+  const { upi_id } = req.body;
+
+  // Find the user by their ID
+  const user = await User.findById(req.user.id);
+
+  // If user is not found, return an error
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      message: 'User not found',
+    });
+  }
+
+  user.upi_id = upi_id;
+  await user.save();
+
+  // Return a success response
+  res.status(200).json({
+    success: true,
+    message: 'UPI ID updated successfully',
+    upi: upi_id
+  });
+
+
+})
