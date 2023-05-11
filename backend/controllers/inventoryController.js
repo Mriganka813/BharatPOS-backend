@@ -14,35 +14,7 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Create Inventory
-exports.createInventory = catchAsyncErrors(async (req, res, next) => {
-  const { barCode } = req.body;
-  const userDetail = req.user._id;
-  /// if has image, then create and save on cloudinary
-  console.log(req.files)
-  if (req.files?.image) {
-    const result = await upload(req.files.image);
-    req.body.image = result.url;
-  }
-  req.body.user = userDetail;
-  /// Check if barcode is unique to that particular user
-  if (req.body.barCode !== undefined) {
-    const existingInventory = await Inventory.findOne({
-      barCode: barCode,
-      user: req.user._id,
-    });
-    if (!lodash.isEmpty(existingInventory)) {
-      return next(
-        new ErrorHandler("Product with this barcode already exists ", 400)
-      );
-    }
-  }
-  const inventory = await Inventory.create({ ...req.body });
 
-  res.status(201).json({
-    success: true,
-    inventory,
-  });
-});
 
 // Get All Inventory count and search
 exports.getAllInventoriesAndSearch = catchAsyncErrors(
