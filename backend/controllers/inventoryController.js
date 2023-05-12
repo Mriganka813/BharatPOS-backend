@@ -16,8 +16,12 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
 // Create Inventory
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const { barCode } = req.body;
-  const userDetail = req.user._id;
+  const userDetail = req.user._id; 
   /// if has image, then create and save on cloudinary
+  if(req.body.quantity == undefined){
+    console.log('undefine qty');
+    req.body.quantity=99999
+  }
   console.log(req.files)
   if (req.files?.image) {
     const result = await upload(req.files.image);
