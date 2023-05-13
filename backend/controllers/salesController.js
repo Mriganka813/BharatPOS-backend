@@ -6,8 +6,13 @@ const inventoryController = require("./inventoryController");
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party } = req.body;
+  
+  
   for (const item of orderItems) {
+    const product = await Inventory.findById(item.product);
+    if(product.quantity < 99990){
     inventoryController.decrementQuantity(item.product, item.quantity);
+    }
   }
   try {
     const total = calcTotalAmount(orderItems);
