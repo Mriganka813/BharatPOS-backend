@@ -8,5 +8,10 @@
   </head>
   <body>
     <h1>Successfully connected</h1>
+
+    <form action="/api/v1/inventory/bulk" method="post" enctype="multipart/form-data">
+      <input type="file" name="excelFile" accept=".xlsx, .xls" required>
+      <button type="submit">Upload</button>
+  </form>
   </body>
 </html>

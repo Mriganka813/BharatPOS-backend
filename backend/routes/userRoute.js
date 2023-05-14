@@ -24,13 +24,13 @@ router.route("/login").post(loginUser);
 
 router.route("/logout").get(logout);
 
-router.route("/me").get(isAuthenticatedUser, isSubscribed, getUserDetails);
+router.route("/me").get(isAuthenticatedUser,  getUserDetails);
 
 router.route("/get-token").get(cntlr.refreshJwtToken);
 
-router.route("/password/update").put(isAuthenticatedUser, isSubscribed, updatePassword);
+router.route("/password/update").put(isAuthenticatedUser,  updatePassword);
 
-router.route("/me/update").put(isAuthenticatedUser, isSubscribed, updateProfile);
+router.route("/me/update").put(isAuthenticatedUser,  updateProfile);
 
 router.route("/signup/verifyotp").post(verifyOtp);
 
@@ -39,9 +39,9 @@ router.route("/signup/otp").post(signUpWithPhoneNumber);
 router.route("/password/reset").put(resetPassword);
 
 
-router.route("/getupi").get(isAuthenticatedUser, isSubscribed, getUpi);
+router.route("/getupi").get(isAuthenticatedUser,  getUpi);
 
-router.route("/upi/updateupi").put(isAuthenticatedUser, isSubscribed, updateUpi);
+router.route("/upi/updateupi").put(isAuthenticatedUser,  updateUpi);
 
 
 

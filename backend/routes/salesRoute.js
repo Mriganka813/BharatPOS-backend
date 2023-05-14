@@ -16,27 +16,27 @@ const {
   isAuthenticatedUser,
   authorizeRoles,
   isAuthenticatedAdmin,
-  isSubscribed,
+  
 } = require("../middleware/auth");
 
 router
   .route("/salesOrder/new")
-  .post(isAuthenticatedUser, isSubscribed, newSalesOrder);
+  .post(isAuthenticatedUser,  newSalesOrder);
 
 router
   .route("/sales/credit-history/:id")
-  .get(isAuthenticatedUser, isSubscribed, cntrl.partyCreditHistory)
-  .post(isAuthenticatedUser, isSubscribed, cntrl.addCreditSettleTransaction);
+  .get(isAuthenticatedUser,  cntrl.partyCreditHistory)
+  .post(isAuthenticatedUser,  cntrl.addCreditSettleTransaction);
 router
   .route("/salesOrder/:id")
-  .get(isAuthenticatedUser, isSubscribed, getSingleSalesOrder);
+  .get(isAuthenticatedUser,  getSingleSalesOrder);
 router
   .route("/sales/credit")
-  .get(isAuthenticatedUser, isSubscribed, getCreditSaleOrders);
+  .get(isAuthenticatedUser,  getCreditSaleOrders);
 
 router
   .route("/salesOrders/me")
-  .get(isAuthenticatedUser, isSubscribed, mySalesOrders);
+  .get(isAuthenticatedUser,  mySalesOrders);
 
 router
   .route("/admin/salesOrders")
@@ -44,12 +44,12 @@ router
 
 router
   .route("/salesOrder/:id")
-  .delete(isAuthenticatedUser, isSubscribed, deleteSalesOrder);
+  .delete(isAuthenticatedUser,  deleteSalesOrder);
 router
   .route("/admin/salesOrder/:id")
   .delete(isAuthenticatedAdmin, authorizeRoles("admin"), deleteSalesOrder);
 
 router
   .route("/upd/salesOrder/:id")
-  .put(isAuthenticatedUser, isSubscribed, UpdateSalesOrder);
+  .put(isAuthenticatedUser,  UpdateSalesOrder);
 module.exports = router;

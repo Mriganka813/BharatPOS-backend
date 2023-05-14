@@ -4,6 +4,6 @@ const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
 
 const router = express.Router();
 // get purchase report  , sales report ,  expense report of user between starting date and end date
-router.route("/report").get(isAuthenticatedUser,isSubscribed, getReportofUser);
+router.route("/report").get(isAuthenticatedUser, getReportofUser);
 
 module.exports = router;

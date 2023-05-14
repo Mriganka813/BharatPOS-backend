@@ -1,4 +1,6 @@
 const Inventory = require("../models/inventoryModel");
+var XLSX = require('xlsx');
+const path = require('path');
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const lodash = require("lodash");
@@ -211,3 +213,78 @@ exports.deleteInventory = catchAsyncErrors(async (req, res, next) => {
     message: "Inventory Delete Successfully",
   });
 });
+
+
+
+
+
+exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
+  try {
+
+    if (!req.file) {
+      return res.status(400).json({ error: 'No file found' });
+    }
+    const filePath = req.file.path;
+
+    // Get field names from the first row of the sheet
+    
+    // Read the uploaded Excel file
+    const workbook = XLSX.readFile(filePath);
+    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+    const jsonData = XLSX.utils.sheet_to_json(sheet);
+    
+    const fieldNames = Object.keys(jsonData[0]);
+    // Create an array of user documents
+    const inventoryData = jsonData.map((data) => {
+      const user = {};
+      fieldNames.forEach((fieldName) => {
+        if (data[fieldName] !== undefined) {
+          user[fieldName] = data[fieldName];
+        }
+      });
+      return user;
+    });
+
+
+    await Inventory.insertMany(users, { timeout: 30000 });
+
+     // Delete the file
+     fs.unlinkSync(filePath);
+
+    // Send a response
+    res.status(200).json({ success: true, inventory, message: 'Data uploaded successfully' });
+  } catch (err) {
+    // Handle errors
+    console.error(err);
+    res.status(500).json({ error: 'An error occurred' });
+  }
+});
+
+
+
+// exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
+//   try {
+
+//     const filePath = req.file.path;
+//     if (!req.file) {
+//       return res.status(400).json({ error: 'No file found' });
+//     }
+
+//     // Read the uploaded Excel file
+//     const workbook = XLSX.readFile(req.file.path);
+//     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
+
+//     // Extract data from the sheet
+//     const data = XLSX.utils.sheet_to_json(worksheet);
+
+//     // Process the data and save it to the MongoDB database
+//     const inventory = await Inventory.insertMany(data);
+
+//     // Send a response
+//     res.status(200).json({ success: true, inventory, message: 'Data uploaded successfully' });
+//   } catch (err) {
+//     // Handle errors
+//     console.error(err);
+//     res.status(500).json({ error: 'An error occurred' });
+//   }
+// });
