@@ -288,3 +288,31 @@ exports.updateConsumerDetails = catchAsyncErrors(async (req, res, next) => {
     consumer,
   });
 });
+
+
+// add to cart
+
+exports.addToCart = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.params.userId;
+  const productId = req.params.productId;
+  const qty = req.body.qty;
+  console.log(userId);
+  console.log(qty);
+
+  const consumer = await Consumer.findById(userId);
+  console.log(consumer.cart);
+  if (!consumer) {
+    console.log("User not found");
+  }
+
+  // Create a new cart item
+  const newCartItem = {
+    productId: productId,
+    quantity: qty
+  };
+
+  consumer.cart.push(newCartItem);
+  const savedConsumer = await consumer.save();
+
+  return res.send(savedConsumer);
+});

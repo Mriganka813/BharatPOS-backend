@@ -20,6 +20,7 @@ const {
   getTopClickedSellers,
   getConsumerDetails,
   updateConsumerDetails,
+  addToCart
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -69,5 +70,8 @@ router.route("/products/popular").get(isAuthenticatedConsumer, getTopClickedProd
 router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSellers);
 
 router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSellers);
+
+router.route('/cart/add/user/:userId/product/:productId').post(isAuthenticatedConsumer, addToCart)
+
 
 module.exports = router;

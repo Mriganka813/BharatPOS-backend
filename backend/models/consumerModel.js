@@ -35,6 +35,21 @@ const consumerSchema = new mongoose.Schema({
     type: String,
     default: "user",
   },
+  cart: {
+    type: [
+        {
+            productId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'inventory'
+            },
+            quantity: {
+                type: Number,
+                default: 1
+            }
+        }
+    ],
+    default: []
+},
   createdAt: {
     type: Date,
     default: Date.now,

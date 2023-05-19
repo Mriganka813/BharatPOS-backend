@@ -8,6 +8,7 @@ const subscribedUsersModel = require("../models/subscribedUsersModel");
 const Agent = require("../models/agentModel");
 exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.cookies;
+  console.log(token);
   if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
   }
@@ -28,6 +29,7 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 // auth for consumer
 exports.isAuthenticatedConsumer = catchAsyncErrors(async (req, res, next) => {
   const { token } = req.cookies;
+  console.log(token);
   if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
   }
