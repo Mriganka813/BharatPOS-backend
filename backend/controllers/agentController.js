@@ -7,6 +7,7 @@ const sendEmail = require("../utils/sendEmail");
 const User = require("../models/userModel");
 const subscribedUsersModel = require("../models/subscribedUsersModel");
 
+
 exports.registerAgent = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password, phoneNumber } = req.body;
   if (!name || !email || !password || !phoneNumber) {

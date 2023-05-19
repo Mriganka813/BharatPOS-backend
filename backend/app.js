@@ -48,6 +48,7 @@ const consumer = require("./routes/consumerRoute");
 const payment = require("./routes/paymentRoutes");
 const subscribedUsersModel = require("./models/subscribedUsersModel");
 const agent = require("./routes/agentRoutes");
+const bulk=require('./routes/bulkUploads')
 
 const corsConfig = {
   origin: "http://localhost:5500",
@@ -118,6 +119,7 @@ app.use("/api/v1", report);
 app.use("/api/v1/agent", agent);
 app.use("/api/v1/consumer", consumer);
 app.use("/api/v1/payment", payment);
+app.use("/api/v1",bulk);
 
 app.use(express.static(path.join(__dirname, "build")));
 

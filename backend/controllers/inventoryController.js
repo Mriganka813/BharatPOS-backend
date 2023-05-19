@@ -189,6 +189,9 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   //     );
   //   }
   // }
+
+  console.log("ppp");
+  console.log(req.body.expiryDate);
   inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
     runValidators: true,

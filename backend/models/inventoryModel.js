@@ -97,7 +97,7 @@ const inventorySchema = mongoose.Schema({
     type: Date,
   },
   createdAt: {
-    type: Date,
+    type: String,
     default: Date.now,
   },
 });

@@ -9,6 +9,7 @@ const ExpenseModel = require("../models/expenseModel");
 const SalesModel = require("../models/salesModel");
 const InventoryModel = require("../models/inventoryModel");
 const PartyModel = require("../models/partyModel");
+
 // creating admin
 exports.createAdmin = catchAsyncErrors(async (req, res, next) => {
   const { name, email, password } = req.body;
