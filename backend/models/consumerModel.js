@@ -38,6 +38,10 @@ const consumerSchema = new mongoose.Schema({
   cart: {
     type: [
         {
+            sellerId:{
+              type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            },
             productId: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'inventory'

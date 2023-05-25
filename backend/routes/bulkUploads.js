@@ -1,5 +1,6 @@
 const express = require("express");
 const router = express.Router();
+const xlsx = require('xlsx');
 const { bulkUpload} = require("../controllers/bulkController");
 const { isAuthenticatedAgent } = require("../middleware/auth");
 

@@ -295,23 +295,55 @@ exports.updateConsumerDetails = catchAsyncErrors(async (req, res, next) => {
 exports.addToCart = catchAsyncErrors(async (req, res, next) => {
   const userId = req.params.userId;
   const productId = req.params.productId;
-  const qty = req.body.qty;
-  console.log(userId);
-  console.log(qty);
-
+  const qty = parseInt(req.body.qty);
+  
+  
   const consumer = await Consumer.findById(userId);
+
+  const product = await Inventory.findById(productId)
+  const sellerId=product.user
+  
+
   console.log(consumer.cart);
   if (!consumer) {
     console.log("User not found");
   }
 
-  // Create a new cart item
-  const newCartItem = {
-    productId: productId,
-    quantity: qty
-  };
 
-  consumer.cart.push(newCartItem);
+  consumer.cart = consumer.cart.filter(
+    (item) => item.sellerId.toString() === sellerId.toString()
+  );
+
+    // Create a new cart item
+    const newCartItem = {
+      productId: productId,
+      quantity: qty,
+      sellerId: sellerId
+    };
+  // Check if the product is already in the cart
+  const existingCartItem = consumer.cart.find(
+    (item) =>
+      item.productId.toString() === productId.toString() &&
+      item.sellerId.toString() === sellerId.toString()
+  );
+
+  if (existingCartItem) {
+    // If the product is already in the cart, increase the quantity
+    existingCartItem.quantity += qty;
+  } else {
+    // If the product is not in the cart, create a new cart item
+    const newCartItem = {
+      productId: productId,
+      quantity: qty,
+      sellerId: sellerId,
+    };
+    consumer.cart.push(newCartItem);
+  }
+
+  
+
+
+  // consumer.cart.push(newCartItem);
   const savedConsumer = await consumer.save();
 
   return res.send(savedConsumer);

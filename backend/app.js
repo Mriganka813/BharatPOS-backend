@@ -6,12 +6,122 @@ const fileUpload = require("express-fileupload");
 const path = require("path");
 const cloudinary = require("cloudinary");
 const fs = require("fs");
+const multer = require("multer");
 var busboy = require("connect-busboy");
 const cors = require("cors");
+const Inventory = require("./models/inventoryModel");
 // const fs=require("fs");
+const XLSX = require('xlsx');
 
 const errorMiddleware = require("./middleware/error");
 const logFile = fs.createWriteStream("./logfile.log", { flags: "w" }); //use {flags: 'w'} to open in write mode
+
+//multerconnection
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+
+const upload = multer({ storage: storage }); 
+
+
+app.post('/api/v1/bulkupload/:id', upload.single('file'), async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: 'No file uploaded' });
+  }
+
+  const filePath = req.file.path;
+  const userDetail = req.params.id;
+
+  // Convert the data according to their index number
+  const workbook = XLSX.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+
+  // Convert into JSON format
+  const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+  // Remove the header row
+  const headers = jsonData.shift();
+
+  try {
+    for (const row of jsonData) {
+      const itemData = {};
+      headers.forEach((header, index) => {
+        const value = row[index] !== '' ? row[index] : undefined;
+        itemData[header.toLowerCase()] = value;
+      });
+
+      itemData.user = userDetail;
+
+      // Check if barcode is unique to that particular user
+      if (itemData.barcode) {
+        const existingInventory = await Inventory.findOne({
+          barcode: itemData.barcode,
+          user: userDetail,
+        });
+        if (existingInventory) {
+          console.error('Product with this barcode already exists');
+          continue;
+        }
+      }
+
+      // Create and save the inventory item
+      const inventory = new Inventory(itemData);
+      await inventory.save();
+      console.log('Item saved:', inventory);
+    }
+
+    // Success message
+    res.json({ message: 'File uploaded successfully' });
+  } catch (error) {
+    console.error('Failed to save items:', error);
+    res.status(500).json({ message: 'Failed to save items' });
+  }
+});
+
+
+// app.post('/upload', upload.single('file'), (req, res) => {
+//   if (!req.file) {
+//     return res.status(400).json({ message: 'No file uploaded' });
+//   }
+//   const filePath = req.file.path;
+
+//   //convert the data according to their index number
+//   const workbook = XLSX.readFile(filePath);
+//   const sheetName = workbook.SheetNames[0];
+//   const worksheet = workbook.Sheets[sheetName];
+
+//   // Convert into json formate
+//   const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+//   // Remove the header row
+//   const headers = jsonData.shift();
+
+//   // Process each row and save it to the database
+//   jsonData.forEach(row => {
+//     const itemData = {};
+//     headers.forEach((header, index) => {
+//       itemData[header.toLowerCase()] = row[index];
+//     });
+
+//     //save the items
+//     const item = new Inventory(itemData);
+//     item.save().catch(err => {
+//       console.error('Failed to save item:', err);
+//     });
+//   });
+//   //success message
+//   res.json({ message: 'File uploaded successfully' });
+//   console.log("file uploaded ");
+// });
+
+
+
 
 // Config
 if (process.env.NODE_ENV !== "PRODUCTION") {
@@ -34,6 +144,8 @@ app.use(cors());
 // Set EJS as templating engine
 app.set("view engine", "ejs");
 
+
+
 // Route Imports
 const product = require("./routes/inventoryRoute");
 const user = require("./routes/userRoute");
@@ -44,7 +156,10 @@ const purchase = require("./routes/purchaseRoute");
 const sales = require("./routes/salesRoute");
 const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
+
 const consumer = require("./routes/consumerRoute");
+
+
 const payment = require("./routes/paymentRoutes");
 const subscribedUsersModel = require("./models/subscribedUsersModel");
 const agent = require("./routes/agentRoutes");
