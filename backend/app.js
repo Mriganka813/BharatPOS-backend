@@ -76,6 +76,8 @@ app.post('/api/v1/bulkupload/:id', upload.single('file'), async (req, res) => {
       console.log('Item saved:', inventory);
     }
 
+    fs.unlinkSync(filePath);
+
     // Success message
     res.json({ message: 'File uploaded successfully' });
   } catch (error) {
