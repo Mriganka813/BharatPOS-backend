@@ -11,7 +11,8 @@ const {
   signUpWithPhoneNumber,
   resetPassword,
   getUpi,
-  updateUpi
+  updateUpi,
+  uploadData
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -41,6 +42,25 @@ router.route("/password/reset").put(resetPassword);
 router.route("/getupi").get(isAuthenticatedUser,  getUpi);
 
 router.route("/upi/updateupi").put(isAuthenticatedUser,  updateUpi);
+
+
+
+const multer = require("multer");
+
+
+
+//multerconnection
+const storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null, Date.now() + '-' + file.originalname);
+  }
+});
+const upload = multer({ storage: storage }); 
+
+router.route("/upload").post(isAuthenticatedUser, upload.single('file'), uploadData)
 
 
 
