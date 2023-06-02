@@ -27,10 +27,10 @@ const userSchema = new mongoose.Schema(
       trim: true,
     },
     address: {
-      type: String,
-      required: [true, "Please enter your address"],
-      maxLength: [200, "Name cannot exceed 30 characters"],
-      minLength: [5, "Name should have more than 4 characters"],
+      locality: { type: String },
+      city: { type: String },
+      state: { type: String },
+      country: { type: String, default: 'India' } // Assuming the country is always India
     },
     role: {
       type: String,

@@ -26,13 +26,14 @@ exports.registerConsumer = catchAsyncErrors(async (req, res, next) => {
   sendToken(consumer, 201, res);
 });
 
+
 // consumer login
 exports.loginConsumer = catchAsyncErrors(async (req, res, next) => {
-  const { phoneNumber, password } = req.body;
-  if (!phoneNumber || !password) {
+  const { email, password } = req.body;
+  if (!email || !password) {
     return next(new ErrorHandler("Please provide all the details", 400));
   }
-  const consumer = await Consumer.findOne({ phoneNumber }).select("+password");
+  const consumer = await Consumer.findOne({ email }).select("+password");
   if (!consumer) {
     return next(new ErrorHandler("Invalid credentials", 400));
   }

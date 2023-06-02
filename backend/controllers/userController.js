@@ -127,6 +127,45 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
 
 // register user
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
+  console.log(req.body.email);
+  console.log("inside ");
+  if (req.files?.image) {
+    const result = await upload(req.files.image);
+    req.body.image = result.url;
+  }
+  
+  const { locality, city, state } = req.body; // Extracting address subfields
+
+  console.log(city);
+  
+  const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
+  if (data) {
+    return next(
+      new ErrorHandler("Phone Number already registered, Sign In instead", 400)
+    );
+  }
+
+  const user = await User.create({ 
+    ...req.body,
+    address: {
+      locality: locality,
+      city: city,
+      state: state,
+      country: "India" // Assuming the country is always India
+    }
+  });
+  
+  const subbed = await subscribedUsersModel.create({
+    email: req.body.email,
+    phoneNumber: req.body.phoneNumber,
+    expireAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15),
+  });
+
+  sendToken(user, 201, res);
+});
+
+
+exports.registerUser0 = catchAsyncErrors(async (req, res, next) => {
   console.log("inside ");
   if (req.files?.image) {
     const result = await upload(req.files.image);
@@ -404,4 +443,18 @@ exports.uploadData=catchAsyncErrors(async(req,res,next)=>{
         console.error('Failed to save items:', error);
         res.status(500).json({ message: 'Failed to save items' });
       }
+})
+
+
+exports.renderRegister=catchAsyncErrors(async(req,res,next)=>{
+
+  return res.render('register')
+
+})
+
+exports.collect=catchAsyncErrors(async(req,res,next)=>{
+
+  console.log('collected');
+  res.redirect('back')
+
 })
