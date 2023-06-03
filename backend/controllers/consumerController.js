@@ -349,3 +349,11 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 
   return res.send(savedConsumer);
 });
+
+
+exports.addToCart = catchAsyncErrors(async (req, res, next) => {
+
+  const userId=req.user.id
+  // send cart data to orderDB
+
+});

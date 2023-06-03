@@ -44,7 +44,7 @@ router.route("/inventories/all").get(isAuthenticatedUser, getAllInventories);
 
 router.route("/inventory/new").post(isAuthenticatedUser ,createInventory);
 
-router.route("/inventory/bulk").post(upload.single('excelFile'),bulkUpload)
+// router.route("/inventory/bulk").post(upload.single('excelFile'),bulkUpload)
 
 router.route("/inventory/me").get(isAuthenticatedUser, getInventoryForUser);
 

@@ -23,6 +23,10 @@ const inventorySchema = mongoose.Schema({
     // required: [true, "Please Enter selling price of inventory"],
     maxLength: [8, "Price cannot exceed 8 characters"],
   },
+  returnPeriod:{
+      type:Number,
+      default:0, 
+  },
   barCode: {
     type: String,
     // required: true,
