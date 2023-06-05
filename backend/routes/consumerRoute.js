@@ -22,7 +22,8 @@ const {
   updateConsumerDetails,
   addToCart,
   searchLocation,
-  searchProduct
+  searchProduct,
+  filterProduct
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -81,4 +82,8 @@ router.route('/search/location').post(searchLocation)
 // Search Product Todo add Auth middleware later 
 
 router.route('/search/product').post(searchProduct)
+
+router.route('/category/:productCategory/location/:location').get(filterProduct)
+
+
 module.exports = router;

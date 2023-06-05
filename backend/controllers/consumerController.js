@@ -6,7 +6,8 @@ const sendEmail = require("../utils/sendEmail");
 const User = require("../models/userModel");
 const Inventory = require("../models/inventoryModel");
 const ApiFeatures = require("../utils/apiFeatures");
-const Product = require('../models/inventoryModel')
+const Product = require('../models/inventoryModel');
+const { unsubscribe } = require("../routes/consumerRoute");
 
 // variable for global clicks counter
 let allClicksProducts = 0;
@@ -387,32 +388,7 @@ exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-//  Search Product
-exports.searchProduct1 = catchAsyncErrors(async (req, res, next) => {
 
-  // const userId=req.user.id
-  const productName=req.body.productName;
-  const name=productName.toLowerCase();
-  try{
-    const product=await Product.find({
-      $or: [
-        { "name": name },
-        { "category": name }
-      ]
-    })
-
-    console.log(product);
-    if (product.length === 0) {
-      return res.send("Sorry, no sellers found at that location.");
-    }
-
-    res.status(200).json({ product });
-  }catch(err){
-    res.send(err)
-  }
-  // send cart data to orderDB
-
-});
 
 
 // Search Product
@@ -447,4 +423,28 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   } catch (err) {
     res.send(err);
   }
+});
+
+
+// flter Product by category
+
+exports.filterProduct = catchAsyncErrors(async (req, res, next) => {
+
+  const category=req.params.productCategory
+  const location=req.params.location
+  const user= await User.find({
+    businessType:category,
+    $or: [
+      { "address.city": location },
+      { "address.state": location }
+    ]
+  
+  })
+
+  if(user.length === 0){
+    return res.send("Sorry, NO seller Available");
+  }
+  
+  res.send(user)
+
 });
