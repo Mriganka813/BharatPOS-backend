@@ -134,7 +134,11 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     req.body.image = result.url;
   }
   
-  const { locality, city, state } = req.body; // Extracting address subfields
+  const { locality, city, state } = req.body // Extracting address subfields
+
+  const lowercaseLocality = locality.toLowerCase();
+  const lowercaseCity = city.toLowerCase();
+  const lowercaseState = state.toLowerCase();
 
   console.log(city);
   
@@ -148,9 +152,9 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const user = await User.create({ 
     ...req.body,
     address: {
-      locality: locality,
-      city: city,
-      state: state,
+      locality: lowercaseLocality,
+      city: lowercaseCity,
+      state: lowercaseState,
       country: "India" // Assuming the country is always India
     }
   });

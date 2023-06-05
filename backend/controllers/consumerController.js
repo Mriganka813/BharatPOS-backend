@@ -26,7 +26,6 @@ exports.registerConsumer = catchAsyncErrors(async (req, res, next) => {
   sendToken(consumer, 201, res);
 });
 
-
 // consumer login
 exports.loginConsumer = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
@@ -351,9 +350,37 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-exports.addToCart = catchAsyncErrors(async (req, res, next) => {
+// exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 
-  const userId=req.user.id
-  // send cart data to orderDB
+//   const userId=req.user.id
+//   // send cart data to orderDB
+
+// });
+
+
+exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
+
+  const searchedLocation = req.body.location
+  const location=searchedLocation.toLowerCase();
+  console.log(location);
+
+  try {
+    const users = await User.find({
+      $or: [
+        { "address.city": location },
+        { "address.state": location }
+      ]
+    });
+    console.log(users);
+    if(!users){
+      res.send("Sorry no seller at that locaion ")
+    }
+
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+
+  
 
 });

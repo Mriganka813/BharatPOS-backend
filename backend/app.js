@@ -87,44 +87,6 @@ app.post('/api/v1/bulkupload',isAuthenticatedUser, upload.single('file'), async 
   }
 });
 
-/*
-app.post('/upload', upload.single('file'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: 'No file uploaded' });
-  }
-  const filePath = req.file.path;
-
-  //convert the data according to their index number
-  const workbook = XLSX.readFile(filePath);
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-
-  // Convert into json formate
-  const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-  // Remove the header row
-  const headers = jsonData.shift();
-
-  // Process each row and save it to the database
-  jsonData.forEach(row => {
-    const itemData = {};
-    headers.forEach((header, index) => {
-      itemData[header.toLowerCase()] = row[index];
-    });
-
-    //save the items
-    const item = new Inventory(itemData);
-    item.save().catch(err => {
-      console.error('Failed to save item:', err);
-    });
-  });
-  //success message
-  res.json({ message: 'File uploaded successfully' });
-  console.log("file uploaded ");
-});
-
-*/
-
 
 // Config
 if (process.env.NODE_ENV !== "PRODUCTION") {
