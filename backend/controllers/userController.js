@@ -12,6 +12,7 @@ const upload = require("../services/upload");
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
+const { uploadImage } =require("../services/upload")
 
 exports.verifyOtp = catchAsyncErrors(async (req, res, next) => {
   const otpHolder = await otpModel.find({
@@ -127,11 +128,13 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
 
 // register user
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.body.email);
+  // console.log(req.body.email);
   console.log("inside ");
   if (req.files?.image) {
-    const result = await upload(req.files.image);
+    console.log('image');
+    const result = await uploadImage(req.files.image);
     req.body.image = result.url;
+    console.log(req.body.image);
   }
   
   const { locality, city, state } = req.body // Extracting address subfields
@@ -140,7 +143,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const lowercaseCity = city.toLowerCase();
   const lowercaseState = state.toLowerCase();
 
-  console.log(city);
+  // console.log(city);
   
   const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
   if (data) {

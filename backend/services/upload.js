@@ -1,7 +1,9 @@
 const cloudinary = require("cloudinary").v2;
 const streamifier = require("streamifier");
 
-module.exports = uploadImage = (file) => {
+
+
+const uploadImage = (file) => {
   return new Promise((resolve, reject) => {
     let stream = cloudinary.uploader.upload_stream((error, result) => {
       if (result) {
@@ -12,4 +14,8 @@ module.exports = uploadImage = (file) => {
     });
     streamifier.createReadStream(file.data).pipe(stream);
   });
+};
+
+module.exports = {
+  uploadImage,
 };

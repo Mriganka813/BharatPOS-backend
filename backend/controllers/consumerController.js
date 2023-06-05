@@ -6,6 +6,7 @@ const sendEmail = require("../utils/sendEmail");
 const User = require("../models/userModel");
 const Inventory = require("../models/inventoryModel");
 const ApiFeatures = require("../utils/apiFeatures");
+const Product = require('../models/inventoryModel')
 
 // variable for global clicks counter
 let allClicksProducts = 0;
@@ -358,10 +359,10 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 // });
 
 
+// search Location
 exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
-
-  const searchedLocation = req.body.location
-  const location=searchedLocation.toLowerCase();
+  const searchedLocation = req.body.location;
+  const location = searchedLocation.toLowerCase();
   console.log(location);
 
   try {
@@ -370,17 +371,80 @@ exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
         { "address.city": location },
         { "address.state": location }
       ]
-    });
+    })
+      .limit(20) // Limit the search results to 5
+      .exec();
+
     console.log(users);
-    if(!users){
-      res.send("Sorry no seller at that locaion ")
+    if (users.length === 0) {
+      return res.send("Sorry, no sellers found at that location.");
     }
 
     res.status(200).json({ users });
   } catch (error) {
     res.status(500).json({ error: "Internal server error" });
   }
+});
 
-  
 
+//  Search Product
+exports.searchProduct1 = catchAsyncErrors(async (req, res, next) => {
+
+  // const userId=req.user.id
+  const productName=req.body.productName;
+  const name=productName.toLowerCase();
+  try{
+    const product=await Product.find({
+      $or: [
+        { "name": name },
+        { "category": name }
+      ]
+    })
+
+    console.log(product);
+    if (product.length === 0) {
+      return res.send("Sorry, no sellers found at that location.");
+    }
+
+    res.status(200).json({ product });
+  }catch(err){
+    res.send(err)
+  }
+  // send cart data to orderDB
+
+});
+
+
+// Search Product
+// Search Product
+exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
+  const productName = req.body.productName;
+
+  const nameVariations = [];
+  const nameWords = productName.split(" ");
+
+  for (let i = 0; i < nameWords.length; i++) {
+    const variation = nameWords.slice(0, i + 1).join(" ");
+    nameVariations.push(variation);
+  }
+
+  try {
+    const product = await Product.find({
+      $or: nameVariations.map(variation => ({
+        $or: [
+          { name: { $regex: new RegExp(variation, "i") } },
+          { category: { $regex: new RegExp(variation, "i") } }
+        ]
+      }))
+    });
+
+    console.log(product);
+    if (product.length === 0) {
+      return res.send("Sorry, no products found matching your search.");
+    }
+
+    res.status(200).json({ product });
+  } catch (err) {
+    res.send(err);
+  }
 });
