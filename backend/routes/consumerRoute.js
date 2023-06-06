@@ -23,7 +23,8 @@ const {
   addToCart,
   searchLocation,
   searchProduct,
-  filterProduct
+  filterProduct,
+  viewAll
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -78,6 +79,9 @@ router.route('/cart/add/user/:userId/product/:productId').post(isAuthenticatedCo
 
 // search Location Todo add Auth middleware later 
 router.route('/search/location').post(searchLocation)
+
+// search Location Todo add Auth middleware later 
+router.route('/search/location/viewall/:location').get(viewAll)
 
 // Search Product Todo add Auth middleware later 
 
