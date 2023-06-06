@@ -360,7 +360,7 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 // });
 
 
-// search Location
+// search Location ** TODO send only nearby shops **
 exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
   const searchedLocation = req.body.location;
   const location = searchedLocation.toLowerCase();
@@ -388,11 +388,35 @@ exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
 });
 
 
+// Vie all
 
+exports.viewAll = catchAsyncErrors(async (req, res, next) => {
+  const searchedLocation = req.params.location;
+  const location = searchedLocation.toLowerCase();
+  console.log(location);
 
+  try {
+    const users = await User.find({
+      $or: [
+        { "address.city": location },
+        { "address.state": location }
+      ]
+    })
+      
+
+    console.log(users);
+    if (users.length === 0) {
+      return res.send("Sorry, no sellers found at that location.");
+    }
+
+    res.status(200).json({ users });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
 
 // Search Product
-// Search Product
+// Search Product top reults 
 exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   const productName = req.body.productName;
 
@@ -424,6 +448,9 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
     res.send(err);
   }
 });
+
+
+
 
 
 // flter Product by category
