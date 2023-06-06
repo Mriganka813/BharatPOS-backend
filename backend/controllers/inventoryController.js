@@ -6,6 +6,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const lodash = require("lodash");
 const upload = require("../services/upload");
 const ApiFeatures = require("../utils/apiFeatures");
+const { uploadImage } =require("../services/upload")
 exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
   const barcode = req.params.code;
   const inventory = await Inventory.findOne({ barCode: barcode });
@@ -26,8 +27,10 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   }
   console.log(req.files)
   if (req.files?.image) {
-    const result = await upload(req.files.image);
+    console.log('image');
+    const result = await uploadImage(req.files.image);
     req.body.image = result.url;
+    console.log(req.body.image);
   }
   req.body.user = userDetail;
   /// Check if barcode is unique to that particular user

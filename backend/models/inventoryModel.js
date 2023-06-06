@@ -101,9 +101,11 @@ const inventorySchema = mongoose.Schema({
     type: Date,
   },
   createdAt: {
-    type: String,
+    type: Date,
     default: Date.now,
   },
-});
+  
+ 
+}, { timestamps: true });
 
 module.exports = mongoose.model("inventory", inventorySchema);
