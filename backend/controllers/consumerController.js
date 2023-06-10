@@ -395,12 +395,14 @@ exports.showCart=catchAsyncErrors(async(req,res,next)=>{
   res.send(cartWithProductInfo);
 })
 
-// exports.addToCart = catchAsyncErrors(async (req, res, next) => {
+exports.checloutCart = catchAsyncErrors(async (req, res, next) => {
 
-//   const userId=req.user.id
-//   // send cart data to orderDB
+  const userId=req.user.id
+  // send cart data to orderDB
+  const user = await User.findById(userId)
+  console.log(user.cart );
 
-// });
+});
 
 
 // search Location ** TODO send only nearby shops **
@@ -457,6 +459,7 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
     res.status(500).json({ error: "Internal server error" });
   }
 });
+
 
 // Search Product
 // Search Product top reults 
