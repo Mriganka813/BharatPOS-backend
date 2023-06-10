@@ -323,6 +323,7 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 
     // Create a new cart item
     const newCartItem = {
+
       productId: productId,
       quantity: qty,
       sellerId: sellerId
@@ -362,6 +363,28 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
   return res.send(savedConsumer);
 });
 
+
+exports.showCart=catchAsyncErrors(async(req,res,next)=>{
+
+  console.log("jii");
+  const userId = req.user._id
+
+  const consumer = await Consumer.findById(userId)
+
+  const cartWithProductInfo = await Promise.all(
+    consumer.cart.map(async (item) => {
+      const product = await Inventory.findById(item.productId);
+      return {
+        
+        product,
+        quantity: item.quantity,
+        // _id: item._id
+      };
+    })
+  );
+
+  res.send(cartWithProductInfo);
+})
 
 // exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 
