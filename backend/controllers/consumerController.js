@@ -306,7 +306,10 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 
   console.log(product.quantity);
   if(qty>product.quantity){
-    return res.send("cant select that much")
+    return res.json({
+      satus: false,
+      msg:"quantity Not available"
+    })
   }
   const sellerId=product.user
   
@@ -339,7 +342,10 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
     const totalQty = existingCartItem.quantity + qty;
 
     if (totalQty > product.quantity) {
-      return res.send("Cannot select that much");
+      return res.json({
+        satus: false,
+        msg:"quantity Not available"
+      })
     }
 
     // If the product is already in the cart, update the quantity
@@ -360,7 +366,10 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
   // consumer.cart.push(newCartItem);
   const savedConsumer = await consumer.save();
 
-  return res.send(savedConsumer);
+  return res.json({
+    satus: true,
+    msg:"Added successfully"
+  })
 });
 
 
@@ -378,7 +387,7 @@ exports.showCart=catchAsyncErrors(async(req,res,next)=>{
         
         product,
         quantity: item.quantity,
-        // _id: item._id
+        
       };
     })
   );
