@@ -97,6 +97,9 @@ const inventorySchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
+  sellerName:{
+    type: String,
+  },
   expiryDate: {
     type: Date,
   },

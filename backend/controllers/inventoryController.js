@@ -7,6 +7,7 @@ const lodash = require("lodash");
 const upload = require("../services/upload");
 const ApiFeatures = require("../utils/apiFeatures");
 const { uploadImage } =require("../services/upload")
+const User=require('../models/userModel')
 exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
   const barcode = req.params.code;
   const inventory = await Inventory.findOne({ barCode: barcode });
@@ -20,12 +21,16 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const { barCode } = req.body;
   const userDetail = req.user._id; 
+
+  const seller = await User.findById(userDetail)
+
+  console.log(seller.businessName);
   /// if has image, then create and save on cloudinary
   if(req.body.quantity == undefined){
     console.log('undefine qty');
     req.body.quantity=99999
   }
-  console.log(req.files)
+  // console.log(req.files)
   if (req.files?.image) {
     console.log('image');
     const result = await uploadImage(req.files.image);
@@ -45,7 +50,10 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
       );
     }
   }
-  const inventory = await Inventory.create({ ...req.body });
+  const inventory = await Inventory.create({ 
+    ...req.body,
+    sellerName:seller.businessName
+  });
 
   res.status(201).json({
     success: true,

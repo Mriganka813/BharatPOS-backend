@@ -162,11 +162,11 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     }
   });
   
-  const subbed = await subscribedUsersModel.create({
-    email: req.body.email,
-    phoneNumber: req.body.phoneNumber,
-    expireAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15),
-  });
+  // const subbed = await subscribedUsersModel.create({
+  //   email: req.body.email,
+  //   phoneNumber: req.body.phoneNumber,
+  //   expireAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15),
+  // });
 
   sendToken(user, 201, res);
 });
@@ -195,25 +195,31 @@ exports.registerUser0 = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 201, res);
 });
 
+
 // Login user
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
 
-  console.log("loggedin");
-
+  
   if (!email || !password) {
     return next(new ErrorHandler("Please enter email and password", 400));
   }
-
+  
   const user = await User.findOne({ email }).select("+password");
-
+  
   if (!user) {
+    console.log("wrong password");
     return next(new ErrorHandler("Invalid email or password", 400));
   }
 
   const isPasswordMatched = await user.comparePassword(password);
 
+  if(isPasswordMatched){
+    console.log("correct");
+  }
+
   if (!isPasswordMatched) {
+    console.log("wrong password");
     return next(new ErrorHandler("Invalid email or password", 400));
   }
 
@@ -457,6 +463,49 @@ exports.renderRegister=catchAsyncErrors(async(req,res,next)=>{
 
   return res.render('register')
 
+})
+
+exports.renderWebLogin=catchAsyncErrors(async(req,res,next)=>{
+
+  return res.render('weblogin')
+
+})
+
+
+exports.webLogin=catchAsyncErrors(async(req,res,nex)=>{
+  console.log("oooo");
+ 
+    const { email, password } = req.body;
+  
+    
+    if (!email || !password) {
+      return next(new ErrorHandler("Please enter email and password", 400));
+    }
+    
+    const user = await User.findOne({ email }).select("+password");
+    
+    if (!user) {
+      console.log("wrong password");
+      return next(new ErrorHandler("Invalid email or password", 400));
+    }
+  
+    const isPasswordMatched = await user.comparePassword(password);
+  
+    if(isPasswordMatched){
+      console.log("correct");
+    }
+  
+    if (!isPasswordMatched) {
+      console.log("wrong password");
+      return next(new ErrorHandler("Invalid email or password", 400));
+    }
+  
+    console.log(user);
+    // sendToken(user, 200, res);
+    return res.render('bulkupload',{
+      
+    })
+  
 })
 
 exports.collect=catchAsyncErrors(async(req,res,next)=>{

@@ -11,6 +11,7 @@ var busboy = require("connect-busboy");
 const cors = require("cors");
 const Inventory = require("./models/inventoryModel");
 // const fs=require("fs");
+
 const XLSX = require('xlsx');
 const { isAuthenticatedUser, isSubscribed } = require("./middleware/auth");
 
@@ -28,6 +29,7 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage: storage }); 
+const User = require('./models/userModel')
 
 
 app.post('/api/v1/bulkupload',isAuthenticatedUser, upload.single('file'), async (req, res) => {
@@ -37,6 +39,9 @@ app.post('/api/v1/bulkupload',isAuthenticatedUser, upload.single('file'), async 
 
   const filePath = req.file.path;
   const userDetail = req.user._id;
+
+  // console.log(userDetail);
+  const seller = await User.findById(userDetail)
 
   // Convert the data according to their index number
   const workbook = XLSX.readFile(filePath);
@@ -72,7 +77,9 @@ app.post('/api/v1/bulkupload',isAuthenticatedUser, upload.single('file'), async 
       }
 
       // Create and save the inventory item
-      const inventory = new Inventory(itemData);
+      // const inventory = new Inventory(itemData);
+      const inventory = new Inventory({ ...itemData, sellerName: seller.businessName });
+
       await inventory.save();
       console.log('Item saved:', inventory);
     }

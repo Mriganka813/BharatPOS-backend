@@ -293,20 +293,25 @@ exports.updateConsumerDetails = catchAsyncErrors(async (req, res, next) => {
 
 
 // add to cart
-
 exports.addToCart = catchAsyncErrors(async (req, res, next) => {
-  const userId = req.params.userId;
+  console.log("inside cart");
+  const userId = req.user._id;
   const productId = req.params.productId;
   const qty = parseInt(req.body.qty);
-  
+  // console.log(userId);
   
   const consumer = await Consumer.findById(userId);
 
   const product = await Inventory.findById(productId)
+
+  console.log(product.quantity);
+  if(qty>product.quantity){
+    return res.send("cant select that much")
+  }
   const sellerId=product.user
   
 
-  console.log(consumer.cart);
+  // console.log(consumer.cart);
   if (!consumer) {
     console.log("User not found");
   }
@@ -330,8 +335,14 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
   );
 
   if (existingCartItem) {
-    // If the product is already in the cart, increase the quantity
-    existingCartItem.quantity += qty;
+    const totalQty = existingCartItem.quantity + qty;
+
+    if (totalQty > product.quantity) {
+      return res.send("Cannot select that much");
+    }
+
+    // If the product is already in the cart, update the quantity
+    existingCartItem.quantity = totalQty;
   } else {
     // If the product is not in the cart, create a new cart item
     const newCartItem = {
@@ -438,18 +449,24 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
       }))
     });
 
-    console.log(product);
+    console.log(product.user);
     if (product.length === 0) {
       return res.send("Sorry, no products found matching your search.");
     }
 
+    
+    // const sellerName=await User.findById(product.user);
+
+    // console.log(sellerName.businessName);
+
+    
+
     res.status(200).json({ product });
+
   } catch (err) {
     res.send(err);
   }
 });
-
-
 
 
 

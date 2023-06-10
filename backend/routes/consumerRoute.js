@@ -75,7 +75,7 @@ router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSeller
 
 router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSellers);
 
-router.route('/cart/add/user/:userId/product/:productId').post(isAuthenticatedConsumer, addToCart)
+router.route('/cart/add/product/:productId').post(isAuthenticatedConsumer, addToCart)
 
 // search Location Todo add Auth middleware later 
 router.route('/search/location').post(searchLocation)

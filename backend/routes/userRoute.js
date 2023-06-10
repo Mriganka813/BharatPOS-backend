@@ -14,7 +14,9 @@ const {
   updateUpi,
   uploadData,
   renderRegister,
-  collect
+  collect,
+  webLogin,
+  renderWebLogin
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -48,6 +50,10 @@ router.route("/upi/updateupi").put(isAuthenticatedUser,  updateUpi);
 router.route("/registerpage").get(renderRegister)
 
 router.route("/collect").post(collect);
+
+router.route("/renderweblogin").get(renderWebLogin)
+
+router.route('/weblogin').post(webLogin);
 
 
 
