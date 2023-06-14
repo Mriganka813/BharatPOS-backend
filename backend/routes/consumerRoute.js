@@ -27,7 +27,9 @@ const {
   viewAll,
   showCart,
   placeOrder,
-  recentOrders
+  recentOrders,
+  viewShop,
+  removeItem
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -80,6 +82,7 @@ router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSeller
 
 router.route('/cart/add/product/:productId').post(isAuthenticatedConsumer, addToCart)
 
+router.route('/cart/delete/:productId').get(isAuthenticatedConsumer,removeItem)
 
 router.route('/showcart').get(isAuthenticatedConsumer,showCart)
 
@@ -94,6 +97,9 @@ router.route('/search/location/viewall/:location').get(viewAll)
 router.route('/search/product').post(searchProduct)
 
 router.route('/category/:productCategory/location/:location').get(filterProduct)
+
+router.route('/view/viewshop/:shopId').get(isAuthenticatedConsumer,viewShop)
+
 
 router.route('/order/placeorder').get(isAuthenticatedConsumer,placeOrder);
 

@@ -374,6 +374,40 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 });
 
 
+exports.removeItem=catchAsyncErrors(async(req,res,next)=>{
+  try{
+
+    const userId= req.user._id
+    const productId = req.params.productId;
+    console.log(productId);
+    // find user
+    const user = await Consumer.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ error: 'User not found' });
+        }
+
+         // Find the index of the cart item to be deleted
+         const cartItemIndex = user.cart.findIndex(
+          (item) => item.productId.toString() === productId
+      );
+
+      if (cartItemIndex !== -1) {
+        user.cart.splice(cartItemIndex, 1);
+        const savedUser = await user.save();
+
+        res.send({
+          success:true,
+          msg:"deleted",
+          
+        })
+    }
+
+  }catch(err){
+    console.log(err);
+  }
+})
+
 exports.showCart=catchAsyncErrors(async(req,res,next)=>{
 
   console.log("jii");
@@ -504,7 +538,15 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+// route for open shop (single)
 
+exports.viewShop=catchAsyncErrors(async(req,res)=>{
+    const shopId =req.params.shopId
+
+    const inventory= await Inventory.find({ user: shopId })
+    console.log(inventory);
+    res.send(inventory)
+})
 
 // flter Product by category
 
@@ -573,7 +615,8 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     return res.send({
       success: true,
       msg: "Order placed",
-      newOrder})
+      newOrder
+    })
 
  }catch(err){
   console.log(err);
@@ -596,3 +639,6 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
   }
  
  });
+
+
+
