@@ -1,6 +1,7 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const Consumer = require("../models/consumerModel");
+const OrderedItem= require("../models/orderedItem")
 const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const User = require("../models/userModel");
@@ -527,3 +528,71 @@ exports.filterProduct = catchAsyncErrors(async (req, res, next) => {
   res.send(user)
 
 });
+
+
+
+exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
+
+ try{
+
+  const userId=req.user._id
+  console.log(userId);
+  // return res.send(userId)
+
+  const user = await Consumer.findById(userId).populate('cart.productId');
+  console.log(user);
+
+  const orderItems = user.cart.map((item) => {
+    return {
+      productId: item.productId._id,
+      productName: item.productId.name,
+      productPrice: item.productId.sellingPrice,
+      productImage: item.productId.img,
+      quantity: item.quantity,
+      barcode: item.productId.barCode,
+      sellerId: item.productId.user,
+      sellerName: item.productId.sellerName
+    };
+  });
+
+  user.cart = [];
+  await user.save();
+
+   // Fetch the recent orders for the user
+   
+   
+   const newOrder = new OrderedItem({
+     items: orderItems,
+     userId: userId,
+    });
+    await newOrder.save();
+    
+    // const recentOrders = await OrderedItem.find({ userId: userId });
+
+
+    return res.send({
+      success: true,
+      msg: "Order placed",
+      newOrder})
+
+ }catch(err){
+  console.log(err);
+ }
+
+});
+
+
+exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
+
+  try{
+    const userId = req.user._id
+    const recentOrders = await OrderedItem.find({ userId: userId });
+
+    res.send(recentOrders)
+ 
+ 
+  }catch(err){
+   console.log(err);
+  }
+ 
+ });

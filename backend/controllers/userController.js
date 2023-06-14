@@ -3,6 +3,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const sendToken = require("../utils/jwtToken");
+const sendTokenlogin =require("../utils/jwtToken")
 const fast2sms = require("fast-two-sms");
 const otpGenerator = require("otp-generator");
 const otpModel = require("../models/otpModel");
@@ -466,7 +467,7 @@ exports.renderRegister=catchAsyncErrors(async(req,res,next)=>{
 })
 
 exports.renderWebLogin=catchAsyncErrors(async(req,res,next)=>{
-
+  
   return res.render('weblogin')
 
 })
@@ -501,16 +502,18 @@ exports.webLogin=catchAsyncErrors(async(req,res,nex)=>{
     }
   
     console.log(user);
-    // sendToken(user, 200, res);
-    return res.render('bulkupload',{
-      
-    })
-  
+    // sendTokenlogin(user, 200, res)
+    // return res.redirect('/api/v1/renderbnulk')
+    const responseData = {
+      success: true,
+      user: req.user,
+      token: req.cookies.token,
+    };
+    return res.render('bulkupload', { data: responseData });
 })
 
-exports.collect=catchAsyncErrors(async(req,res,next)=>{
-
-  console.log('collected');
-  res.redirect('back')
+exports.renderBulkupload=catchAsyncErrors(async(req,res,next)=>{
+  console.log(req.user);
+  return res.render('bulkupload')
 
 })

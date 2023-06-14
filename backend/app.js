@@ -10,6 +10,8 @@ const multer = require("multer");
 var busboy = require("connect-busboy");
 const cors = require("cors");
 const Inventory = require("./models/inventoryModel");
+// const passport = require('passport');
+// const passportLocal = require('./config/passport-local-strategy');
 // const fs=require("fs");
 
 const XLSX = require('xlsx');
@@ -28,8 +30,17 @@ const storage = multer.diskStorage({
   }
 });
 
+app.use(cookieParser());
 const upload = multer({ storage: storage }); 
+
+// app.use(passport.initialize());
+// app.use(passport.session());
 const User = require('./models/userModel')
+
+app.post('/api/v1/tets',isAuthenticatedUser,async(req,res)=>{
+  console.log(req.user._id)
+  
+})
 
 
 app.post('/api/v1/bulkupload',isAuthenticatedUser, upload.single('file'), async (req, res) => {
@@ -39,6 +50,7 @@ app.post('/api/v1/bulkupload',isAuthenticatedUser, upload.single('file'), async 
 
   const filePath = req.file.path;
   const userDetail = req.user._id;
+  
 
   // console.log(userDetail);
   const seller = await User.findById(userDetail)

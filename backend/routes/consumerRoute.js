@@ -25,7 +25,9 @@ const {
   searchProduct,
   filterProduct,
   viewAll,
-  showCart
+  showCart,
+  placeOrder,
+  recentOrders
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -93,5 +95,8 @@ router.route('/search/product').post(searchProduct)
 
 router.route('/category/:productCategory/location/:location').get(filterProduct)
 
+router.route('/order/placeorder').get(isAuthenticatedConsumer,placeOrder);
+
+router.route('/orders/hostory').get(isAuthenticatedConsumer,recentOrders)
 
 module.exports = router;
