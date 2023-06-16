@@ -571,58 +571,71 @@ exports.filterProduct = catchAsyncErrors(async (req, res, next) => {
 
 });
 
-
-
 exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const userId = req.user._id;
 
- try{
+    const user = await Consumer.findById(userId).populate('cart.productId');
+    const orderItems = user.cart.map((item) => {
+      return {
+        productId: item.productId._id,
+        productName: item.productId.name,
+        productPrice: item.productId.sellingPrice,
+        productImage: item.productId.img,
+        quantity: item.quantity,
+        barcode: item.productId.barCode,
+        sellerId: item.productId.user,
+        sellerName: item.productId.sellerName
+      };
+    });
 
-  const userId=req.user._id
-  console.log(userId);
-  // return res.send(userId)
-
-  const user = await Consumer.findById(userId).populate('cart.productId');
-  console.log(user);
-
-  const orderItems = user.cart.map((item) => {
-    return {
-      productId: item.productId._id,
-      productName: item.productId.name,
-      productPrice: item.productId.sellingPrice,
-      productImage: item.productId.img,
-      quantity: item.quantity,
-      barcode: item.productId.barCode,
-      sellerId: item.productId.user,
-      sellerName: item.productId.sellerName
+    const address = {
+      country: req.body.country,
+      state: req.body.state,
+      city: req.body.city,
+      phoneNumber: req.body.phoneNumber,
+      pinCode: req.body.pinCode,
+      streetAddress: req.body.streetAddress,
+      additionalInfo: req.body.additionalInfo,
+      landmark: req.body.landmark,
+      latitude: req.body.latitude,
+      longitude: req.body.longitude
     };
-  });
 
-  user.cart = [];
-  await user.save();
 
-   // Fetch the recent orders for the user
-   
-   
-   const newOrder = new OrderedItem({
-     items: orderItems,
-     userId: userId,
+    // Deduct the quantity of each ordered item from the database
+   for (const item of user.cart) {
+    console.log(item.productId);
+    const inventory = await Inventory.findById(item.productId);
+    if (inventory) {
+      console.log(inventory.quantity);
+      inventory.quantity -= item.quantity;
+      await inventory.save();
+    }
+  }
+    user.cart = [];
+    await user.save();
+
+    const newOrder = new OrderedItem({
+      items: orderItems,
+      userId: userId,
+      addresses: address
     });
     await newOrder.save();
-    
-    // const recentOrders = await OrderedItem.find({ userId: userId });
-
 
     return res.send({
       success: true,
       msg: "Order placed",
       newOrder
-    })
+    });
 
- }catch(err){
-  console.log(err);
- }
-
+  } catch (err) {
+    console.log(err);
+  }
 });
+
+
+
 
 
 exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
@@ -640,5 +653,55 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
  
  });
 
+ 
+ exports.addAddress = catchAsyncErrors(async (req, res, next) => {
+
+  try{
+    const consumerId=req.user._id
+    const {
+     
+      state,
+      city,
+      phoneNumber,
+      pinCode,
+      streetAddress,
+      additionalInfo,
+      landmark,
+      latitude,
+      longitude,
+    } = req.body;
+    const consumer = await Consumer.findById(consumerId)
+    if (!consumer) {
+      return res.status(404).json({ message: "Consumer not found" });
+    }
+
+    const newAddress = {};
+
+    
+    if (state) newAddress.state = state.toLowerCase();
+    if (city) newAddress.city = city;
+    if (phoneNumber) newAddress.phoneNumber = phoneNumber;
+    if (pinCode) newAddress.pinCode = pinCode;
+    if (streetAddress) newAddress.streetAddress = streetAddress;
+    if (additionalInfo) newAddress.additionalInfo = additionalInfo;
+    if (landmark) newAddress.landmark = landmark;
+    if (latitude) newAddress.latitude = latitude;
+    if (longitude) newAddress.longitude = longitude;
+
+    consumer.addresses.push(newAddress);
+    await consumer.save();
+
+    res.status(201).json({ 
+      success:true,
+      message: "Address added successfully", 
+      address: newAddress 
+    });
+ 
+ 
+  }catch(err){
+   console.log(err);
+  }
+ 
+ });
 
 

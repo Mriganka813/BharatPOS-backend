@@ -29,7 +29,8 @@ const {
   placeOrder,
   recentOrders,
   viewShop,
-  removeItem
+  removeItem,
+  addAddress
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -101,8 +102,10 @@ router.route('/category/:productCategory/location/:location').get(filterProduct)
 router.route('/view/viewshop/:shopId').get(isAuthenticatedConsumer,viewShop)
 
 
-router.route('/order/placeorder').get(isAuthenticatedConsumer,placeOrder);
+router.route('/order/placeorder').post(isAuthenticatedConsumer,placeOrder);
 
 router.route('/orders/hostory').get(isAuthenticatedConsumer,recentOrders)
+
+router.route('/add/address').post(isAuthenticatedConsumer,addAddress)
 
 module.exports = router;

@@ -54,6 +54,49 @@ const consumerSchema = new mongoose.Schema({
     ],
     default: []
 },
+addresses: {
+  type: [
+    {
+      country: {
+        type: String,
+        // required: true,
+      },
+      state: {
+        type: String,
+        // required: true,
+      },
+      city: {
+        type: String,
+        // required: true,
+      },
+      phoneNumber: {
+        type: Number,
+        // required: true,
+      },
+      pinCode: {
+        type: String,
+        // required: true,
+      },
+      streetAddress: {
+        type: String,
+        // required: true,
+      },
+      additionalInfo: {
+        type: String,
+      },
+      landmark: {
+        type: String,
+      },
+      latitude: {
+        type: String,
+      },
+      longitude: {
+        type: String,
+      },
+    },
+  ],
+  default: [], // Initialize as an empty array
+},
   createdAt: {
     type: Date,
     default: Date.now,

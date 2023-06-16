@@ -30,6 +30,7 @@ const orderedItemSchema = mongoose.Schema({
         default: 'pending'
         
       },
+      
       sellerId:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "user",
@@ -45,6 +46,50 @@ const orderedItemSchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
+
+  addresses: {
+        
+          
+    country: {
+      type: String,
+      // required: true,
+    },
+    state: {
+      type: String,
+      // required: true,
+    },
+    city: {
+      type: String,
+      // required: true,
+    },
+    phoneNumber: {
+      type: Number,
+      // required: true,
+    },
+    pinCode: {
+      type: String,
+      // required: true,
+    },
+    streetAddress: {
+      type: String,
+      // required: true,
+    },
+    additionalInfo: {
+      type: String,
+    },
+    landmark: {
+      type: String,
+    },
+    latitude: {
+      type: String,
+    },
+    longitude: {
+      type: String,
+    },
+  
+
+
+},
  
   createdAt: {
     type: Date,
