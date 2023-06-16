@@ -57,6 +57,9 @@ const consumerSchema = new mongoose.Schema({
 addresses: {
   type: [
     {
+      name:{
+        type: String
+      },
       country: {
         type: String,
         // required: true,

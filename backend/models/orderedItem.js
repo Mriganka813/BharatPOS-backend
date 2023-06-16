@@ -48,9 +48,10 @@ const orderedItemSchema = mongoose.Schema({
   },
 
   addresses: {
-        
-          
-    country: {
+    name:{
+      type: String
+    },
+     country: {
       type: String,
       // required: true,
     },

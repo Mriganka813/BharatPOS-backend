@@ -590,7 +590,8 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     });
 
     const address = {
-      country: req.body.country,
+      // country: req.body.country,
+      name: req.body.name,
       state: req.body.state,
       city: req.body.city,
       phoneNumber: req.body.phoneNumber,
@@ -659,7 +660,7 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
   try{
     const consumerId=req.user._id
     const {
-     
+      name,
       state,
       city,
       phoneNumber,
@@ -677,7 +678,7 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
 
     const newAddress = {};
 
-    
+    if (name) newAddress.name = name
     if (state) newAddress.state = state.toLowerCase();
     if (city) newAddress.city = city;
     if (phoneNumber) newAddress.phoneNumber = phoneNumber;
