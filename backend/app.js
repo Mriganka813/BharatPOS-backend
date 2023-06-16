@@ -37,8 +37,8 @@ const upload = multer({ storage: storage });
 // app.use(passport.session());
 const User = require('./models/userModel')
 
-app.post('/api/v1/tets',isAuthenticatedUser,async(req,res)=>{
-  console.log(req.user._id)
+app.get('/privacy-policies',async(req,res)=>{
+  res.render('privacypolicies')
   
 })
 
