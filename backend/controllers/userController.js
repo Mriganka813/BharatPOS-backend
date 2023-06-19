@@ -1,6 +1,8 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
+const Order =require('../models/orderedItem')
+const Inventory=require("../models/inventoryModel")
 const jwt = require("jsonwebtoken");
 const sendToken = require("../utils/jwtToken");
 const sendTokenlogin =require("../utils/jwtToken")
@@ -516,4 +518,160 @@ exports.renderBulkupload=catchAsyncErrors(async(req,res,next)=>{
   console.log(req.user);
   return res.render('bulkupload')
 
+})
+
+
+
+exports.orderStatus=catchAsyncErrors(async(req,res,next)=>{
+const userId=req.user._id
+
+const orders = await Order.find({
+  "items": {
+    $elemMatch: {
+      sellerId: userId
+    }
+  }
+});
+
+res.send(orders)
+})
+
+
+exports.itemDeatils=catchAsyncErrors(async(req,res,nex)=>{
+  try{
+    const productId  = req.params.productId
+    const userId=req.user._id
+
+    const order = await Order.findOne({
+      "items.productId": productId ,
+      "items.sellerId": userId
+    })
+
+    if(!order){
+      return res.status(404).json({
+        success: false,
+        error:"Order not found"
+      })
+    }
+
+    const orderItem = order.items.find((item) => item.productId.toString() === productId);
+    if (!orderItem) {
+      return res.status(404).json({ error: "Order item not found" });
+    }
+    
+    res.send(orderItem);
+
+    // res.send(orders)
+
+
+  }catch(err){
+    console.log(err);
+  }
+})
+
+
+
+exports.acceptOrder=catchAsyncErrors(async(req,res,nex)=>{
+  try{
+    const productId  = req.params.productId
+    const userId=req.user._id
+
+    const order = await Order.findOne({
+      "items.productId": productId ,
+      "items.sellerId": userId
+    })
+
+    if(!order){
+      return res.status(404).json({
+        success: false,
+        error:"Order not found"
+      })
+    }
+
+    const orderItem = order.items.find((item) => item.productId.toString() === productId);
+
+    
+    if (!orderItem) {
+      return res.status(404).json({ error: "Order item not found" });
+      
+    }
+
+    
+    orderItem.status = 'confirmed'
+    const inventory = await Inventory.findById(productId)
+    if (inventory) {
+      console.log(inventory.quantity);
+      if(orderItem.quantity>inventory.quantity){
+        return res.send({
+          success: false,
+          error: 'quantity not available'
+        })
+      }
+      inventory.quantity -= orderItem.quantity;
+      await inventory.save();
+    }
+
+    await order.save()
+    
+    res.send(orderItem);
+
+    // res.send(orders)
+
+
+  }catch(err){
+    console.log(err);
+  }
+})
+
+
+
+
+
+// change order status
+
+exports.rejectStatus=catchAsyncErrors(async(req,res,nex)=>{
+  try{
+    const productId  = req.params.productId
+    const userId=req.user._id
+    
+
+    
+
+    const order = await Order.findOne({
+      "items.productId": productId ,
+      "items.sellerId": userId
+    })
+
+    if(!order){
+      return res.status(404).json({
+        success: false,
+        error:"Order not found"
+      })
+    }
+
+    const orderItem = order.items.find((item) => item.productId.toString() === productId);
+    if (!orderItem) {
+      return res.status(404).json({ error: "Order item not found" });
+      
+    }
+
+    
+    orderItem.status = 'rejected'
+    // const inventory = await Inventory.findById(productId)
+    // if (inventory) {
+    //   console.log(inventory.quantity);
+    //   inventory.quantity -= orderItem.quantity;
+    //   await inventory.save();
+    // }
+
+    await order.save()
+    
+    res.send(orderItem);
+
+    // res.send(orders)
+
+
+  }catch(err){
+    console.log(err);
+  }
 })

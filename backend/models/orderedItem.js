@@ -5,7 +5,7 @@ const orderedItemSchema = mongoose.Schema({
     {
       productId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "Product",
+        ref: "inventory",
         required: true,
       },
       productName: {
@@ -41,11 +41,17 @@ const orderedItemSchema = mongoose.Schema({
       }
     },
   ],
-  userId: {
+  seller: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
+    // required: true,
+  },
+  consumer:{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Consumer",
     required: true,
   },
+
 
   addresses: {
     name:{

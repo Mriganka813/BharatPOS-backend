@@ -101,7 +101,6 @@ router.route('/category/:productCategory/location/:location').get(filterProduct)
 
 router.route('/view/viewshop/:shopId').get(isAuthenticatedConsumer,viewShop)
 
-
 router.route('/order/placeorder').post(isAuthenticatedConsumer,placeOrder);
 
 router.route('/orders/hostory').get(isAuthenticatedConsumer,recentOrders)

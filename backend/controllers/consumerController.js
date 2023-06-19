@@ -572,10 +572,15 @@ exports.filterProduct = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
+  //  to do can order if cart is empty
   try {
     const userId = req.user._id;
-
+    // const sellerId = req.params.sellerId
     const user = await Consumer.findById(userId).populate('cart.productId');
+    console.log(user.cart.length);
+    if(user.cart.length==0){
+      return res.send({success: false, msg:"Cart is Empty "})
+    }
     const orderItems = user.cart.map((item) => {
       return {
         productId: item.productId._id,
@@ -619,7 +624,8 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
 
     const newOrder = new OrderedItem({
       items: orderItems,
-      userId: userId,
+      consumer: userId,
+      // seller:sellerId,
       addresses: address
     });
     await newOrder.save();
