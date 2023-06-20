@@ -610,15 +610,15 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
 
 
     // Deduct the quantity of each ordered item from the database
-   for (const item of user.cart) {
-    console.log(item.productId);
-    const inventory = await Inventory.findById(item.productId);
-    if (inventory) {
-      console.log(inventory.quantity);
-      inventory.quantity -= item.quantity;
-      await inventory.save();
-    }
-  }
+  //  for (const item of user.cart) {
+  //   console.log(item.productId);
+  //   const inventory = await Inventory.findById(item.productId);
+  //   if (inventory) {
+  //     console.log(inventory.quantity);
+  //     inventory.quantity -= item.quantity;
+  //     await inventory.save();
+  //   }
+  // }
     user.cart = [];
     await user.save();
 
@@ -712,3 +712,28 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
  });
 
 
+
+ 
+exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
+
+  try{
+    return res.render('deletePage')
+ 
+ 
+  }catch(err){
+   console.log(err);
+  }
+ 
+ });
+
+ exports.policyPage = catchAsyncErrors(async (req, res, next) => {
+
+  try{
+    return res.render('consumerprivacy')
+ 
+ 
+  }catch(err){
+   console.log(err);
+  }
+ 
+ });

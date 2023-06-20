@@ -25,12 +25,14 @@ const {
   searchProduct,
   filterProduct,
   viewAll,
+  policyPage,
   showCart,
   placeOrder,
   recentOrders,
   viewShop,
   removeItem,
-  addAddress
+  addAddress,
+  deleteAccountPage
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -107,4 +109,8 @@ router.route('/orders/hostory').get(isAuthenticatedConsumer,recentOrders)
 
 router.route('/add/address').post(isAuthenticatedConsumer,addAddress)
 
+router.route('/delete').get(deleteAccountPage)
+
+
+router.route('/policy').get(policyPage)
 module.exports = router;

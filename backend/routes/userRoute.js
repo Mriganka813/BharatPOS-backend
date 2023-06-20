@@ -19,7 +19,9 @@ const {
   renderWebLogin,
   renderBulkupload,
   orderStatus,
-  acceptOrder
+  acceptOrder,
+  rejectStatus,
+
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -63,6 +65,11 @@ router.route('/renderbnulk').get(renderBulkupload)
 router.route('/myorders').get(isAuthenticatedUser,orderStatus)
 
 router.route('/myorders/accept/:productId').get(isAuthenticatedUser,acceptOrder)
+
+router.route('/myorders/reject/:productId').get(isAuthenticatedUser,rejectStatus)
+
+
+
 
 const multer = require("multer");
 
