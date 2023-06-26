@@ -726,6 +726,41 @@ exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
  
  });
 
+  
+ const Consumer = require('../models/Consumer'); // Import the Consumer model
+
+ exports.deleteAccount = catchAsyncErrors(async (req, res, next) => {
+   try {
+     const { email, password } = req.body;
+ 
+     // Find the consumer by email
+     const consumer = await Consumer.findOne({ email });
+ 
+     if (!consumer) {
+       return res.status(404).json({ message: 'Consumer not found' });
+     }
+ 
+     // Check if the provided password matches the consumer's password
+     const isPasswordMatched = await consumer.comparePassword(password);
+ 
+     if (!isPasswordMatched) {
+       return res.status(401).json({ message: 'Invalid password' });
+     }
+ 
+     // Delete the consumer account
+     await Consumer.findByIdAndDelete(consumer._id);
+ 
+     res.status(200).json({ message: 'Account deleted successfully' });
+   } catch (err) {
+     console.log(err);
+     res.status(500).json({ message: 'Internal server error' });
+   }
+ });
+ 
+
+
+
+
  exports.policyPage = catchAsyncErrors(async (req, res, next) => {
 
   try{
