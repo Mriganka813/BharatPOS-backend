@@ -727,7 +727,7 @@ exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
  });
 
   
- const Consumer = require('../models/Consumer'); // Import the Consumer model
+//  const Consumer = require('../models/Consumer'); // Import the Consumer model
 
  exports.deleteAccount = catchAsyncErrors(async (req, res, next) => {
    try {
