@@ -80,7 +80,7 @@ const userSchema = new mongoose.Schema(
     GstIN: {
       type: String,
       trim: true,
-      unique: true,
+      // unique: true,
     },
     upi_id: {
       type: String,

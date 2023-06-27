@@ -129,8 +129,12 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
 
 
 
+
+
+
 // register user
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
+  console.log(req.body.GstIN);
   // console.log(req.body.email);
   console.log("inside ");
   if (req.files?.image) {
