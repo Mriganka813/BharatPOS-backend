@@ -64,9 +64,9 @@ router.route('/renderbnulk').get(renderBulkupload)
 
 router.route('/myorders').get(isAuthenticatedUser,orderStatus)
 
-router.route('/myorders/accept/:productId').get(isAuthenticatedUser,acceptOrder)
+router.route('/myorders/accept/:productId').get(acceptOrder)
 
-router.route('/myorders/reject/:productId').get(isAuthenticatedUser,rejectStatus)
+router.route('/myorders/reject/:productId').get(rejectStatus)
 
 
 
