@@ -649,6 +649,23 @@ exports.acceptAll=catchAsyncErrors(async(req,res,next)=>{
   });
 })
 
+exports.rejectAll=catchAsyncErrors(async(req,res,next)=>{
+  const {orderId}=req.params
+
+  const order = await Order.findById(orderId)
+
+  order.items.forEach(item =>{
+    item.status = 'rejected'
+  })
+
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Status of all products changed to confirmed"
+  });
+})
+
 
 
 

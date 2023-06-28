@@ -22,6 +22,7 @@ const {
   orderStatus,
   acceptOrder,
   rejectStatus,
+  rejectAll,
 
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
@@ -70,6 +71,8 @@ router.route('/myorders/accept/:productId').get(isAuthenticatedUser,acceptOrder)
 router.route('/myorders/reject/:productId').get(rejectStatus)
 
 router.route('/myorders/acceptall/:orderId').get(acceptAll)
+
+router.route('/myorders/rejectall/:orderId').get(rejectAll)
 
 
 const multer = require("multer");
