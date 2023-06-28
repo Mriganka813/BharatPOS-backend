@@ -528,6 +528,7 @@ exports.renderBulkupload=catchAsyncErrors(async(req,res,next)=>{
 
 exports.orderStatus=catchAsyncErrors(async(req,res,next)=>{
 const userId=req.user._id
+console.log(userId);
 
 const orders = await Order.find({
   "items": {
@@ -545,6 +546,7 @@ exports.itemDeatils=catchAsyncErrors(async(req,res,nex)=>{
   try{
     const productId  = req.params.productId
     const userId=req.user._id
+
 
     const order = await Order.findOne({
       "items.productId": productId ,
@@ -579,6 +581,9 @@ exports.acceptOrder=catchAsyncErrors(async(req,res,nex)=>{
   try{
     const productId  = req.params.productId
     const userId=req.user._id
+
+    // console.log(userId);
+    console.log(productId);
 
     const order = await Order.findOne({
       "items.productId": productId ,
@@ -627,6 +632,22 @@ exports.acceptOrder=catchAsyncErrors(async(req,res,nex)=>{
   }
 })
 
+exports.acceptAll=catchAsyncErrors(async(req,res,next)=>{
+  const {orderId}=req.params
+
+  const order = await Order.findById(orderId)
+
+  order.items.forEach(item =>{
+    item.status = 'confirmed'
+  })
+
+  await order.save();
+
+  res.status(200).json({
+    success: true,
+    message: "Status of all products changed to confirmed"
+  });
+})
 
 
 

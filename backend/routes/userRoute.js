@@ -18,6 +18,7 @@ const {
   webLogin,
   renderWebLogin,
   renderBulkupload,
+  acceptAll,
   orderStatus,
   acceptOrder,
   rejectStatus,
@@ -64,11 +65,11 @@ router.route('/renderbnulk').get(renderBulkupload)
 
 router.route('/myorders').get(isAuthenticatedUser,orderStatus)
 
-router.route('/myorders/accept/:productId').get(acceptOrder)
+router.route('/myorders/accept/:productId').get(isAuthenticatedUser,acceptOrder)
 
 router.route('/myorders/reject/:productId').get(rejectStatus)
 
-
+router.route('/myorders/acceptall/:orderId').get(acceptAll)
 
 
 const multer = require("multer");
