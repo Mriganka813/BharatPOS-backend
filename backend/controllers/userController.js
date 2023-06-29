@@ -128,17 +128,72 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
 
 
 
+exports.registerUser = catchAsyncErrors(async (req, res, next) => {
+  // Check if GstIN already exists
+  if (req.body.GstIN) {
+    const existingUser = await User.findOne({ GstIN: req.body.GstIN });
+    if (existingUser) {
+      return next(new ErrorHandler("GstIN already exists", 400));
+    }
+  }
+
+  if (req.files?.image) {
+    const result = await uploadImage(req.files.image);
+    req.body.image = result.url;
+    console.log(req.body.image);
+  }
+
+  const { locality, city, state } = req.body; // Extracting address subfields
+
+  const lowercaseLocality = locality.toLowerCase();
+  const lowercaseCity = city.toLowerCase();
+  const lowercaseState = state.toLowerCase();
+
+  const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
+  if (data) {
+    return next(
+      new ErrorHandler(
+        "Phone Number already registered, Sign In instead",
+        400
+      )
+    );
+  }
+
+  const userData = {
+    ...req.body,
+    address: {
+      locality: lowercaseLocality,
+      city: lowercaseCity,
+      state: lowercaseState,
+      country: "India", // Assuming the country is always India
+    },
+  };
+
+  // Remove GstIN field if it is empty
+  if (!req.body.GstIN) {
+    delete userData.GstIN;
+    console.log('removed');
+  }
+
+  const user = await User.create(userData);
+
+  return res.render("signedupsuccess");
+});
+
 
 
 
 
 // register user
-exports.registerUser = catchAsyncErrors(async (req, res, next) => {
-  console.log(req.body.GstIN);
-  // console.log(req.body.email);
-  console.log("inside ");
+exports.registerUser123 = catchAsyncErrors(async (req, res, next) => {
+
+  if (!req.body.GstIN) {
+    console.log('jhhh');
+  }
+
+
   if (req.files?.image) {
-    console.log('image');
+  
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
     console.log(req.body.image);
@@ -169,13 +224,9 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
     }
   });
   
-  // const subbed = await subscribedUsersModel.create({
-  //   email: req.body.email,
-  //   phoneNumber: req.body.phoneNumber,
-  //   expireAt: new Date(Date.now() + 1000 * 60 * 60 * 24 * 15),
-  // });
-
-  sendToken(user, 201, res);
+  
+  // sendToken(user, 201, res);
+  return res.render('signedupsuccess')
 });
 
 
