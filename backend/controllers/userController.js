@@ -726,10 +726,9 @@ exports.rejectStatus=catchAsyncErrors(async(req,res,nex)=>{
   try{
     const productId  = req.params.productId
     const userId=req.user._id
+    console.log(userId);
     
-
     
-
     const order = await Order.findOne({
       "items.productId": productId ,
       "items.sellerId": userId
@@ -750,12 +749,12 @@ exports.rejectStatus=catchAsyncErrors(async(req,res,nex)=>{
 
     
     orderItem.status = 'rejected'
-    // const inventory = await Inventory.findById(productId)
-    // if (inventory) {
-    //   console.log(inventory.quantity);
-    //   inventory.quantity -= orderItem.quantity;
-    //   await inventory.save();
-    // }
+    const inventory = await Inventory.findById(productId)
+    if (inventory) {
+      console.log(inventory.quantity);
+      inventory.quantity -= orderItem.quantity;
+      await inventory.save();
+    }
 
     await order.save()
     

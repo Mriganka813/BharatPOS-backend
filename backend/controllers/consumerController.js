@@ -31,6 +31,7 @@ exports.registerConsumer = catchAsyncErrors(async (req, res, next) => {
 
 // consumer login
 exports.loginConsumer = catchAsyncErrors(async (req, res, next) => {
+  // console.log('hi');
   const { email, password } = req.body;
   if (!email || !password) {
     return next(new ErrorHandler("Please provide all the details", 400));

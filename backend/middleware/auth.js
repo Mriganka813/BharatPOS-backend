@@ -33,14 +33,17 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
 // auth for consumer
 exports.isAuthenticatedConsumer = catchAsyncErrors(async (req, res, next) => {
-  const { authorization } = req.headers;
+  // const { authorization } = req.headers;
   // console.log(authorization);
-  const token = authorization
-  console.log(token);
+  // const token = authorization
+
+  const { token } = req.cookies;
+  // console.log(token);
   if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
   }
   try {
+    console.log('hh');
     const decodedData = jwt.verify(token, process.env.JWT_SECRET);
     req.user = await Consumer.findById(decodedData.id);
     next();
