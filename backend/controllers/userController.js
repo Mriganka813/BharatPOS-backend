@@ -750,11 +750,11 @@ exports.rejectStatus=catchAsyncErrors(async(req,res,nex)=>{
     
     orderItem.status = 'rejected'
     const inventory = await Inventory.findById(productId)
-    if (inventory) {
-      console.log(inventory.quantity);
-      inventory.quantity -= orderItem.quantity;
-      await inventory.save();
-    }
+    // if (inventory) {
+    //   console.log(inventory.quantity);
+    //   inventory.quantity -= orderItem.quantity;
+    //   await inventory.save();
+    // }
 
     await order.save()
     
