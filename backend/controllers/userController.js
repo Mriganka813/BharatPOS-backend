@@ -144,9 +144,10 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   }
 
   const { locality, city, state } = req.body; // Extracting address subfields
-
+  console.log(city);
+  const trimmedCity = city.trim()
   const lowercaseLocality = locality.toLowerCase();
-  const lowercaseCity = city.toLowerCase();
+  const lowercaseCity = trimmedCity.toLowerCase();
   const lowercaseState = state.toLowerCase();
 
   const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
