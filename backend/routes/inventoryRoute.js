@@ -45,7 +45,7 @@ router.route("/inventories/all").get(isAuthenticatedUser, getAllInventories);
 router.route("/inventory/new").post(isAuthenticatedUser ,createInventory);
 
 // router.route("/inventory/bulk").post(upload.single('excelFile'),bulkUpload)
-
+// /inventory/me/?page=1&limit=20
 router.route("/inventory/me").get(isAuthenticatedUser, getInventoryForUser);
 
 router.route("/update/inventory/:id").put(isAuthenticatedUser, updateInventory);
