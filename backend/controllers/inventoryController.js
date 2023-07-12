@@ -140,18 +140,17 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
 
 exports.getInventoryForUser = catchAsyncErrors(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1; // Current page number
-  const limit = parseInt(req.query.limit) || 50; // Number of results per page
-  // Calculate the starting index of the results based on the page number and limit
+  const limit = parseInt(req.query.limit) || 20; // Number of results per page
+
   const startIndex = (page - 1) * limit;
 
-  // const inventories = await Inventory.find({ user: req.user._id });
-  const ApiFeature = new ApiFeatures(
-    Inventory.find({ user: req.user._id }),
-    req.query
-  )
-    .search()
-    .limit(limit)
-    .skip(startIndex);
+  const query = Inventory.find({ user: req.user._id });
+
+  // Apply search filters if required
+  const ApiFeature = new ApiFeatures(query, req.query).search();
+
+  // Apply pagination
+  ApiFeature.query = ApiFeature.query.skip(startIndex).limit(limit);
 
   const inventories = await ApiFeature.query;
 
