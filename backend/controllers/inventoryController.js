@@ -1,6 +1,6 @@
 const Inventory = require("../models/inventoryModel");
 var XLSX = require('xlsx');
-const path = require('path');
+const path = require ('path');
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const lodash = require("lodash");
@@ -139,14 +139,30 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.getInventoryForUser = catchAsyncErrors(async (req, res, next) => {
+  const page = parseInt(req.query.page) || 1; // Current page number
+  const limit = 20; // Number of results per page
+  // Calculate the starting index of the results based on the page number and limit
+  const startIndex = (page - 1) * limit;
+
   // const inventories = await Inventory.find({ user: req.user._id });
   const ApiFeature = new ApiFeatures(
     Inventory.find({ user: req.user._id }),
     req.query
-  ).search();
+  )
+    .search()
+    .limit(limit)
+    .skip(startIndex);
+
   const inventories = await ApiFeature.query;
-  res.status(200).json({ success: true, inventories });
+
+  res.status(200).json({
+    success: true,
+    page,
+    count: inventories.length,
+    inventories
+  });
 });
+
 
 // Get Single Inventory Details
 exports.getInventoryDetails = catchAsyncErrors(async (req, res, next) => {
