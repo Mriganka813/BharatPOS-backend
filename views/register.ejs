@@ -207,6 +207,11 @@
     padding: 0.1rem 0.5rem;
   }
 
+   #image-preview {
+      width: 128px;
+      height: 140px;
+    }
+
   @media(max-width:910px) {
     .container {
       width: 85%;
@@ -336,7 +341,26 @@
       option_str.options[option_str.length] = new Option(city_arr[i], city_arr[i]);
     }
   }
+  function getLocation() {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+      } else {
+        alert("Geolocation is not supported by this browser.");
+      }
+    }
 
+    function showPosition(position) {
+      document.getElementById("latitude").value = position.coords.latitude;
+      document.getElementById("longitude").value = position.coords.longitude;
+    }
+  function previewImage(event) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var output = document.getElementById("image-preview");
+        output.src = reader.result;
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
 
 </script>
 
@@ -354,14 +378,23 @@
 
     <!-- form -->
     <form action="/api/v1/registration" method="post" enctype="multipart/form-data">
-      <div class="form-group">
-        <label for="image" class="image-picker">
-          <span class="icon">
-            <img src="https://cdn-icons-png.flaticon.com/128/685/685685.png" alt="">
-          </span> 
-        </label>
-        <input type="file" id="image" name="image">
-      </div>
+     <div class="form-group">
+          <label for="image" class="image-picker">
+            <span class="icon">
+              <img
+                id="image-preview"
+                src="https://cdn-icons-png.flaticon.com/128/685/685685.png"
+                alt=""
+              />
+            </span>
+          </label>
+          <input
+            type="file"
+            id="image"
+            name="image"
+            onchange="previewImage(event)"
+          />
+        </div>
        <div class="box">
         <label for="">Business Name</label>
         <input type="text" name="businessName" required>
@@ -446,6 +479,17 @@
         <label for="">Phone Number</label>
         <input type="number" name="phoneNumber" required>
       </div>
+       <div class="box">
+          <button onclick="getLocation()">Get Location</button>
+        </div>
+        <div class="box">
+          <label for="">Latitude</label>
+          <input type="text" id="latitude" name="latitude" readonly />
+        </div>
+        <div class="box">
+          <label for="">Longitude</label>
+          <input type="text" id="longitude" name="longitude" readonly />
+        </div>
       <div class="box-check">
         <input type="checkbox" name="agreeTerms">
         <p>By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>

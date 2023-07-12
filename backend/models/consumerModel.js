@@ -50,9 +50,18 @@ const consumerSchema = new mongoose.Schema({
                 type: Number,
                 default: 1
             }
-        }
+                  }
     ],
-    default: []
+    default: [],
+    latitude: {
+      type: String,
+      //required: true,
+    },
+    longitude: {
+      type: String,
+      //required: true,
+    },
+
 },
 addresses: {
   type: [
