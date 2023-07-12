@@ -140,7 +140,7 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
 
 exports.getInventoryForUser = catchAsyncErrors(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1; // Current page number
-  const limit = 20; // Number of results per page
+  const limit = parseInt(req.query.limit) || 50; // Number of results per page
   // Calculate the starting index of the results based on the page number and limit
   const startIndex = (page - 1) * limit;
 
