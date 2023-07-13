@@ -179,24 +179,25 @@
 
 
   .image-picker {
-  display: inline-block;
-  padding: 10px 20px;
-  /* background-color: #f0f0f0; */
-  color: #333;
-  /* border: 1px solid #ccc; */
-  border-radius: 4px;
-  cursor: pointer;
-}
+    display: inline-block;
+    padding: 10px 20px;
+    /* background-color: #f0f0f0; */
+    color: #333;
+    /* border: 1px solid #ccc; */
+    border-radius: 4px;
+    cursor: pointer;
+  }
 
-.icon {
-  display: inline-block;
-  font-size: 18px;
-  margin-right: 5px;
-}
-.icon img{
-  height: 100%;
-  width: 100%;
-}
+  .icon {
+    display: inline-block;
+    font-size: 18px;
+    margin-right: 5px;
+  }
+
+  .icon img {
+    height: 100%;
+    width: 100%;
+  }
 
 
   .box .radio {
@@ -207,10 +208,10 @@
     padding: 0.1rem 0.5rem;
   }
 
-   #image-preview {
-      width: 128px;
-      height: 140px;
-    }
+  #image-preview {
+    width: 128px;
+    height: 140px;
+  }
 
   @media(max-width:910px) {
     .container {
@@ -256,7 +257,7 @@
   }
 
 
-  
+
   function validatePassword() {
     console.log();
     const password = document.getElementById('password').value;
@@ -279,7 +280,7 @@
 
   }
 
-  
+
   var state_arr = new Array("Andaman & Nicobar", "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chandigarh", "Chhattisgarh", "Dadra & Nagar Haveli", "Daman & Diu", "Delhi", "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jammu & Kashmir", "Jharkhand", "Karnataka", "Kerala", "Lakshadweep", "Madhya Pradesh", "Maharashtra", "Manipur", "Meghalaya", "Mizoram", "Nagaland", "Orissa", "Pondicherry", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Tripura", "Uttar Pradesh", "Uttaranchal", "West Bengal");
 
   var s_a = new Array();
@@ -341,26 +342,27 @@
       option_str.options[option_str.length] = new Option(city_arr[i], city_arr[i]);
     }
   }
-  function getLocation() {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-      } else {
-        alert("Geolocation is not supported by this browser.");
-      }
-    }
 
-    function showPosition(position) {
-      document.getElementById("latitude").value = position.coords.latitude;
-      document.getElementById("longitude").value = position.coords.longitude;
+  function getLocation() {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+      alert("Geolocation is not supported by this browser.");
     }
+  }
+
+  function showPosition(position) {
+    document.getElementById("latitude").value = position.coords.latitude;
+    document.getElementById("longitude").value = position.coords.longitude;
+  }
   function previewImage(event) {
-      var reader = new FileReader();
-      reader.onload = function () {
-        var output = document.getElementById("image-preview");
-        output.src = reader.result;
-      };
-      reader.readAsDataURL(event.target.files[0]);
-    }
+    var reader = new FileReader();
+    reader.onload = function () {
+      var output = document.getElementById("image-preview");
+      output.src = reader.result;
+    };
+    reader.readAsDataURL(event.target.files[0]);
+  }
 
 </script>
 
@@ -378,24 +380,15 @@
 
     <!-- form -->
     <form action="/api/v1/registration" method="post" enctype="multipart/form-data">
-     <div class="form-group">
-          <label for="image" class="image-picker">
-            <span class="icon">
-              <img
-                id="image-preview"
-                src="https://cdn-icons-png.flaticon.com/128/685/685685.png"
-                alt=""
-              />
-            </span>
-          </label>
-          <input
-            type="file"
-            id="image"
-            name="image"
-            onchange="previewImage(event)"
-          />
-        </div>
-       <div class="box">
+      <div class="form-group">
+        <label for="image" class="image-picker">
+          <span class="icon">
+            <img id="image-preview" src="https://cdn-icons-png.flaticon.com/128/685/685685.png" alt="" />
+          </span>
+        </label>
+        <input type="file" id="image" name="image" onchange="previewImage(event)" />
+      </div>
+      <div class="box">
         <label for="">Business Name</label>
         <input type="text" name="businessName" required>
       </div>
@@ -418,13 +411,13 @@
         <label for="">State</label>
 
         <select onchange="print_city('state', this.selectedIndex);" id="sts" name="state" required></select>
-        
+
       </div>
       <div class="box">
         <label for="">City</label>
         <select id="state" name="city" required></select>
         <script language="javascript">print_state("sts");</script>
-        
+
       </div>
       <div class="box">
         <label for="">Country</label>
@@ -441,11 +434,11 @@
         </label>
         <p>Have GSTIN?</p>
       </div>
-     
+
       <div id="toggle-content">
         <div class="box">
           <label for="">GSTIN</label>
-          <input type="text" name="GstIN" >
+          <input type="text" name="GstIN">
         </div>
         <div class="box">
           <label for="">Type</label>
@@ -479,30 +472,56 @@
         <label for="">Phone Number</label>
         <input type="number" name="phoneNumber" required>
       </div>
-       <div class="box">
-          <button onclick="getLocation()">Get Location</button>
-        </div>
-        <div class="box">
-          <label for="">Latitude</label>
-          <input type="text" id="latitude" name="latitude" readonly />
-        </div>
-        <div class="box">
-          <label for="">Longitude</label>
-          <input type="text" id="longitude" name="longitude" readonly />
-        </div>
+      <div class="box">
+        <button onclick="setLocation(event)">Get Location</button>
+      </div>
+      <div class="box">
+        <label for="">Latitude</label>
+        <input type="text" id="latitude" name="latitude" readonly />
+      </div>
+      <div class="box">
+        <label for="">Longitude</label>
+        <input type="text" id="longitude" name="longitude" readonly />
+      </div>
       <div class="box-check">
         <input type="checkbox" name="agreeTerms">
         <p>By signing up, you agree to our <a href="#">Terms of Service</a> and <a href="#">Privacy Policy</a></p>
-      </div> 
+      </div>
       <div class="box">
         <button type="submit">Create Account</button>
       </div>
     </form>
-     
-    
+
+
   </div>
 
 
-  
+
 </body>
+
+<script>
+  function setLocation() {
+    event.preventDefault()
+    // Check if geolocation is supported by the browser
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        function (position) {
+          // Get latitude and longitude from the Geolocation API
+          const latitude = position.coords.latitude;
+          const longitude = position.coords.longitude;
+
+          // Populate the input fields with latitude and longitude
+          document.getElementById("latitude").value = latitude;
+          document.getElementById("longitude").value = longitude;
+        },
+        function (error) {
+          console.log("Error occurred. Error code: " + error.code);
+        }
+      );
+    } else {
+      console.log("Geolocation is not supported by this browser.");
+    }
+  }
+</script>
+
 </html>

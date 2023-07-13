@@ -502,6 +502,13 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
 exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   const productName = req.body.productName;
 
+
+
+
+
+
+
+  
   const nameVariations = [];
   const nameWords = productName.split(" ");
 
