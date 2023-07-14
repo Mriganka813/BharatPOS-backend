@@ -97,6 +97,10 @@ const inventorySchema = mongoose.Schema({
     ref: "User",
     required: true,
   },
+  rating:{
+    type: mongoose.Schema.ObjectId,
+    ref: "Consumer",
+  },
   sellerName:{
     type: String,
   },

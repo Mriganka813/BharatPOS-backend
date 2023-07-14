@@ -294,13 +294,84 @@ exports.updateConsumerDetails = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-// add to cart
 exports.addToCart = catchAsyncErrors(async (req, res, next) => {
   console.log("inside cart");
   const userId = req.user._id;
   const productId = req.params.productId;
   const qty = parseInt(req.body.qty);
+
+  const consumer = await Consumer.findById(userId);
+  const product = await Inventory.findById(productId);
+  const sellerId = product.user;
+
+  if (!consumer) {
+    console.log("User not found");
+    return res.json({
+      status: false,
+      msg: "User not found",
+    });
+  }
+
+  const latitude = req.body.latitude; // Assuming latitude is passed in the request body
+  const longitude = req.body.longitude; // Assuming longitude is passed in the request body
+
+  const existingCartItem = consumer.cart.find(
+    (item) =>
+      item.productId.toString() === productId.toString() &&
+      item.sellerId.toString() === sellerId.toString()
+  );
+
+  if (existingCartItem) {
+    const totalQty = existingCartItem.quantity + qty;
+
+    if (totalQty > product.quantity) {
+      return res.json({
+        status: false,
+        msg: "Quantity not available",
+      });
+    }
+
+    // If the product is already in the cart, update the quantity
+    existingCartItem.quantity = totalQty;
+  } else {
+    // If the product is not in the cart, create a new cart item
+    const newCartItem = {
+      productId: productId,
+      quantity: qty,
+      sellerId: sellerId,
+    };
+    consumer.cart.push(newCartItem);
+  }
+
+  // Push latitude and longitude to the cart item
+  consumer.cart.forEach((item) => {
+    if (
+      item.productId.toString() === productId.toString() &&
+      item.sellerId.toString() === sellerId.toString()
+    ) {
+      item.latitude = latitude;
+      item.longitude = longitude;
+    }
+  });
+
+  const savedConsumer = await consumer.save();
+
+  return res.json({
+    status: true,
+    msg: "Added successfully",
+  });
+});
+
+
+// add to cart
+exports.addToCarttest = catchAsyncErrors(async (req, res, next) => {
+  console.log("inside cart");
+  const userId = req.user._id;
+  const productId = req.params.productId;
+  const qty = parseInt(req.body.qty);
   // console.log(userId);
+  
+  
   
   const consumer = await Consumer.findById(userId);
 
@@ -314,6 +385,13 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
     })
   }
   const sellerId=product.user
+
+  const seller = User.findById(sellerId)
+
+  const latitude = seller.latitude
+  const longitude = seller.longitude
+
+
   
 
   // console.log(consumer.cart);
@@ -502,14 +580,7 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
 exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   const productName = req.body.productName;
 
-
-
-
-
-
-
-  
-  const nameVariations = [];
+const nameVariations = [];
   const nameWords = productName.split(" ");
 
   for (let i = 0; i < nameWords.length; i++) {

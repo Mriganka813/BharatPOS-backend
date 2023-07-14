@@ -26,7 +26,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 
   console.log(seller.businessName);
   /// if has image, then create and save on cloudinary
-  if(req.body.quantity == undefined){
+  if(req.body.quantity == undefined || req.body.quantity === null){
     console.log('undefine qty');
     req.body.quantity=99999
   }
@@ -62,6 +62,14 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Get All Inventory count and search
+exports.getAllInventoriesAndSearch1=catchAsyncErrors(async(req,res,next)=>{
+
+  const {keyword} = req.query
+  const findInventories=await Inventory.find({ ...keyword })
+
+  console.log(findInventories);
+
+})
 exports.getAllInventoriesAndSearch = catchAsyncErrors(
   async (req, res, next) => {
     const resultPerPage = 8;
