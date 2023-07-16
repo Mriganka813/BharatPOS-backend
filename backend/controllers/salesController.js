@@ -10,9 +10,7 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   
   for (const item of orderItems) {
     const product = await Inventory.findById(item.product);
-    if(product.quantity < 99990){
-    inventoryController.decrementQuantity(item.product, item.quantity);
-    }
+   
   }
   try {
     const total = calcTotalAmount(orderItems);
@@ -101,10 +99,14 @@ exports.getAllSalesOrders = catchAsyncErrors(async (req, res, next) => {
 async function updateStock(id, quantity) {
   const inventory = await Inventory.findById(id);
 
-  inventory.Stock -= quantity;
+  if (inventory.Stock !== null) {
+      inventory.Stock -= quantity;
+  }
 
   await inventory.save({ validateBeforeSave: false });
 }
+
+
 
 // delete Order -- Admin
 exports.deleteSalesOrder = catchAsyncErrors(async (req, res, next) => {

@@ -7,8 +7,11 @@ const inventoryController = require("./inventoryController");
 exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party } = req.body;
   for (const item of orderItems) {
-    inventoryController.incrementQuantity(item.product, item.quantity);
-  }
+    if (item.quantity !== null) {
+        inventoryController.incrementQuantity(item.product, item.quantity);
+    }
+}
+
   const total = await calcTotalAmount(orderItems);
   const purchaseOrder = await PurchaseOrder.create({
     orderItems,
@@ -112,10 +115,14 @@ exports.updatePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
 async function updateStock(id, quantity) {
   const inventory = await Inventory.findById(id);
 
-  inventory.Stock -= quantity;
+  if (inventory.Stock !== null) {
+      inventory.Stock -= quantity;
+  }
 
   await inventory.save({ validateBeforeSave: false });
 }
+
+
 
 async function calcTotalAmount(orderItems) {
   let totalAmount = 0;

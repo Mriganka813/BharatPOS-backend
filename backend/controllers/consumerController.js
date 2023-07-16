@@ -380,12 +380,12 @@ exports.addToCarttest = catchAsyncErrors(async (req, res, next) => {
   const product = await Inventory.findById(productId)
 
   console.log(product.quantity);
-  if(qty>product.quantity){
+  if (product.quantity !== null && qty > product.quantity) {
     return res.json({
-      satus: false,
-      msg:"quantity Not available"
-    })
-  }
+        status: false,
+        msg: "quantity Not available"
+    });
+}
   const sellerId=product.user
 
   const seller = User.findById(sellerId)
@@ -423,12 +423,13 @@ exports.addToCarttest = catchAsyncErrors(async (req, res, next) => {
   if (existingCartItem) {
     const totalQty = existingCartItem.quantity + qty;
 
-    if (totalQty > product.quantity) {
+    if (product.quantity !== null && totalQty > product.quantity) {
       return res.json({
-        satus: false,
-        msg:"quantity Not available"
-      })
-    }
+          status: false,
+          msg: "quantity Not available"
+      });
+  }
+  
 
     // If the product is already in the cart, update the quantity
     existingCartItem.quantity = totalQty;

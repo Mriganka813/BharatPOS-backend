@@ -662,17 +662,20 @@ exports.acceptOrder=catchAsyncErrors(async(req,res,nex)=>{
     const inventory = await Inventory.findById(productId)
     if (inventory) {
       console.log(inventory.quantity);
-      if(orderItem.quantity>inventory.quantity){
-        return res.send({
-          success: false,
-          error: 'quantity not available'
-        })
+      if (inventory.quantity !== null && orderItem.quantity > inventory.quantity) {
+          return res.send({
+              success: false,
+              error: 'quantity not available'
+          });
       }
-      inventory.quantity -= orderItem.quantity;
-      await inventory.save();
-    }
-
-    await order.save()
+      if (inventory.quantity !== null) {
+          inventory.quantity -= orderItem.quantity;
+          await inventory.save();
+      }
+  }
+  
+  await order.save();
+  
     
     res.send(orderItem);
 
