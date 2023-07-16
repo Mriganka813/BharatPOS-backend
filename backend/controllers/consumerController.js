@@ -324,12 +324,14 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
   if (existingCartItem) {
     const totalQty = existingCartItem.quantity + qty;
 
-    if (totalQty > product.quantity) {
+    if (product.quantity !== null && totalQty > product.quantity) {
       return res.json({
         status: false,
         msg: "Quantity not available",
       });
     }
+
+
 
     // If the product is already in the cart, update the quantity
     existingCartItem.quantity = totalQty;
