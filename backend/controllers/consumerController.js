@@ -9,6 +9,7 @@ const Inventory = require("../models/inventoryModel");
 const ApiFeatures = require("../utils/apiFeatures");
 const Product = require('../models/inventoryModel');
 const { unsubscribe } = require("../routes/consumerRoute");
+const Rating = require('../models/ratingModel')
 
 // variable for global clicks counter
 let allClicksProducts = 0;
@@ -848,9 +849,45 @@ exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
   try{
     return res.render('consumerprivacy')
  
- 
+
   }catch(err){
    console.log(err);
   }
  
  });
+
+
+ exports.rating=catchAsyncErrors(async(req,res,next)=>{
+  
+  const {rating}=req.body
+  const userId = req.user._id
+  const {productId}=req.params
+
+  const product= await Inventory.findById(productId)
+  if(!product){
+    return res.send("Product Not found")
+  }
+
+  const checkRating = await Rating.findOne({consumer: userId,product:productId})
+  if(checkRating){
+    return res.send("You can Only rate Once")
+  }
+
+  const addRating = new Rating({
+    consumer: userId,
+    product: productId,
+    rating: rating
+
+  })
+  await addRating.save()
+
+  return res.send({
+    success: true,
+    msg: "Rated Successfully"
+  })
+
+
+
+
+
+ })

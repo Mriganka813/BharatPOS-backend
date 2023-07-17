@@ -110,6 +110,7 @@ router.route('/orders/hostory').get(isAuthenticatedConsumer,recentOrders)
 router.route('/add/address').post(isAuthenticatedConsumer,addAddress)
 
 router.route('/delete').get(deleteAccountPage)
+router.route('/rate/:productId').post(isAuthenticatedConsumer,rating)
 
 
 router.route('/policy').get(policyPage)
