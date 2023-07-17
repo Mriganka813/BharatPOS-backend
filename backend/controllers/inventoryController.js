@@ -300,6 +300,20 @@ exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
+// Update existing inventories
+exports.updateExistingInventories = catchAsyncErrors(async (req, res, next) => {
+  const inventoriesToUpdate = await Inventory.find({ quantity: 1 });
+
+  for (const inventory of inventoriesToUpdate) {
+    inventory.quantity = null;
+    await inventory.save();
+  }
+
+  res.status(200).json({ success: true, message: 'Existing inventories updated successfully' });
+});
+
+
+
 
 
 // exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
