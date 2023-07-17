@@ -31,6 +31,7 @@ const {
   recentOrders,
   viewShop,
   removeItem,
+  rating,
   addAddress,
   deleteAccountPage
 } = require("../controllers/consumerController");
@@ -105,7 +106,7 @@ router.route('/view/viewshop/:shopId').get(isAuthenticatedConsumer,viewShop)
 
 router.route('/order/placeorder').post(isAuthenticatedConsumer,placeOrder);
 
-router.route('/orders/hostory').get(isAuthenticatedConsumer,recentOrders)
+router.route('/orders/history').get(isAuthenticatedConsumer,recentOrders)
 
 router.route('/add/address').post(isAuthenticatedConsumer,addAddress)
 
