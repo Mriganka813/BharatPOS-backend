@@ -33,11 +33,11 @@ exports.isAuthenticatedUser = catchAsyncErrors(async (req, res, next) => {
 
 // auth for consumer
 exports.isAuthenticatedConsumer = catchAsyncErrors(async (req, res, next) => {
-  // const { authorization } = req.headers;
-  // console.log(authorization);
-  // const token = authorization
+  const { authorization } = req.headers;
+  console.log(authorization);
+  const token = authorization
 
-  const { token } = req.cookies;
+  // const { token } = req.cookies;
   console.log(token);
   if (!token) {
     return next(new ErrorHandler("Please login to access this resource", 401));
