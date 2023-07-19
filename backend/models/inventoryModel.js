@@ -52,7 +52,7 @@ const inventorySchema = mongoose.Schema({
   quantity: {
     type: Number,
     required: false,
-    maxLength: [4, "Stock cannot exceed 4 characters"],
+    maxLength: [7, "Stock cannot exceed 4 characters"],
     default: 1,
   },
   GSTRate: {
@@ -111,6 +111,7 @@ const inventorySchema = mongoose.Schema({
     type: Date,
     default: Date.now,
   },
+  
   
  
 }, { timestamps: true });

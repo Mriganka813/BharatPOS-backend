@@ -30,7 +30,7 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
 exports.getSinglePurchaseOrder = catchAsyncErrors(async (req, res, next) => {
   const purchaseOrder = await PurchaseOrder.findById(req.params.id).populate(
     "user",
-    "name email"
+    "name"
   );
 
   if (!purchaseOrder) {

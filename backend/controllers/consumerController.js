@@ -580,7 +580,7 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
 
 
 // Search Product
-// Search Product top reults 
+// Search Product top reults  todo add pginations
 exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   const productName = req.body.productName;
 

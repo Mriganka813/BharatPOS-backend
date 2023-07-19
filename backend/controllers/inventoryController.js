@@ -25,6 +25,11 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const seller = await User.findById(userDetail)
 
   console.log(seller.businessName);
+
+  if(req.body.quantity == undefined || req.body.quantity === null){
+    console.log('undefine qty');
+    req.body.quantity=99999
+  }
   /// if has image, then create and save on cloudinary
  
   // console.log(req.files)
