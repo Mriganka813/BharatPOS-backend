@@ -96,6 +96,18 @@ const userSchema = new mongoose.Schema(
       type: String,
       //required: true,
     },
+    openingTime: {
+      type: String,
+      // required: true
+    },
+    closingTime: {
+      type: String,
+      // required: true
+    },
+    shopOpen:{
+      type: Boolean,
+      default: true,
+    },
     
     resetPasswordToken: String,
     resetPasswordExpire: Date,

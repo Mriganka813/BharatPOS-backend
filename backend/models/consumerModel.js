@@ -54,9 +54,7 @@ const consumerSchema = new mongoose.Schema({
             },
             longitude:{
               type:String
-            }
-            
- 
+            } 
 },
 addresses: {
   type: [
