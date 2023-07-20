@@ -36,32 +36,21 @@ const consumerSchema = new mongoose.Schema({
     default: "user",
   },
   cart: {
-    type: [
-        {
-            sellerId:{
+          sellerId:{
               type: mongoose.Schema.Types.ObjectId,
                 ref: 'User'
             },
-            productId: {
+            product: [{
+              productId:{
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'inventory'
-            },
-            quantity: {
-                type: Number,
-                default: 1
-            }
-                  }
-    ],
-    default: [],
-    latitude: {
-      type: String,
-      //required: true,
-    },
-    longitude: {
-      type: String,
-      //required: true,
-    },
-
+              },
+              qty:{
+                type: Number
+              }
+            }],
+            
+ 
 },
 addresses: {
   type: [

@@ -295,9 +295,81 @@ exports.updateConsumerDetails = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-exports.addToCart = catchAsyncErrors(async (req, res, next) => {
+exports.addToCart = (async (req, res, next) => {
+  
+try{
+ 
+console.log("inside cart");
+const userId = req.user._id;
+console.log(userId);
+const productId = req.params.productId;
+const qty = parseInt(req.body.qty);
+
+const consumer = await Consumer.findById(userId);
+const product = await Inventory.findById(productId);
+const sellerId = product.user;
+const seller=User.findById(sellerId)
+
+const latitude=seller.latitude
+const longitude=seller.longitude
+
+if (!consumer) {
+  console.log("User not found");
+  return res.json({
+    status: false,
+    msg: "User not found",
+  });
+}
+
+
+if (!consumer.cart.sellerId || consumer.cart.sellerId != sellerId) {
+  // If sellerId is missing or mismatched, update the cart's sellerId
+  consumer.cart.sellerId = sellerId;
+  consumer.cart.longitude=longitude
+  consumer.cart.latitude=latitude
+  
+}
+
+// Check if the product with the given productId already exists in the cart
+const existingProduct = consumer.cart.product.find(
+  (product) => product.productId == productId
+);
+
+if (existingProduct) {
+  // If the product already exists, update its quantity
+  existingProduct.qty += qty;
+} else {
+  // If the product doesn't exist, add a new entry to the cart
+  consumer.cart.product.push({
+    productId: productId,
+    qty: qty,
+  });
+}
+
+// Update the cart's total quantity
+consumer.cart.quantity += qty;
+
+// Save the updated consumer object
+await consumer.save();
+
+return res.json({
+  status: true,
+  msg: "Product added to cart successfully",
+  cart: consumer.cart, // Return the updated cart
+});
+
+ }catch(err){
+  console.log(err);
+}
+});
+
+
+
+
+exports.addToCart0 = catchAsyncErrors(async (req, res, next) => {
   console.log("inside cart");
   const userId = req.user._id;
+  console.log(userId);
   const productId = req.params.productId;
   const qty = parseInt(req.body.qty);
 
@@ -366,95 +438,7 @@ exports.addToCart = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-// add to cart
-exports.addToCarttest = catchAsyncErrors(async (req, res, next) => {
-  console.log("inside cart");
-  const userId = req.user._id;
-  const productId = req.params.productId;
-  const qty = parseInt(req.body.qty);
-  // console.log(userId);
-  
-  
-  
-  const consumer = await Consumer.findById(userId);
 
-  const product = await Inventory.findById(productId)
-
-  console.log(product.quantity);
-  if (product.quantity !== null && qty > product.quantity) {
-    return res.json({
-        status: false,
-        msg: "quantity Not available"
-    });
-}
-  const sellerId=product.user
-
-  const seller = User.findById(sellerId)
-
-  const latitude = seller.latitude
-  const longitude = seller.longitude
-
-
-  
-
-  // console.log(consumer.cart);
-  if (!consumer) {
-    console.log("User not found");
-  }
-
-
-  consumer.cart = consumer.cart.filter(
-    (item) => item.sellerId.toString() === sellerId.toString()
-  );
-
-    // Create a new cart item
-    const newCartItem = {
-
-      productId: productId,
-      quantity: qty,
-      sellerId: sellerId
-    };
-  // Check if the product is already in the cart
-  const existingCartItem = consumer.cart.find(
-    (item) =>
-      item.productId.toString() === productId.toString() &&
-      item.sellerId.toString() === sellerId.toString()
-  );
-
-  if (existingCartItem) {
-    const totalQty = existingCartItem.quantity + qty;
-
-    if (product.quantity !== null && totalQty > product.quantity) {
-      return res.json({
-          status: false,
-          msg: "quantity Not available"
-      });
-  }
-  
-
-    // If the product is already in the cart, update the quantity
-    existingCartItem.quantity = totalQty;
-  } else {
-    // If the product is not in the cart, create a new cart item
-    const newCartItem = {
-      productId: productId,
-      quantity: qty,
-      sellerId: sellerId,
-    };
-    consumer.cart.push(newCartItem);
-  }
-
-  
-
-
-  // consumer.cart.push(newCartItem);
-  const savedConsumer = await consumer.save();
-
-  return res.json({
-    satus: true,
-    msg:"Added successfully"
-  })
-});
 
 
 exports.removeItem=catchAsyncErrors(async(req,res,next)=>{

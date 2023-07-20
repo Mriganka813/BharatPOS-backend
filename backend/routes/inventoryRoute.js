@@ -10,6 +10,7 @@ const {
   getInventoryForUser,
   findInventoryByBarcode,
   bulkUpload,
+  availablility,
   updateExistingInventories // Add this line
 } = require("../controllers/inventoryController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -44,4 +45,5 @@ router.route("/del/inventory/:id").delete(isAuthenticatedUser, deleteInventory);
 
 router.route("/inventory/:id").get(isAuthenticatedUser, getInventoryDetails);
 
+router.route("/inventory/:productId/:status").get(availablility)
 module.exports = router;

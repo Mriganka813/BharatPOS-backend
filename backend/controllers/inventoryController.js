@@ -318,7 +318,43 @@ exports.updateExistingInventories = catchAsyncErrors(async (req, res, next) => {
 });
 
 
+exports.availablility=catchAsyncErrors(async (req,res,next)=>{
+  const {status,productId}=req.params
+  console.log(productId);
+  const product = await Inventory.findById(productId)
+  if (!product) {
+    return res.status(404).json({
+      status: 'error',
+      message: 'Product not found',
+    });
+  }
 
+  if(status === 'active'){
+    if(product.available === true){
+      return res.send({
+        status: 'Already Active'
+      })
+     }
+
+     product.available=true
+     await product.save()
+  }
+
+  else if(status === 'disable'){
+    if(product.available === false){
+      return res.send({
+        status: 'Already disable'
+      })
+    }
+    product.available=false
+     await product.save()
+  }
+
+  res.send({
+    status: 'success',
+    data: product,
+  });
+})
 
 
 // exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
