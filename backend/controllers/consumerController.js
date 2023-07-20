@@ -308,8 +308,8 @@ exports.addToCart = async (req, res, next) => {
     console.log(sellerId);
     const seller = await User.findById(sellerId);
 
-    const latitude = seller.latitude;
-    const longitude = seller.longitude;
+    let latitude = seller?.latitude || "unavailable";
+    let longitude = seller?.longitude || "unavailable";
 
     if (!consumer) {
       console.log("User not found");
