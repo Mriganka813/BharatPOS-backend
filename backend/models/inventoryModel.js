@@ -101,6 +101,7 @@ const inventorySchema = mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Consumer",
   },
+  
   sellerName:{
     type: String,
   },

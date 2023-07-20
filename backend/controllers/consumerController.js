@@ -319,8 +319,8 @@ exports.addToCart = async (req, res, next) => {
       });
     }
 
-
-    if (!consumer.cart.sellerId.toString() || consumer.cart.sellerId.toString() != sellerId.toString()) {
+    
+    if (!consumer.cart.sellerId ||consumer.cart.sellerId.toString() !== sellerId.toString()) {
       consumer.cart = {
         sellerId: sellerId,
         longitude: longitude,
