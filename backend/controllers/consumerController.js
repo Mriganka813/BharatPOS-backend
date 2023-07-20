@@ -1,7 +1,7 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const Consumer = require("../models/consumerModel");
-const OrderedItem= require("../models/orderedItem")
+const OrderedItem = require("../models/orderedItem")
 const sendToken = require("../utils/jwtToken");
 const sendEmail = require("../utils/sendEmail");
 const User = require("../models/userModel");
@@ -153,11 +153,11 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
 exports.getSellersByName = catchAsyncErrors(async (req, res, next) => {
   const key = req.query.keyword
     ? {
-        businessName: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
+      businessName: {
+        $regex: req.query.keyword,
+        $options: "i",
+      },
+    }
     : {};
   const apiFeature = new ApiFeatures(User.find(key), req.query).pagination(10);
   const sellers = await apiFeature.query;
@@ -171,11 +171,11 @@ exports.getSellersByName = catchAsyncErrors(async (req, res, next) => {
 exports.getProductNamesandSearch = catchAsyncErrors(async (req, res, next) => {
   const key = req.query.keyword
     ? {
-        name: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
+      name: {
+        $regex: req.query.keyword,
+        $options: "i",
+      },
+    }
     : {};
   const products = await Inventory.find(key).select("name");
   res.status(200).json({
@@ -295,73 +295,69 @@ exports.updateConsumerDetails = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-exports.addToCart = (async (req, res, next) => {
-  
-try{
- 
-console.log("inside cart");
-const userId = req.user._id;
-console.log(userId);
-const productId = req.params.productId;
-const qty = parseInt(req.body.qty);
+exports.addToCart = async (req, res, next) => {
+  try {
+    console.log("inside cart");
+    const userId = req.user._id;
+    const productId = req.params.productId;
+    const qty = parseInt(req.body.qty);
 
-const consumer = await Consumer.findById(userId);
-const product = await Inventory.findById(productId);
-const sellerId = product.user;
-const seller=User.findById(sellerId)
+    const consumer = await Consumer.findById(userId);
+    const product = await Inventory.findById(productId);
+    const sellerId = product.user;
+    console.log(sellerId);
+    const seller = await User.findById(sellerId);
 
-const latitude=seller.latitude
-const longitude=seller.longitude
+    const latitude = seller.latitude;
+    const longitude = seller.longitude;
 
-if (!consumer) {
-  console.log("User not found");
-  return res.json({
-    status: false,
-    msg: "User not found",
-  });
-}
+    if (!consumer) {
+      console.log("User not found");
+      return res.json({
+        status: false,
+        msg: "User not found",
+      });
+    }
 
 
-if (!consumer.cart.sellerId || consumer.cart.sellerId != sellerId) {
-  // If sellerId is missing or mismatched, update the cart's sellerId
-  consumer.cart.sellerId = sellerId;
-  consumer.cart.longitude=longitude
-  consumer.cart.latitude=latitude
-  
-}
+    if (!consumer.cart.sellerId.toString() || consumer.cart.sellerId.toString() != sellerId.toString()) {
+      consumer.cart = {
+        sellerId: sellerId,
+        longitude: longitude,
+        latitude: latitude,
+        product: [], // Initialize product array as empty
+      };
+    }
 
-// Check if the product with the given productId already exists in the cart
-const existingProduct = consumer.cart.product.find(
-  (product) => product.productId == productId
-);
+    const existingProduct = consumer.cart.product.find(
+      (product) => product.productId == productId
+    );
 
-if (existingProduct) {
-  // If the product already exists, update its quantity
-  existingProduct.qty += qty;
-} else {
-  // If the product doesn't exist, add a new entry to the cart
-  consumer.cart.product.push({
-    productId: productId,
-    qty: qty,
-  });
-}
+    if (existingProduct) {
+      // If the product already exists, update its quantity
+      existingProduct.qty += qty;
+    } else {
+      // If the product doesn't exist, add a new entry to the cart
+      consumer.cart.product.push({
+        productId: productId,
+        qty: qty,
+      });
+    }
 
-// Update the cart's total quantity
-consumer.cart.quantity += qty;
+    // Save the updated consumer object
+    await consumer.save();
 
-// Save the updated consumer object
-await consumer.save();
+    return res.json({
+      status: true,
+      msg: "Product added to cart successfully",
+      cart: consumer.cart, // Return the updated cart
+    });
 
-return res.json({
-  status: true,
-  msg: "Product added to cart successfully",
-  cart: consumer.cart, // Return the updated cart
-});
+  } catch (err) {
+    console.log(err);
+  }
+};
 
- }catch(err){
-  console.log(err);
-}
-});
 
 
 
@@ -441,41 +437,41 @@ exports.addToCart0 = catchAsyncErrors(async (req, res, next) => {
 
 
 
-exports.removeItem=catchAsyncErrors(async(req,res,next)=>{
-  try{
+exports.removeItem = catchAsyncErrors(async (req, res, next) => {
+  try {
 
-    const userId= req.user._id
+    const userId = req.user._id
     const productId = req.params.productId;
     console.log(productId);
     // find user
     const user = await Consumer.findById(userId);
 
-        if (!user) {
-            return res.status(404).json({ error: 'User not found' });
-        }
-
-         // Find the index of the cart item to be deleted
-         const cartItemIndex = user.cart.findIndex(
-          (item) => item.productId.toString() === productId
-      );
-
-      if (cartItemIndex !== -1) {
-        user.cart.splice(cartItemIndex, 1);
-        const savedUser = await user.save();
-
-        res.send({
-          success:true,
-          msg:"deleted",
-          
-        })
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
 
-  }catch(err){
+    // Find the index of the cart item to be deleted
+    const cartItemIndex = user.cart.findIndex(
+      (item) => item.productId.toString() === productId
+    );
+
+    if (cartItemIndex !== -1) {
+      user.cart.splice(cartItemIndex, 1);
+      const savedUser = await user.save();
+
+      res.send({
+        success: true,
+        msg: "deleted",
+
+      })
+    }
+
+  } catch (err) {
     console.log(err);
   }
 })
 
-exports.showCart=catchAsyncErrors(async(req,res,next)=>{
+exports.showCart = catchAsyncErrors(async (req, res, next) => {
 
   console.log("jii");
   const userId = req.user._id
@@ -486,10 +482,10 @@ exports.showCart=catchAsyncErrors(async(req,res,next)=>{
     consumer.cart.map(async (item) => {
       const product = await Inventory.findById(item.productId);
       return {
-        
+
         product,
         quantity: item.quantity,
-        
+
       };
     })
   );
@@ -499,10 +495,10 @@ exports.showCart=catchAsyncErrors(async(req,res,next)=>{
 
 exports.checloutCart = catchAsyncErrors(async (req, res, next) => {
 
-  const userId=req.user.id
+  const userId = req.user.id
   // send cart data to orderDB
   const user = await User.findById(userId)
-  console.log(user.cart );
+  console.log(user.cart);
 
 });
 
@@ -549,7 +545,7 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
         { "address.state": location }
       ]
     })
-      
+
 
     console.log(users);
     if (users.length === 0) {
@@ -568,7 +564,7 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
 exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   const productName = req.body.productName;
 
-const nameVariations = [];
+  const nameVariations = [];
   const nameWords = productName.split(" ");
 
   for (let i = 0; i < nameWords.length; i++) {
@@ -591,12 +587,12 @@ const nameVariations = [];
       return res.send("Sorry, no products found matching your search.");
     }
 
-    
+
     // const sellerName=await User.findById(product.user);
 
     // console.log(sellerName.businessName);
 
-    
+
 
     res.status(200).json({ product });
 
@@ -607,33 +603,33 @@ const nameVariations = [];
 
 // route for open shop (single)
 
-exports.viewShop=catchAsyncErrors(async(req,res)=>{
-    const shopId =req.params.shopId
+exports.viewShop = catchAsyncErrors(async (req, res) => {
+  const shopId = req.params.shopId
 
-    const inventory= await Inventory.find({ user: shopId })
-    console.log(inventory);
-    res.send(inventory)
+  const inventory = await Inventory.find({ user: shopId })
+  console.log(inventory);
+  res.send(inventory)
 })
 
 // flter Product by category
 
 exports.filterProduct = catchAsyncErrors(async (req, res, next) => {
 
-  const category=req.params.productCategory
-  const location=req.params.location
-  const user= await User.find({
-    businessType:category,
+  const category = req.params.productCategory
+  const location = req.params.location
+  const user = await User.find({
+    businessType: category,
     $or: [
       { "address.city": location },
       { "address.state": location }
     ]
-  
+
   })
 
-  if(user.length === 0){
+  if (user.length === 0) {
     return res.send("Sorry, NO seller Available");
   }
-  
+
   res.send(user)
 
 });
@@ -645,8 +641,8 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     // const sellerId = req.params.sellerId
     const user = await Consumer.findById(userId).populate('cart.productId');
     console.log(user.cart.length);
-    if(user.cart.length==0){
-      return res.send({success: false, msg:"Cart is Empty "})
+    if (user.cart.length == 0) {
+      return res.send({ success: false, msg: "Cart is Empty " })
     }
     const orderItems = user.cart.map((item) => {
       return {
@@ -677,15 +673,15 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
 
 
     // Deduct the quantity of each ordered item from the database
-  //  for (const item of user.cart) {
-  //   console.log(item.productId);
-  //   const inventory = await Inventory.findById(item.productId);
-  //   if (inventory) {
-  //     console.log(inventory.quantity);
-  //     inventory.quantity -= item.quantity;
-  //     await inventory.save();
-  //   }
-  // }
+    //  for (const item of user.cart) {
+    //   console.log(item.productId);
+    //   const inventory = await Inventory.findById(item.productId);
+    //   if (inventory) {
+    //     console.log(inventory.quantity);
+    //     inventory.quantity -= item.quantity;
+    //     await inventory.save();
+    //   }
+    // }
     user.cart = [];
     await user.save();
 
@@ -714,25 +710,25 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
 
 exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
 
-  try{
+  try {
     const userId = req.user._id
     console.log(userId);
     const recentOrders = await OrderedItem.find({ consumer: userId });
 
     res.send(recentOrders)
- 
- 
-  }catch(err){
-   console.log(err);
+
+
+  } catch (err) {
+    console.log(err);
   }
- 
- });
 
- 
- exports.addAddress = catchAsyncErrors(async (req, res, next) => {
+});
 
-  try{
-    const consumerId=req.user._id
+
+exports.addAddress = catchAsyncErrors(async (req, res, next) => {
+
+  try {
+    const consumerId = req.user._id
     const {
       name,
       state,
@@ -766,95 +762,95 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
     consumer.addresses.push(newAddress);
     await consumer.save();
 
-    res.status(201).json({ 
-      success:true,
-      message: "Address added successfully", 
-      address: newAddress 
+    res.status(201).json({
+      success: true,
+      message: "Address added successfully",
+      address: newAddress
     });
- 
- 
-  }catch(err){
-   console.log(err);
+
+
+  } catch (err) {
+    console.log(err);
   }
- 
- });
+
+});
 
 
 
- 
+
 exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
 
-  try{
+  try {
     return res.render('deletePage')
- 
- 
-  }catch(err){
-   console.log(err);
-  }
- 
- });
 
-  
+
+  } catch (err) {
+    console.log(err);
+  }
+
+});
+
+
 //  const Consumer = require('../models/Consumer'); // Import the Consumer model
 
- exports.deleteAccount = catchAsyncErrors(async (req, res, next) => {
-   try {
-     const { email, password } = req.body;
- 
-     // Find the consumer by email
-     const consumer = await Consumer.findOne({ email });
- 
-     if (!consumer) {
-       return res.status(404).json({ message: 'Consumer not found' });
-     }
- 
-     // Check if the provided password matches the consumer's password
-     const isPasswordMatched = await consumer.comparePassword(password);
- 
-     if (!isPasswordMatched) {
-       return res.status(401).json({ message: 'Invalid password' });
-     }
- 
-     // Delete the consumer account
-     await Consumer.findByIdAndDelete(consumer._id);
- 
-     res.status(200).json({ message: 'Account deleted successfully' });
-   } catch (err) {
-     console.log(err);
-     res.status(500).json({ message: 'Internal server error' });
-   }
- });
- 
+exports.deleteAccount = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
+    // Find the consumer by email
+    const consumer = await Consumer.findOne({ email });
 
+    if (!consumer) {
+      return res.status(404).json({ message: 'Consumer not found' });
+    }
 
+    // Check if the provided password matches the consumer's password
+    const isPasswordMatched = await consumer.comparePassword(password);
 
- exports.policyPage = catchAsyncErrors(async (req, res, next) => {
+    if (!isPasswordMatched) {
+      return res.status(401).json({ message: 'Invalid password' });
+    }
 
-  try{
-    return res.render('consumerprivacy')
- 
+    // Delete the consumer account
+    await Consumer.findByIdAndDelete(consumer._id);
 
-  }catch(err){
-   console.log(err);
+    res.status(200).json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: 'Internal server error' });
   }
- 
- });
+});
 
 
- exports.rating=catchAsyncErrors(async(req,res,next)=>{
-  
-  const {rating}=req.body
+
+
+
+exports.policyPage = catchAsyncErrors(async (req, res, next) => {
+
+  try {
+    return res.render('consumerprivacy')
+
+
+  } catch (err) {
+    console.log(err);
+  }
+
+});
+
+
+exports.rating = catchAsyncErrors(async (req, res, next) => {
+
+  const { rating } = req.body
   const userId = req.user._id
-  const {productId}=req.params
+  const { productId } = req.params
 
-  const product= await Inventory.findById(productId)
-  if(!product){
+  const product = await Inventory.findById(productId)
+  if (!product) {
     return res.send("Product Not found")
   }
 
-  const checkRating = await Rating.findOne({consumer: userId,product:productId})
-  if(checkRating){
+  const checkRating = await Rating.findOne({ consumer: userId, product: productId })
+  if (checkRating) {
     return res.send("You can Only rate Once")
   }
 
@@ -875,4 +871,4 @@ exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
 
 
 
- })
+})

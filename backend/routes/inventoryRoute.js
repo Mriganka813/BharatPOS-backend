@@ -36,7 +36,6 @@ router.route("/inventory/bulk").post(upload.single('excelFile'), bulkUpload);
 // Add the following route for updating existing inventories
 router.route("/inventory/update-existing").post(isAuthenticatedUser, updateExistingInventories);
 
-
 router.route("/inventory/me").get(isAuthenticatedUser, getInventoryForUser);
 
 router.route("/update/inventory/:id").put(isAuthenticatedUser, updateInventory);
@@ -45,5 +44,7 @@ router.route("/del/inventory/:id").delete(isAuthenticatedUser, deleteInventory);
 
 router.route("/inventory/:id").get(isAuthenticatedUser, getInventoryDetails);
 
-router.route("/inventory/:productId/:status").get(availablility)
+router.route("/inventory/:productId/:status").get(isAuthenticatedUser, availablility)
+
+
 module.exports = router;

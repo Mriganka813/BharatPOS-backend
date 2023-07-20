@@ -49,6 +49,12 @@ const consumerSchema = new mongoose.Schema({
                 type: Number
               }
             }],
+            latitude:{
+              type:String
+            },
+            longitude:{
+              type:String
+            }
             
  
 },
