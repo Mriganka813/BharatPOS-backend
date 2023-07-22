@@ -619,86 +619,12 @@ exports.placeOrder = catchAsyncErrors(async (req,res,next)=>{
     
   res.send(orderedItems)
 })
-exports.placeOrder1 = catchAsyncErrors(async (req, res, next) => {
-  //  to do cant order if cart is empty
-  try {
-    const userId = req.user._id;
-    // const sellerId = req.params.sellerId
-    const user = await Consumer.findById(userId).populate('cart.productId');
-    console.log(user.cart.length);
-    if (user.cart.length == 0) {
-      return res.send({ success: false, msg: "Cart is Empty " })
-    }
-    const orderItems = user.cart.map((item) => {
-      return {
-        productId: item.productId._id,
-        productName: item.productId.name,
-        productPrice: item.productId.sellingPrice,
-        productImage: item.productId.img,
-        quantity: item.quantity,
-        barcode: item.productId.barCode,
-        sellerId: item.productId.user,
-        sellerName: item.productId.sellerName
-      };
-    });
-
-    const address = {
-      // country: req.body.country,
-      name: req.body.name,
-      state: req.body.state,
-      city: req.body.city,
-      phoneNumber: req.body.phoneNumber,
-      pinCode: req.body.pinCode,
-      streetAddress: req.body.streetAddress,
-      additionalInfo: req.body.additionalInfo,
-      landmark: req.body.landmark,
-      latitude: req.body.latitude,
-      longitude: req.body.longitude
-    };
-
-
-    // Deduct the quantity of each ordered item from the database
-    //  for (const item of user.cart) {
-    //   console.log(item.productId);
-    //   const inventory = await Inventory.findById(item.productId);
-    //   if (inventory) {
-    //     console.log(inventory.quantity);
-    //     inventory.quantity -= item.quantity;
-    //     await inventory.save();
-    //   }
-    // }
-    user.cart = [];
-    await user.save();
-
-    const newOrder = new OrderedItem({
-      items: orderItems,
-      consumer: userId,
-      // seller:sellerId,
-      addresses: address
-    });
-    await newOrder.save();
-
-    return res.send({
-      success: true,
-      msg: "Order placed",
-      newOrder
-    });
-
-  } catch (err) {
-    console.log(err);
-  }
-});
-
-
-
-
-
 exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
 
   try {
     const userId = req.user._id
     console.log(userId);
-    const recentOrders = await OrderedItem.find({ consumer: userId });
+    const recentOrders = await OrderedItem.find({ consumerId: userId });
 
     res.send(recentOrders)
 
