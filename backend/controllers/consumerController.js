@@ -410,12 +410,14 @@ exports.showCart = catchAsyncErrors(async (req, res, next) => {
     const product = products.find(prod => prod._id.toString() === item.productId.toString());
     return {
       productId: item.productId,
+      sellerName: product.sellerName,
+      sellerId: product.user,
+      price: product.sellingPrice,
       qty: item.qty,
       name: product ? product.name : 'Product Not Found' // Use a default name if the product is not found
     };
 
   });
-
   res.send(cartWithProductNames);
 })
 
