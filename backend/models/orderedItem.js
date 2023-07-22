@@ -46,12 +46,15 @@ const orderedItemSchema = mongoose.Schema({
     ref: "User",
     // required: true,
   },
-  consumer:{
+  consumerId:{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Consumer",
     required: true,
   },
 
+  consumerName:{
+    type: String
+  },
 
   addresses: {
     name:{
@@ -59,6 +62,7 @@ const orderedItemSchema = mongoose.Schema({
     },
      country: {
       type: String,
+      default: "india"
       // required: true,
     },
     state: {

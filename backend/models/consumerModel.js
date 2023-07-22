@@ -41,12 +41,24 @@ const consumerSchema = new mongoose.Schema({
                 ref: 'User'
             },
             product: [{
+              productName:{
+                type:String
+              },
+              sellerName:{
+                type:String
+              },
               productId:{
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'inventory'
               },
               qty:{
                 type: Number
+              },
+              price:{
+                type:Number
+              },
+              image:{
+                type: String
               }
             }],
             latitude:{

@@ -304,10 +304,13 @@ exports.addToCart = async (req, res, next) => {
 
     const consumer = await Consumer.findById(userId);
     const product = await Inventory.findById(productId);
+    const productName=product.name
+    const price=product.sellingPrice
+    const image=product.image ||  "unavailable"
     const sellerId = product.user;
     console.log(sellerId);
     const seller = await User.findById(sellerId);
-
+    const sellerName=seller.businessName
     let latitude = seller?.latitude || "unavailable";
     let longitude = seller?.longitude || "unavailable";
 
@@ -341,6 +344,10 @@ exports.addToCart = async (req, res, next) => {
       consumer.cart.product.push({
         productId: productId,
         qty: qty,
+        sellerName,
+        productName,
+        price,
+        image 
       });
     }
 
@@ -373,12 +380,12 @@ exports.removeItem = catchAsyncErrors(async (req, res, next) => {
     }
 
     // Find the index of the cart item to be deleted
-    const cartItemIndex = user.cart.findIndex(
+    const cartItemIndex = user.cart.product.findIndex(
       (item) => item.productId.toString() === productId
     );
 
     if (cartItemIndex !== -1) {
-      user.cart.splice(cartItemIndex, 1);
+      user.cart.product.splice(cartItemIndex, 1);
       const savedUser = await user.save();
 
       res.send({
@@ -409,11 +416,13 @@ exports.showCart = catchAsyncErrors(async (req, res, next) => {
   const cartWithProductNames = cart.product.map(item => {
     const product = products.find(prod => prod._id.toString() === item.productId.toString());
     return {
+      // cart,
       productId: item.productId,
       sellerName: product.sellerName,
       sellerId: product.user,
       price: product.sellingPrice,
       qty: item.qty,
+      image: product.image || "unavailable",
       name: product ? product.name : 'Product Not Found' // Use a default name if the product is not found
     };
 
@@ -563,8 +572,55 @@ exports.filterProduct = catchAsyncErrors(async (req, res, next) => {
 
 });
 
-exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
-  //  to do can order if cart is empty
+exports.placeOrder = catchAsyncErrors(async (req,res,next)=>{
+
+  const userId= req.user._id
+  const user = await Consumer.findById(userId)
+  const sellerid=user.cart.sellerId
+  // const address= user.addresses
+
+  const orderedItems = user.cart.product.map((item)=>{
+    return{
+      productId: item.productId,
+      productName: item.productName,
+      productPrice: item.price,
+      productImage: item.image,
+      quantity: item.qty,
+      sellerId: sellerid,
+      sellerName: item.sellerName    
+    }
+  })
+
+  const address = {
+    // country: req.body.country,
+    name: req.body.name,
+    state: req.body.state,
+    city: req.body.city,
+    phoneNumber: req.body.phoneNumber,
+    pinCode: req.body.pinCode,
+    streetAddress: req.body.streetAddress,
+    additionalInfo: req.body.additionalInfo,
+    landmark: req.body.landmark,
+    latitude: req.body.latitude,
+    longitude: req.body.longitude
+  };
+  
+  user.cart = [];
+    await user.save();
+
+    const newOrder = new OrderedItem({
+      items: orderedItems,
+      consumerId: userId,
+      consumerName: user.name,
+      seller:user.cart.sellerId,
+      addresses: address
+    });
+    await newOrder.save();
+    
+  res.send(orderedItems)
+})
+exports.placeOrder1 = catchAsyncErrors(async (req, res, next) => {
+  //  to do cant order if cart is empty
   try {
     const userId = req.user._id;
     // const sellerId = req.params.sellerId
