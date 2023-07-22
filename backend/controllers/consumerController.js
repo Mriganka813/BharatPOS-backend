@@ -400,7 +400,23 @@ exports.showCart = catchAsyncErrors(async (req, res, next) => {
 
   const consumer = await Consumer.findById(userId)
   const cart=consumer.cart
-  res.send(cart);
+
+  const productId =  cart.product.map(item=>item.productId)
+  
+  const products = await Inventory.find({_id:{$in: productId}})
+  
+
+  const cartWithProductNames = cart.product.map(item => {
+    const product = products.find(prod => prod._id.toString() === item.productId.toString());
+    return {
+      productId: item.productId,
+      qty: item.qty,
+      name: product ? product.name : 'Product Not Found' // Use a default name if the product is not found
+    };
+
+  });
+
+  res.send(cartWithProductNames);
 })
 
 
@@ -444,7 +460,6 @@ exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
 
 
 // Vie all
-
 exports.viewAll = catchAsyncErrors(async (req, res, next) => {
   const searchedLocation = req.params.location;
   const location = searchedLocation.toLowerCase();
