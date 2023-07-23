@@ -501,6 +501,60 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
 // Search Product top reults  todo add pginations
 exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   const productName = req.body.productName;
+  const page = parseInt(req.query.page) || 1; // Default page is 1
+  const limit = parseInt(req.query.limit) || 10; // Default limit is 10 items per page
+
+  const nameVariations = [];
+  const nameWords = productName.split(" ");
+
+  for (let i = 0; i < nameWords.length; i++) {
+    const variation = nameWords.slice(0, i + 1).join(" ");
+    nameVariations.push(variation);
+  }
+
+  try {
+    const productCount = await Product.countDocuments({
+      $or: nameVariations.map(variation => ({
+        $or: [
+          { name: { $regex: new RegExp(variation, "i") } },
+          { category: { $regex: new RegExp(variation, "i") } }
+        ]
+      }))
+    });
+
+    const totalPages = Math.ceil(productCount / limit);
+    const skip = (page - 1) * limit;
+
+    const products = await Product.find({
+      $or: nameVariations.map(variation => ({
+        $or: [
+          { name: { $regex: new RegExp(variation, "i") } },
+          { category: { $regex: new RegExp(variation, "i") } }
+        ]
+      }))
+    })
+      .skip(skip)
+      .limit(limit);
+
+    if (products.length === 0) {
+      return res.send("Sorry, no products found matching your search.");
+    }
+
+    res.status(200).json({
+      products,
+      currentPage: page,
+      totalPages,
+      totalProducts: productCount
+    });
+
+  } catch (err) {
+    res.send(err);
+  }
+});
+
+
+exports.searchProduct0 = catchAsyncErrors(async (req, res, next) => {
+  const productName = req.body.productName;
 
   const nameVariations = [];
   const nameWords = productName.split(" ");
