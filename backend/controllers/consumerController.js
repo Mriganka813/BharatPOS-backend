@@ -474,6 +474,47 @@ exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
 exports.viewAll = catchAsyncErrors(async (req, res, next) => {
   const searchedLocation = req.params.location;
   const location = searchedLocation.toLowerCase();
+  const page = parseInt(req.query.page) || 1; // Default page is 1
+  const limit = parseInt(req.query.limit) || 10; // Default limit is 10 items per page
+
+  try {
+    const userCount = await User.countDocuments({
+      $or: [
+        { "address.city": location },
+        { "address.state": location },
+      ],
+    });
+
+    const totalPages = Math.ceil(userCount / limit);
+    const skip = (page - 1) * limit;
+
+    const users = await User.find({
+      $or: [
+        { "address.city": location },
+        { "address.state": location },
+      ],
+    })
+      .skip(skip)
+      .limit(limit);
+
+    if (users.length === 0) {
+      return res.send("Sorry, no sellers found at that location.");
+    }
+
+    res.status(200).json({
+      users,
+      currentPage: page,
+      totalPages,
+      totalUsers: userCount,
+    });
+  } catch (error) {
+    res.status(500).json({ error: "Internal server error" });
+  }
+});
+
+exports.viewAll0 = catchAsyncErrors(async (req, res, next) => {
+  const searchedLocation = req.params.location;
+  const location = searchedLocation.toLowerCase();
   console.log(location);
 
   try {
@@ -594,8 +635,39 @@ exports.searchProduct0 = catchAsyncErrors(async (req, res, next) => {
 });
 
 // route for open shop (single)
-
 exports.viewShop = catchAsyncErrors(async (req, res) => {
+  const shopId = req.params.shopId;
+  const page = parseInt(req.query.page) || 1; // Default page is 1
+  const limit = parseInt(req.query.limit) || 10; // Default limit is 10 items per page
+
+  try {
+    const inventoryCount = await Inventory.countDocuments({ user: shopId });
+    const totalPages = Math.ceil(inventoryCount / limit);
+    const skip = (page - 1) * limit;
+
+    const inventory = await Inventory.find({ user: shopId })
+      .skip(skip)
+      .limit(limit);
+
+    if (inventory.length === 0) {
+      return res.send("Sorry, no inventory found for this shop.");
+    }
+
+    res.status(200).json({
+      inventory,
+      currentPage: page,
+      totalPages,
+      totalItems: inventoryCount,
+    });
+
+  } catch (err) {
+    res.send(err);
+  }
+});
+
+
+
+exports.viewShop0 = catchAsyncErrors(async (req, res) => {
   const shopId = req.params.shopId
 
   const inventory = await Inventory.find({ user: shopId })
