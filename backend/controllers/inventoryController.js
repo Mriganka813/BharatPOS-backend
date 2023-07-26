@@ -44,18 +44,19 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     console.log(req.body.image);
   }
   req.body.user = userDetail;
+  console.log(req.body.barcode);
   /// Check if barcode is unique to that particular user
-  if (req.body.barCode !== undefined || req.body.barCode !== "") {
-    const existingInventory = await Inventory.findOne({
-      barCode: barCode,
-      user: req.user._id,
-    });
-    if (!lodash.isEmpty(existingInventory)) {
-      return next(
-        new ErrorHandler("Product with this barcode already exists ", 400)
-      );
-    }
-  }
+  // if (req.body.barCode !== undefined || req.body.barCode !== "") {
+  //   const existingInventory = await Inventory.findOne({
+  //     barCode: barCode,
+  //     user: req.user._id,
+  //   });
+  //   if (!lodash.isEmpty(existingInventory)) {
+  //     return next(
+  //       new ErrorHandler("Product with this barcode already exists ", 400)
+  //     );
+  //   }
+  // }
   const inventory = await Inventory.create({
     ...req.body,
     sellerName: seller.businessName,
