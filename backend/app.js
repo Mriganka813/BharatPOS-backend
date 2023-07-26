@@ -14,7 +14,7 @@ const Inventory = require("./models/inventoryModel");
 // const passportLocal = require('./config/passport-local-strategy');
 // const fs=require("fs");
 
-const XLSX = require('xlsx');
+const XLSX = require("xlsx");
 const { isAuthenticatedUser, isSubscribed } = require("./middleware/auth");
 
 const errorMiddleware = require("./middleware/error");
@@ -22,90 +22,94 @@ const logFile = fs.createWriteStream("./logfile.log", { flags: "w" }); //use {fl
 app.use(cookieParser());
 //multerconnection
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, 'uploads/');
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
   },
-  filename: function(req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
 });
 
 app.use(cookieParser());
-const upload = multer({ storage: storage }); 
+const upload = multer({ storage: storage });
 
 // app.use(passport.initialize());
 // app.use(passport.session());
-const User = require('./models/userModel')
+const User = require("./models/userModel");
 
-app.get('/privacy-policies',async(req,res)=>{
-  res.render('privacypolicies')
-  
-})
-
-
-app.post('/api/v1/bulkupload',isAuthenticatedUser, upload.single('file'), async (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ message: 'No file uploaded' });
-  }
-
-  const filePath = req.file.path;
-  const userDetail = req.user._id;
-  
-
-  // console.log(userDetail);
-  const seller = await User.findById(userDetail)
-
-  // Convert the data according to their index number
-  const workbook = XLSX.readFile(filePath);
-  const sheetName = workbook.SheetNames[0];
-  const worksheet = workbook.Sheets[sheetName];
-
-  // Convert into JSON format
-  const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-
-  // Remove the header row
-  const headers = jsonData.shift();
-
-  try {
-    for (const row of jsonData) {
-      const itemData = {};
-      headers.forEach((header, index) => {
-        const value = row[index] !== '' ? row[index] : undefined;
-        itemData[header] = value;
-      });
-
-      itemData.user = userDetail;
-
-      // Check if barcode is unique to that particular user
-      if (itemData.barcode) {
-        const existingInventory = await Inventory.findOne({
-          barcode: itemData.barcode,
-          user: userDetail,
-        });
-        if (existingInventory) {
-          console.error('Product with this barcode already exists');
-          continue;
-        }
-      }
-
-      // Create and save the inventory item
-      // const inventory = new Inventory(itemData);
-      const inventory = new Inventory({ ...itemData, sellerName: seller.businessName });
-
-      await inventory.save();
-      console.log('Item saved:', inventory);
-    }
-
-    fs.unlinkSync(filePath);
-
-    // Success message
-    res.json({ message: 'File uploaded successfully' });
-  } catch (error) {
-    console.error('Failed to save items:', error);
-    res.status(500).json({ message: 'Failed to save items' });
-  }
+app.get("/privacy-policies", async (req, res) => {
+  res.render("privacypolicies");
 });
 
+app.post(
+  "/api/v1/bulkupload",
+  isAuthenticatedUser,
+  upload.single("file"),
+  async (req, res) => {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" });
+    }
+
+    const filePath = req.file.path;
+    const userDetail = req.user._id;
+
+    // console.log(userDetail);
+    const seller = await User.findById(userDetail);
+
+    // Convert the data according to their index number
+    const workbook = XLSX.readFile(filePath);
+    const sheetName = workbook.SheetNames[0];
+    const worksheet = workbook.Sheets[sheetName];
+
+    // Convert into JSON format
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+    // Remove the header row
+    const headers = jsonData.shift();
+
+    try {
+      for (const row of jsonData) {
+        const itemData = {};
+        headers.forEach((header, index) => {
+          const value = row[index] !== "" ? row[index] : undefined;
+          itemData[header] = value;
+        });
+
+        itemData.user = userDetail;
+
+        // Check if barcode is unique to that particular user
+        if (itemData.barcode) {
+          const existingInventory = await Inventory.findOne({
+            barcode: itemData.barcode,
+            user: userDetail,
+          });
+          if (existingInventory) {
+            console.error("Product with this barcode already exists");
+            continue;
+          }
+        }
+
+        // Create and save the inventory item
+        // const inventory = new Inventory(itemData);
+        const inventory = new Inventory({
+          ...itemData,
+          sellerName: seller.businessName,
+        });
+
+        await inventory.save();
+        console.log("Item saved:", inventory);
+      }
+
+      fs.unlinkSync(filePath);
+
+      // Success message
+      res.json({ message: "File uploaded successfully" });
+    } catch (error) {
+      console.error("Failed to save items:", error);
+      res.status(500).json({ message: "Failed to save items" });
+    }
+  }
+);
 
 // Config
 if (process.env.NODE_ENV !== "PRODUCTION") {
@@ -197,14 +201,14 @@ const purchase = require("./routes/purchaseRoute");
 const sales = require("./routes/salesRoute");
 const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
+const table = require("./routes/tableRoute");
 
 const consumer = require("./routes/consumerRoute");
-
 
 const payment = require("./routes/paymentRoutes");
 const subscribedUsersModel = require("./models/subscribedUsersModel");
 const agent = require("./routes/agentRoutes");
-const bulk=require('./routes/bulkUploads')
+const bulk = require("./routes/bulkUploads");
 
 const corsConfig = {
   origin: "http://localhost:5500",
@@ -213,7 +217,7 @@ const corsConfig = {
 app.use(cors(corsConfig));
 
 app.use(function (req, res, next) {
-  res.header("Access-Control-Allow-Origin",req.header("origin"));
+  res.header("Access-Control-Allow-Origin", req.header("origin"));
   res.header("Access-Control-Allow-Credentials", true);
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
   res.header(
@@ -275,7 +279,8 @@ app.use("/api/v1", report);
 app.use("/api/v1/agent", agent);
 app.use("/api/v1/consumer", consumer);
 app.use("/api/v1/payment", payment);
-app.use("/api/v1",bulk);
+app.use("/api/v1", bulk);
+app.use("/api/v1", table);
 
 app.use(express.static(path.join(__dirname, "build")));
 
