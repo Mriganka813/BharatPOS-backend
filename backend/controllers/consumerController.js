@@ -455,8 +455,7 @@ exports.searchLocation = catchAsyncErrors(async (req, res, next) => {
         { "address.state": location }
       ]
     })
-      .limit(20) // Limit the search results to 5
-      .exec();
+      
 
     console.log(users);
     if (users.length === 0) {
@@ -512,35 +511,19 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-exports.viewAll0 = catchAsyncErrors(async (req, res, next) => {
-  const searchedLocation = req.params.location;
-  const location = searchedLocation.toLowerCase();
-  console.log(location);
 
-  try {
-    const users = await User.find({
-      $or: [
-        { "address.city": location },
-        { "address.state": location }
-      ]
-    })
-
-
-    console.log(users);
-    if (users.length === 0) {
-      return res.send("Sorry, no sellers found at that location.");
-    }
-
-    res.status(200).json({ users });
-  } catch (error) {
-    res.status(500).json({ error: "Internal server error" });
-  }
-});
 
 
 // Search Product
 // Search Product top reults  todo add pginations
-exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
+exports.searchProduct=catchAsyncErrors(async(req,res,next)=>{
+  const productName = req.body.productName;
+  const location = req.params.location
+
+  
+
+})
+exports.searchProduct9 = catchAsyncErrors(async (req, res, next) => {
   const productName = req.body.productName;
   const page = parseInt(req.query.page) || 1; // Default page is 1
   const limit = parseInt(req.query.limit) || 10; // Default limit is 10 items per page

@@ -42,8 +42,8 @@
         <th>Shop Name</th>
         <th>OrderID</th>
         <th>Order Status</th>
-        <th>Price</th>
         <th>Product Name</th>
+        <th>Price</th>
         <th>Quantity</th>
         <th>Total Price</th>
       </tr>
@@ -53,10 +53,10 @@
         <td><%= data[i].sellerName %></td>
         <td><%= data[i].orderId %></td>
         <td><%= data[i].status %></td>
-        <td><%= data[i].price %></td>
         <td><%= data[i].productName %></td>
+        <td><%= data[i].price %></td>
         <td><%= data[i].quantity %></td>
-        <td><%= data[i].total %></td>
+        <td><%= data[i].quantity *  data[i].price %></td>
       </tr>
       <% } %>
     </table>

@@ -98,11 +98,13 @@ router.route('/search/location/viewall/:location').get(viewAll)
 
 // Search Product Todo add Auth middleware later 
 
-router.route('/search/product').post(searchProduct)
+// todo edit search route with city
+router.route('/search/product/:location').post(searchProduct)
+
 
 router.route('/category/:productCategory/location/:location').get(filterProduct)
 
-router.route('/view/viewshop/:shopId').get(isAuthenticatedConsumer,viewShop)
+router.route('/view/viewshop/:shopId').get(viewShop)
 
 router.route('/order/placeorder').post(isAuthenticatedConsumer,placeOrder);
 

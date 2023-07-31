@@ -8,7 +8,7 @@ exports.create = (req, res) => {
     productId: req.body.productId,
     status: req.body.status,
     productName: req.body.productName,
-    productPrice: req.body.productPrice,
+    // productPrice: req.body.productPrice,
   });
   table
     .save(table)

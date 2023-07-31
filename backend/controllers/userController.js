@@ -3,6 +3,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
 const Order =require('../models/orderedItem')
 const Inventory=require("../models/inventoryModel")
+const Consumer=require("../models/consumerModel")
 const jwt = require("jsonwebtoken");
 const sendToken = require("../utils/jwtToken");
 const sendTokenlogin =require("../utils/jwtToken")
@@ -770,4 +771,85 @@ exports.rejectStatus=catchAsyncErrors(async(req,res,nex)=>{
   }catch(err){
     console.log(err);
   }
+})
+
+exports.changeTiming=catchAsyncErrors(async(req,res,next)=>{
+  try{
+    const userId=req.user._id
+  
+  const {open, close}=req.body
+
+  const user= await User.findById(userId)
+    console.log(user);
+  user.closingTime=close
+  user.openingTime=open
+
+  await user.save()
+
+  return res.send({
+    success: true,
+    closingTime:open,
+    openingTime:close
+  })
+  }catch(err){
+    // console.log(err);
+    res.send(err)
+  }
+
+})
+
+exports.openCloseShop=catchAsyncErrors(async(req,res,next)=>{
+  const userId=req.user._id
+  const user= await User.findById(userId)
+  if(user.shopOpen == true){
+    user.shopOpen = false
+  }else{
+    user.shopOpen = true
+  }
+
+  await user.save()
+
+  return res.send({
+    success: true,
+    status: user.shopOpen
+
+  })
+})
+
+exports.orderData=catchAsyncErrors(async(req,res,next)=>{
+  // const userId=req.user._id
+  const { orderId }=req.params
+  console.log(orderId);
+  const order=await Order.findById(orderId)
+  let price=0
+  const sellerId=req.user._id
+  
+  const seller=await User.findById(sellerId)
+  console.log(seller);
+  const upi=seller.upi_id 
+
+  if(!upi || upi==""){
+    return res.send({
+      success: false,
+      err:"ADD UPI ID first"
+    })
+  }
+
+  const sellerName= seller.businessName
+  const sellerNumber=seller.phoneNumber
+  const consumerName= order.consumerName
+  const consumer= await Consumer.findById(order.consumerId)
+  const consumerNumber=consumer.phoneNumber
+  order.items.map(item=>{
+    price=price+item.productPrice
+  })
+
+  res.send({
+      sellerName,
+      sellerNumber,
+      upi,
+      consumerName,
+      consumerNumber
+  })
+  
 })

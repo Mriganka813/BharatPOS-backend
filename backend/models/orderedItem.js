@@ -28,7 +28,6 @@ const orderedItemSchema = mongoose.Schema({
         type: String,
         enum: ['pending', 'confirmed','dispatched','delivered','rejected','cancelled','refunded'],
         default: 'pending'
-        
       },
       
       sellerId:{
@@ -45,6 +44,10 @@ const orderedItemSchema = mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "User",
     // required: true,
+  },
+  isPaid:{
+    type: Boolean,
+    default: false
   },
   consumerId:{
     type: mongoose.Schema.Types.ObjectId,

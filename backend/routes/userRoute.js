@@ -23,6 +23,9 @@ const {
   acceptOrder,
   rejectStatus,
   rejectAll,
+  openCloseShop,
+  changeTiming,
+  orderData
 
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
@@ -78,6 +81,13 @@ router.route('/myorders/rejectall/:orderId').get(rejectAll)
 
 const multer = require("multer");
 
+router.route('/shop-time').post(isAuthenticatedUser,changeTiming)
+
+router.route('/change/shop-status').get(isAuthenticatedUser,openCloseShop)
+
+router.route('/order/details/:orderId').get(isAuthenticatedUser,orderData)
+
+
 
 
 //multerconnection
@@ -92,7 +102,6 @@ const storage = multer.diskStorage({
 const upload = multer({ storage: storage }); 
 
 router.route("/upload").post(isAuthenticatedUser, upload.single('file'), uploadData)
-
 
 
 
