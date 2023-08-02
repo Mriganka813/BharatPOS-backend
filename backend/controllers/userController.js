@@ -1,12 +1,12 @@
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
-const Order =require('../models/orderedItem')
-const Inventory=require("../models/inventoryModel")
-const Consumer=require("../models/consumerModel")
+const Order = require("../models/orderedItem");
+const Inventory = require("../models/inventoryModel");
+const Consumer = require("../models/consumerModel");
 const jwt = require("jsonwebtoken");
 const sendToken = require("../utils/jwtToken");
-const sendTokenlogin =require("../utils/jwtToken")
+const sendTokenlogin = require("../utils/jwtToken");
 const fast2sms = require("fast-two-sms");
 const otpGenerator = require("otp-generator");
 const otpModel = require("../models/otpModel");
@@ -16,7 +16,7 @@ const upload = require("../services/upload");
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
-const { uploadImage } =require("../services/upload")
+const { uploadImage } = require("../services/upload");
 
 exports.verifyOtp = catchAsyncErrors(async (req, res, next) => {
   const otpHolder = await otpModel.find({
@@ -127,8 +127,6 @@ exports.signUpWithPhoneNumber = catchAsyncErrors(async (req, res, next) => {
   // return res.status(200).json("Otp send successfully",Otp);
 });
 
-
-
 exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   // Check if GstIN already exists
   if (req.body.GstIN) {
@@ -146,7 +144,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
   const { locality, city, state } = req.body; // Extracting address subfields
   console.log(city);
-  const trimmedCity = city.trim()
+  const trimmedCity = city.trim();
   const lowercaseLocality = locality.toLowerCase();
   const lowercaseCity = trimmedCity.toLowerCase();
   const lowercaseState = state.toLowerCase();
@@ -154,10 +152,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
   if (data) {
     return next(
-      new ErrorHandler(
-        "Phone Number already registered, Sign In instead",
-        400
-      )
+      new ErrorHandler("Phone Number already registered, Sign In instead", 400)
     );
   }
 
@@ -174,7 +169,7 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   // Remove GstIN field if it is empty
   if (!req.body.GstIN) {
     delete userData.GstIN;
-    console.log('removed');
+    console.log("removed");
   }
 
   const user = await User.create(userData);
@@ -182,33 +177,26 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   return res.render("signedupsuccess");
 });
 
-
-
-
-
 // register user
 exports.registerUser123 = catchAsyncErrors(async (req, res, next) => {
-
   if (!req.body.GstIN) {
-    console.log('jhhh');
+    console.log("jhhh");
   }
 
-
   if (req.files?.image) {
-  
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
     console.log(req.body.image);
   }
-  
-  const { locality, city, state } = req.body // Extracting address subfields
+
+  const { locality, city, state } = req.body; // Extracting address subfields
 
   const lowercaseLocality = locality.toLowerCase();
   const lowercaseCity = city.toLowerCase();
   const lowercaseState = state.toLowerCase();
 
   // console.log(city);
-  
+
   const data = await User.findOne({ phoneNumber: req.body.phoneNumber });
   if (data) {
     return next(
@@ -216,21 +204,19 @@ exports.registerUser123 = catchAsyncErrors(async (req, res, next) => {
     );
   }
 
-  const user = await User.create({ 
+  const user = await User.create({
     ...req.body,
     address: {
       locality: lowercaseLocality,
       city: lowercaseCity,
       state: lowercaseState,
-      country: "India" // Assuming the country is always India
-    }
+      country: "India", // Assuming the country is always India
+    },
   });
-  
-  
-  // sendToken(user, 201, res);
-  return res.render('signedupsuccess')
-});
 
+  // sendToken(user, 201, res);
+  return res.render("signedupsuccess");
+});
 
 exports.registerUser0 = catchAsyncErrors(async (req, res, next) => {
   console.log("inside ");
@@ -255,18 +241,16 @@ exports.registerUser0 = catchAsyncErrors(async (req, res, next) => {
   sendToken(user, 201, res);
 });
 
-
 // Login user
 exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   const { email, password } = req.body;
 
-  
   if (!email || !password) {
     return next(new ErrorHandler("Please enter email and password", 400));
   }
-  
+
   const user = await User.findOne({ email }).select("+password");
-  
+
   if (!user) {
     console.log("wrong password");
     return next(new ErrorHandler("Invalid email or password", 400));
@@ -274,7 +258,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
 
   const isPasswordMatched = await user.comparePassword(password);
 
-  if(isPasswordMatched){
+  if (isPasswordMatched) {
     console.log("correct");
   }
 
@@ -414,23 +398,20 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 // GetUser UPi
 
 exports.getUpi = catchAsyncErrors(async (req, res, next) => {
-
   const user = await User.findById(req.user.id);
-  const upi = user.upi_id
+  const upi = user.upi_id;
   res.status(200).json({
     success: true,
+    businessName: user.businessName,
     upi,
   });
-
-})
+});
 // Update user UPI
 
 exports.updateUpi = catchAsyncErrors(async (req, res, next) => {
-
   const { upi_id } = req.body;
 
   // Find the user by their ID
@@ -440,7 +421,7 @@ exports.updateUpi = catchAsyncErrors(async (req, res, next) => {
   if (!user) {
     return res.status(404).json({
       success: false,
-      message: 'User not found',
+      message: "User not found",
     });
   }
 
@@ -450,406 +431,378 @@ exports.updateUpi = catchAsyncErrors(async (req, res, next) => {
   // Return a success response
   res.status(200).json({
     success: true,
-    message: 'UPI ID updated successfully',
-    upi: upi_id
+    message: "UPI ID updated successfully",
+    upi: upi_id,
   });
-
-
-})
+});
 
 const multer = require("multer");
 
-
-
-exports.uploadData=catchAsyncErrors(async(req,res,next)=>{
+exports.uploadData = catchAsyncErrors(async (req, res, next) => {
   if (!req.file) {
-        return res.status(400).json({ message: 'No file uploaded' });
-      }
-    
-      const filePath = req.file.path;
-      const userDetail = req.user._id;
-    
-      // Convert the data according to their index number
-      const workbook = XLSX.readFile(filePath);
-      const sheetName = workbook.SheetNames[0];
-      const worksheet = workbook.Sheets[sheetName];
-    
-      // Convert into JSON format
-      const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
-    
-      // Remove the header row
-      const headers = jsonData.shift();
-    
-      try {
-        for (const row of jsonData) {
-          const itemData = {};
-          headers.forEach((header, index) => {
-            const value = row[index] !== '' ? row[index] : undefined;
-            itemData[header] = value;
-          });
-    
-          itemData.user = userDetail;
-    
-          // Check if barcode is unique to that particular user
-          if (itemData.barcode) {
-            const existingInventory = await Inventory.findOne({
-              barcode: itemData.barcode,
-              user: userDetail,
-            });
-            if (existingInventory) {
-              console.error('Product with this barcode already exists');
-              continue;
-            }
-          }
-    
-          // Create and save the inventory item
-          const inventory = new Inventory(itemData);
-          await inventory.save();
-          console.log('Item saved:', inventory);
+    return res.status(400).json({ message: "No file uploaded" });
+  }
+
+  const filePath = req.file.path;
+  const userDetail = req.user._id;
+
+  // Convert the data according to their index number
+  const workbook = XLSX.readFile(filePath);
+  const sheetName = workbook.SheetNames[0];
+  const worksheet = workbook.Sheets[sheetName];
+
+  // Convert into JSON format
+  const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 });
+
+  // Remove the header row
+  const headers = jsonData.shift();
+
+  try {
+    for (const row of jsonData) {
+      const itemData = {};
+      headers.forEach((header, index) => {
+        const value = row[index] !== "" ? row[index] : undefined;
+        itemData[header] = value;
+      });
+
+      itemData.user = userDetail;
+
+      // Check if barcode is unique to that particular user
+      if (itemData.barcode) {
+        const existingInventory = await Inventory.findOne({
+          barcode: itemData.barcode,
+          user: userDetail,
+        });
+        if (existingInventory) {
+          console.error("Product with this barcode already exists");
+          continue;
         }
-    
-        fs.unlinkSync(filePath);
-    
-        // Success message
-        res.json({ message: 'File uploaded successfully' });
-      } catch (error) {
-        console.error('Failed to save items:', error);
-        res.status(500).json({ message: 'Failed to save items' });
       }
-})
 
-
-exports.renderRegister=catchAsyncErrors(async(req,res,next)=>{
-
-  return res.render('register')
-
-})
-
-exports.renderWebLogin=catchAsyncErrors(async(req,res,next)=>{
-  
-  return res.render('weblogin')
-
-})
-
-
-exports.webLogin=catchAsyncErrors(async(req,res,nex)=>{
-  console.log("oooo");
- 
-    const { email, password } = req.body;
-  
-    
-    if (!email || !password) {
-      return next(new ErrorHandler("Please enter email and password", 400));
+      // Create and save the inventory item
+      const inventory = new Inventory(itemData);
+      await inventory.save();
+      console.log("Item saved:", inventory);
     }
-    
-    const user = await User.findOne({ email }).select("+password");
-    
-    if (!user) {
-      console.log("wrong password");
-      return next(new ErrorHandler("Invalid email or password", 400));
-    }
-  
-    const isPasswordMatched = await user.comparePassword(password);
-  
-    if(isPasswordMatched){
-      console.log("correct");
-    }
-  
-    if (!isPasswordMatched) {
-      console.log("wrong password");
-      return next(new ErrorHandler("Invalid email or password", 400));
-    }
-  
-    console.log(user);
-    // sendTokenlogin(user, 200, res)
-    // return res.redirect('/api/v1/renderbnulk')
-    const responseData = {
-      success: true,
-      user: req.user,
-      token: req.cookies.token,
-    };
-    return res.render('bulkupload', { data: responseData });
-})
 
-exports.renderBulkupload=catchAsyncErrors(async(req,res,next)=>{
-  console.log(req.user);
-  return res.render('bulkupload')
+    fs.unlinkSync(filePath);
 
-})
-
-
-
-exports.orderStatus=catchAsyncErrors(async(req,res,next)=>{
-const userId=req.user._id
-console.log(userId);
-
-const orders = await Order.find({
-  "items": {
-    $elemMatch: {
-      sellerId: userId
-    }
+    // Success message
+    res.json({ message: "File uploaded successfully" });
+  } catch (error) {
+    console.error("Failed to save items:", error);
+    res.status(500).json({ message: "Failed to save items" });
   }
 });
 
-res.send(orders)
-})
+exports.renderRegister = catchAsyncErrors(async (req, res, next) => {
+  return res.render("register");
+});
 
+exports.renderWebLogin = catchAsyncErrors(async (req, res, next) => {
+  return res.render("weblogin");
+});
 
-exports.itemDeatils=catchAsyncErrors(async(req,res,nex)=>{
-  try{
-    const productId  = req.params.productId
-    const userId=req.user._id
+exports.webLogin = catchAsyncErrors(async (req, res, nex) => {
+  console.log("oooo");
 
+  const { email, password } = req.body;
+
+  if (!email || !password) {
+    return next(new ErrorHandler("Please enter email and password", 400));
+  }
+
+  const user = await User.findOne({ email }).select("+password");
+
+  if (!user) {
+    console.log("wrong password");
+    return next(new ErrorHandler("Invalid email or password", 400));
+  }
+
+  const isPasswordMatched = await user.comparePassword(password);
+
+  if (isPasswordMatched) {
+    console.log("correct");
+  }
+
+  if (!isPasswordMatched) {
+    console.log("wrong password");
+    return next(new ErrorHandler("Invalid email or password", 400));
+  }
+
+  console.log(user);
+  // sendTokenlogin(user, 200, res)
+  // return res.redirect('/api/v1/renderbnulk')
+  const responseData = {
+    success: true,
+    user: req.user,
+    token: req.cookies.token,
+  };
+  return res.render("bulkupload", { data: responseData });
+});
+
+exports.renderBulkupload = catchAsyncErrors(async (req, res, next) => {
+  console.log(req.user);
+  return res.render("bulkupload");
+});
+
+exports.orderStatus = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+  console.log(userId);
+
+  const orders = await Order.find({
+    items: {
+      $elemMatch: {
+        sellerId: userId,
+      },
+    },
+  });
+
+  res.send(orders);
+});
+
+exports.itemDeatils = catchAsyncErrors(async (req, res, nex) => {
+  try {
+    const productId = req.params.productId;
+    const userId = req.user._id;
 
     const order = await Order.findOne({
-      "items.productId": productId ,
-      "items.sellerId": userId
-    })
+      "items.productId": productId,
+      "items.sellerId": userId,
+    });
 
-    if(!order){
+    if (!order) {
       return res.status(404).json({
         success: false,
-        error:"Order not found"
-      })
+        error: "Order not found",
+      });
     }
 
-    const orderItem = order.items.find((item) => item.productId.toString() === productId);
+    const orderItem = order.items.find(
+      (item) => item.productId.toString() === productId
+    );
     if (!orderItem) {
       return res.status(404).json({ error: "Order item not found" });
     }
-    
+
     res.send(orderItem);
 
     // res.send(orders)
-
-
-  }catch(err){
+  } catch (err) {
     console.log(err);
   }
-})
+});
 
-
-
-exports.acceptOrder=catchAsyncErrors(async(req,res,nex)=>{
-  try{
-    const productId  = req.params.productId
-    const userId=req.user._id
+exports.acceptOrder = catchAsyncErrors(async (req, res, nex) => {
+  try {
+    const productId = req.params.productId;
+    const userId = req.user._id;
 
     // console.log(userId);
     console.log(productId);
 
     const order = await Order.findOne({
-      "items.productId": productId ,
-      "items.sellerId": userId
-    })
+      "items.productId": productId,
+      "items.sellerId": userId,
+    });
 
-    if(!order){
+    if (!order) {
       return res.status(404).json({
         success: false,
-        error:"Order not found"
-      })
+        error: "Order not found",
+      });
     }
 
-    const orderItem = order.items.find((item) => item.productId.toString() === productId);
+    const orderItem = order.items.find(
+      (item) => item.productId.toString() === productId
+    );
 
-    
     if (!orderItem) {
       return res.status(404).json({ error: "Order item not found" });
-      
     }
 
-    
-    orderItem.status = 'confirmed'
-    const inventory = await Inventory.findById(productId)
+    orderItem.status = "confirmed";
+    const inventory = await Inventory.findById(productId);
     if (inventory) {
       console.log(inventory.quantity);
-      if (inventory.quantity !== null && orderItem.quantity > inventory.quantity) {
-          return res.send({
-              success: false,
-              error: 'quantity not available'
-          });
+      if (
+        inventory.quantity !== null &&
+        orderItem.quantity > inventory.quantity
+      ) {
+        return res.send({
+          success: false,
+          error: "quantity not available",
+        });
       }
       if (inventory.quantity !== null) {
-          inventory.quantity -= orderItem.quantity;
-          await inventory.save();
+        inventory.quantity -= orderItem.quantity;
+        await inventory.save();
       }
-  }
-  
-  await order.save();
-  
-    
+    }
+
+    await order.save();
+
     res.send(orderItem);
 
     // res.send(orders)
-
-
-  }catch(err){
+  } catch (err) {
     console.log(err);
   }
-})
+});
 
-exports.acceptAll=catchAsyncErrors(async(req,res,next)=>{
-  const {orderId}=req.params
+exports.acceptAll = catchAsyncErrors(async (req, res, next) => {
+  const { orderId } = req.params;
 
-  const order = await Order.findById(orderId)
+  const order = await Order.findById(orderId);
 
-  order.items.forEach(item =>{
-    item.status = 'confirmed'
-  })
+  order.items.forEach((item) => {
+    item.status = "confirmed";
+  });
 
   await order.save();
 
   res.status(200).json({
     success: true,
-    message: "Status of all products changed to confirmed"
+    message: "Status of all products changed to confirmed",
   });
-})
+});
 
-exports.rejectAll=catchAsyncErrors(async(req,res,next)=>{
-  const {orderId}=req.params
+exports.rejectAll = catchAsyncErrors(async (req, res, next) => {
+  const { orderId } = req.params;
 
-  const order = await Order.findById(orderId)
+  const order = await Order.findById(orderId);
 
-  order.items.forEach(item =>{
-    item.status = 'rejected'
-  })
+  order.items.forEach((item) => {
+    item.status = "rejected";
+  });
 
   await order.save();
 
   res.status(200).json({
     success: true,
-    message: "Status of all products changed to confirmed"
+    message: "Status of all products changed to confirmed",
   });
-})
-
-
-
+});
 
 // change order status
 
-exports.rejectStatus=catchAsyncErrors(async(req,res,nex)=>{
-  try{
-    const productId  = req.params.productId
-    const userId=req.user._id
+exports.rejectStatus = catchAsyncErrors(async (req, res, nex) => {
+  try {
+    const productId = req.params.productId;
+    const userId = req.user._id;
     console.log(userId);
-    
-    
-    const order = await Order.findOne({
-      "items.productId": productId ,
-      "items.sellerId": userId
-    })
 
-    if(!order){
+    const order = await Order.findOne({
+      "items.productId": productId,
+      "items.sellerId": userId,
+    });
+
+    if (!order) {
       return res.status(404).json({
         success: false,
-        error:"Order not found"
-      })
+        error: "Order not found",
+      });
     }
 
-    const orderItem = order.items.find((item) => item.productId.toString() === productId);
+    const orderItem = order.items.find(
+      (item) => item.productId.toString() === productId
+    );
     if (!orderItem) {
       return res.status(404).json({ error: "Order item not found" });
-      
     }
 
-    
-    orderItem.status = 'rejected'
-    const inventory = await Inventory.findById(productId)
+    orderItem.status = "rejected";
+    const inventory = await Inventory.findById(productId);
     // if (inventory) {
     //   console.log(inventory.quantity);
     //   inventory.quantity -= orderItem.quantity;
     //   await inventory.save();
     // }
 
-    await order.save()
-    
+    await order.save();
+
     res.send(orderItem);
 
     // res.send(orders)
-
-
-  }catch(err){
+  } catch (err) {
     console.log(err);
   }
-})
+});
 
-exports.changeTiming=catchAsyncErrors(async(req,res,next)=>{
-  try{
-    const userId=req.user._id
-  
-  const {open, close}=req.body
+exports.changeTiming = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const userId = req.user._id;
 
-  const user= await User.findById(userId)
+    const { open, close } = req.body;
+
+    const user = await User.findById(userId);
     console.log(user);
-  user.closingTime=close
-  user.openingTime=open
+    user.closingTime = close;
+    user.openingTime = open;
 
-  await user.save()
+    await user.save();
 
-  return res.send({
-    success: true,
-    closingTime:open,
-    openingTime:close
-  })
-  }catch(err){
+    return res.send({
+      success: true,
+      closingTime: open,
+      openingTime: close,
+    });
+  } catch (err) {
     // console.log(err);
-    res.send(err)
+    res.send(err);
+  }
+});
+
+exports.openCloseShop = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+  const user = await User.findById(userId);
+  if (user.shopOpen == true) {
+    user.shopOpen = false;
+  } else {
+    user.shopOpen = true;
   }
 
-})
-
-exports.openCloseShop=catchAsyncErrors(async(req,res,next)=>{
-  const userId=req.user._id
-  const user= await User.findById(userId)
-  if(user.shopOpen == true){
-    user.shopOpen = false
-  }else{
-    user.shopOpen = true
-  }
-
-  await user.save()
+  await user.save();
 
   return res.send({
     success: true,
-    status: user.shopOpen
+    status: user.shopOpen,
+  });
+});
 
-  })
-})
-
-exports.orderData=catchAsyncErrors(async(req,res,next)=>{
+exports.orderData = catchAsyncErrors(async (req, res, next) => {
   // const userId=req.user._id
-  const { orderId }=req.params
+  const { orderId } = req.params;
   console.log(orderId);
-  const order=await Order.findById(orderId)
-  let price=0
-  const sellerId=req.user._id
-  
-  const seller=await User.findById(sellerId)
-  console.log(seller);
-  const upi=seller.upi_id 
+  const order = await Order.findById(orderId);
+  let price = 0;
+  const sellerId = req.user._id;
 
-  if(!upi || upi==""){
+  const seller = await User.findById(sellerId);
+  console.log(seller);
+  const upi = seller.upi_id;
+
+  if (!upi || upi == "") {
     return res.send({
       success: false,
-      err:"ADD UPI ID first"
-    })
+      err: "ADD UPI ID first",
+    });
   }
 
-  const sellerName= seller.businessName
-  const sellerNumber=seller.phoneNumber
-  const consumerName= order.consumerName
-  const consumer= await Consumer.findById(order.consumerId)
-  const consumerNumber=consumer.phoneNumber
-  order.items.map(item=>{
-    price=price+item.productPrice
-  })
+  const sellerName = seller.businessName;
+  const sellerNumber = seller.phoneNumber;
+  const consumerName = order.consumerName;
+  const consumer = await Consumer.findById(order.consumerId);
+  const consumerNumber = consumer.phoneNumber;
+  order.items.map((item) => {
+    price = price + item.productPrice;
+  });
 
   res.send({
-      sellerName,
-      sellerNumber,
-      upi,
-      consumerName,
-      consumerNumber
-  })
-  
-})
+    sellerName,
+    sellerNumber,
+    upi,
+    consumerName,
+    consumerNumber,
+  });
+});

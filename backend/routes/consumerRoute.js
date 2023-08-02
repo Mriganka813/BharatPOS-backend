@@ -33,7 +33,7 @@ const {
   removeItem,
   rating,
   addAddress,
-  deleteAccountPage
+  deleteAccountPage,
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -60,61 +60,83 @@ router.route("/seller/:id").get(isAuthenticatedConsumer, getSingleUserDetail);
 
 router.route("/product/:id").get(isAuthenticatedConsumer, getInventoryDetails);
 
-router.route("/products/all").get(isAuthenticatedConsumer, getAllInventorieswithSearch);
+router
+  .route("/products/all")
+  .get(isAuthenticatedConsumer, getAllInventorieswithSearch);
 
-router.route("/sellercontact/:id").get(isAuthenticatedConsumer, getContactNumber);
+router
+  .route("/sellercontact/:id")
+  .get(isAuthenticatedConsumer, getContactNumber);
 
-router.route("/getSellersAndSearch").get(isAuthenticatedConsumer, getSellersAndSearch);
+router
+  .route("/getSellersAndSearch")
+  .get(isAuthenticatedConsumer, getSellersAndSearch);
 
 router.route("/sellers").get(isAuthenticatedConsumer, getSellers);
 
-router.route("/sellerProduct/:id").get(isAuthenticatedConsumer, getProductsOfUser);
+router
+  .route("/sellerProduct/:id")
+  .get(isAuthenticatedConsumer, getProductsOfUser);
 
 router.route("/sellers/search").get(isAuthenticatedConsumer, getSellersByName);
 
-router.route("/productname/search").get(isAuthenticatedConsumer, getProductNamesandSearch);
+router
+  .route("/productname/search")
+  .get(isAuthenticatedConsumer, getProductNamesandSearch);
 
-router.route("/product/click/:id").get(isAuthenticatedConsumer, addClickProduct);
+router
+  .route("/product/click/:id")
+  .get(isAuthenticatedConsumer, addClickProduct);
 
 router.route("/seller/click/:id").get(isAuthenticatedConsumer, addClickSeller);
 
-router.route("/products/popular").get(isAuthenticatedConsumer, getTopClickedProducts);
+router
+  .route("/products/popular")
+  .get(isAuthenticatedConsumer, getTopClickedProducts);
 
-router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSellers);
+router
+  .route("/popular/seller")
+  .get(isAuthenticatedConsumer, getTopClickedSellers);
 
-router.route("/popular/seller").get(isAuthenticatedConsumer, getTopClickedSellers);
+router
+  .route("/popular/seller")
+  .get(isAuthenticatedConsumer, getTopClickedSellers);
 
-router.route('/cart/add/product/:productId').post(isAuthenticatedConsumer, addToCart)
+router
+  .route("/cart/add/product/:productId")
+  .post(isAuthenticatedConsumer, addToCart);
 
-router.route('/cart/delete/:productId').get(isAuthenticatedConsumer,removeItem)
+router
+  .route("/cart/delete/:productId")
+  .get(isAuthenticatedConsumer, removeItem);
 
-router.route('/showcart').get(isAuthenticatedConsumer,showCart)
+router.route("/showcart").get(isAuthenticatedConsumer, showCart);
 
-// search Location Todo add Auth middleware later 
-router.route('/search/location').post(searchLocation)
+// search Location Todo add Auth middleware later
+router.route("/search/location").post(searchLocation);
 
-// search Location Todo add Auth middleware later 
-router.route('/search/location/viewall/:location').get(viewAll)
+// search Location Todo add Auth middleware later
+router.route("/search/location/viewall/:location").get(viewAll);
 
-// Search Product Todo add Auth middleware later 
+// Search Product Todo add Auth middleware later
 
 // todo edit search route with city
-router.route('/search/product/:location').post(searchProduct)
+router.route("/search/product/:location").post(searchProduct);
 
+router
+  .route("/category/:productCategory/location/:location")
+  .get(filterProduct);
 
-router.route('/category/:productCategory/location/:location').get(filterProduct)
+router.route("/view/viewshop/:shopId").get(viewShop);
 
-router.route('/view/viewshop/:shopId').get(viewShop)
+router.route("/order/placeorder").post(isAuthenticatedConsumer, placeOrder);
 
-router.route('/order/placeorder').post(isAuthenticatedConsumer,placeOrder);
+router.route("/orders/history").get(isAuthenticatedConsumer, recentOrders);
 
-router.route('/orders/history').get(isAuthenticatedConsumer,recentOrders)
+router.route("/add/address").post(isAuthenticatedConsumer, addAddress);
 
-router.route('/add/address').post(isAuthenticatedConsumer,addAddress)
+router.route("/delete").get(deleteAccountPage);
+router.route("/rate/:productId").post(isAuthenticatedConsumer, rating);
 
-router.route('/delete').get(deleteAccountPage)
-router.route('/rate/:productId').post(isAuthenticatedConsumer,rating)
-
-
-router.route('/policy').get(policyPage)
+router.route("/policy").get(policyPage);
 module.exports = router;

@@ -1,7 +1,7 @@
 const app = require("./app");
 const cloudinary = require("cloudinary");
 const connectDatabase = require("./config/database");
-const multer = require('multer');
+const multer = require("multer");
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
@@ -9,21 +9,19 @@ process.on("uncaughtException", (err) => {
   process.exit(1);
 });
 
-
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    cb(null, 'uploads/');
+    cb(null, "uploads/");
   },
   filename: (req, file, cb) => {
     const ext = path.extname(file.originalname);
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1e9);
+    const uniqueSuffix = Date.now() + "-" + Math.round(Math.random() * 1e9);
     cb(null, uniqueSuffix + ext);
-  }
+  },
 });
 
 // Set up the multer middleware
 const upload = multer({ storage });
-
 
 connectDatabase();
 
