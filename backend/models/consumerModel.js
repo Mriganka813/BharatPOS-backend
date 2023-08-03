@@ -11,6 +11,7 @@ const consumerSchema = new mongoose.Schema({
     maxlength: [50, "Name cannot be more than 50 characters"],
     minlength: [4, "Name must be at least 4 characters"],
   },
+
   email: {
     type: String,
     required: [true, "Please provide your email"],
@@ -36,84 +37,86 @@ const consumerSchema = new mongoose.Schema({
     default: "user",
   },
   cart: {
-          sellerId:{
-              type: mongoose.Schema.Types.ObjectId,
-                ref: 'User'
-            },
-            product: [{
-              productName:{
-                type:String
-              },
-              sellerName:{
-                type:String
-              },
-              productId:{
-                type: mongoose.Schema.Types.ObjectId,
-                ref: 'inventory'
-              },
-              qty:{
-                type: Number
-              },
-              price:{
-                type:Number
-              },
-              image:{
-                type: String
-              }
-            }],
-            latitude:{
-              type:String
-            },
-            longitude:{
-              type:String
-            } 
-},
-addresses: {
-  type: [
-    {
-      name:{
-        type: String
-      },
-      country: {
-        type: String,
-        // required: true,
-      },
-      state: {
-        type: String,
-        // required: true,
-      },
-      city: {
-        type: String,
-        // required: true,
-      },
-      phoneNumber: {
-        type: Number,
-        // required: true,
-      },
-      pinCode: {
-        type: String,
-        // required: true,
-      },
-      streetAddress: {
-        type: String,
-        // required: true,
-      },
-      additionalInfo: {
-        type: String,
-      },
-      landmark: {
-        type: String,
-      },
-      latitude: {
-        type: String,
-      },
-      longitude: {
-        type: String,
-      },
+    sellerId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
     },
-  ],
-  default: [], // Initialize as an empty array
-},
+    product: [
+      {
+        productName: {
+          type: String,
+        },
+        sellerName: {
+          type: String,
+        },
+        productId: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "inventory",
+        },
+        qty: {
+          type: Number,
+        },
+        price: {
+          type: Number,
+        },
+        image: {
+          type: String,
+        },
+      },
+    ],
+    latitude: {
+      type: String,
+    },
+    longitude: {
+      type: String,
+    },
+  },
+  addresses: {
+    type: [
+      {
+        name: {
+          type: String,
+        },
+        country: {
+          type: String,
+          // required: true,
+        },
+        state: {
+          type: String,
+          // required: true,
+        },
+        city: {
+          type: String,
+          // required: true,
+        },
+        phoneNumber: {
+          type: Number,
+          // required: true,
+        },
+        pinCode: {
+          type: String,
+          // required: true,
+        },
+        streetAddress: {
+          type: String,
+          // required: true,
+        },
+        additionalInfo: {
+          type: String,
+        },
+        landmark: {
+          type: String,
+        },
+        latitude: {
+          type: String,
+        },
+        longitude: {
+          type: String,
+        },
+      },
+    ],
+    default: [], // Initialize as an empty array
+  },
   createdAt: {
     type: Date,
     default: Date.now,

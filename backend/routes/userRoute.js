@@ -25,8 +25,7 @@ const {
   rejectAll,
   openCloseShop,
   changeTiming,
-  orderData
-
+  orderData,
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -39,13 +38,13 @@ router.route("/login").post(loginUser);
 
 router.route("/logout").get(logout);
 
-router.route("/me").get(isAuthenticatedUser,  getUserDetails);
+router.route("/me").get(isAuthenticatedUser, getUserDetails);
 
 router.route("/get-token").get(cntlr.refreshJwtToken);
 
-router.route("/password/update").put(isAuthenticatedUser,  updatePassword);
+router.route("/password/update").put(isAuthenticatedUser, updatePassword);
 
-router.route("/me/update").put(isAuthenticatedUser,  updateProfile);
+router.route("/me/update").put(isAuthenticatedUser, updateProfile);
 
 router.route("/signup/verifyotp").post(verifyOtp);
 
@@ -53,21 +52,21 @@ router.route("/signup/otp").post(signUpWithPhoneNumber);
 
 router.route("/password/reset").put(resetPassword);
 
-router.route("/getupi").get(isAuthenticatedUser,  getUpi);
+router.route("/getupi").get(isAuthenticatedUser, getUpi);
 
-router.route("/upi/updateupi").put(isAuthenticatedUser,  updateUpi);
+router.route("/upi/updateupi").put(isAuthenticatedUser, updateUpi);
 
-router.route("/registerpage").get(renderRegister)
+router.route("/registerpage").get(renderRegister);
 
 // router.route("/collect").post(collect);
 
-router.route("/renderweblogin").get(renderWebLogin)
+router.route("/renderweblogin").get(renderWebLogin);
 
-router.route('/weblogin').post(webLogin);
+router.route("/weblogin").post(webLogin);
 
-router.route('/renderbnulk').get(renderBulkupload)
+router.route("/renderbnulk").get(renderBulkupload);
 
-router.route('/myorders').get(isAuthenticatedUser,orderStatus)
+router.route("/myorders").get(isAuthenticatedUser, orderStatus);
 
 // router.route('/myorders').get(isAuthenticatedUser,orderStatus)
 
@@ -75,34 +74,31 @@ router.route('/myorders').get(isAuthenticatedUser,orderStatus)
 
 // router.route('/myorders/reject/:productId').get(rejectStatus)
 
-router.route('/myorders/acceptall/:orderId').get(acceptAll)
+router.route("/myorders/acceptall/:orderId").get(acceptAll);
 
-router.route('/myorders/rejectall/:orderId').get(rejectAll)
+router.route("/myorders/rejectall/:orderId").get(rejectAll);
 
 const multer = require("multer");
 
-router.route('/shop-time').post(isAuthenticatedUser,changeTiming)
+router.route("/shop-time").post(isAuthenticatedUser, changeTiming);
 
-router.route('/change/shop-status').get(isAuthenticatedUser,openCloseShop)
+router.route("/change/shop-status").get(isAuthenticatedUser, openCloseShop);
 
-router.route('/order/details/:orderId').get(isAuthenticatedUser,orderData)
-
-
-
+router.route("/order/details/:orderId").get(isAuthenticatedUser, orderData);
 
 //multerconnection
 const storage = multer.diskStorage({
-  destination: function(req, file, cb) {
-    cb(null, 'uploads/');
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
   },
-  filename: function(req, file, cb) {
-    cb(null, Date.now() + '-' + file.originalname);
-  }
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + "-" + file.originalname);
+  },
 });
-const upload = multer({ storage: storage }); 
+const upload = multer({ storage: storage });
 
-router.route("/upload").post(isAuthenticatedUser, upload.single('file'), uploadData)
-
-
+router
+  .route("/upload")
+  .post(isAuthenticatedUser, upload.single("file"), uploadData);
 
 module.exports = router;

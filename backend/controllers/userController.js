@@ -13,6 +13,7 @@ const otpModel = require("../models/otpModel");
 const bcrypt = require("bcryptjs");
 const subscribedUsersModel = require("../models/subscribedUsersModel");
 const upload = require("../services/upload");
+const Rating = require("../models/ratingModel");
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
@@ -667,6 +668,9 @@ exports.acceptAll = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//RATING
+exports.rating = catchAsyncErrors(async (req, res, next) => {});
+
 exports.rejectAll = catchAsyncErrors(async (req, res, next) => {
   const { orderId } = req.params;
 
@@ -776,7 +780,7 @@ exports.orderData = catchAsyncErrors(async (req, res, next) => {
   console.log(orderId);
   const order = await Order.findById(orderId);
   let price = 0;
-  const sellerId = req.user._id;
+  const sellerId = order.seller;
 
   const seller = await User.findById(sellerId);
   console.log(seller);
@@ -791,9 +795,6 @@ exports.orderData = catchAsyncErrors(async (req, res, next) => {
 
   const sellerName = seller.businessName;
   const sellerNumber = seller.phoneNumber;
-  const consumerName = order.consumerName;
-  const consumer = await Consumer.findById(order.consumerId);
-  const consumerNumber = consumer.phoneNumber;
   order.items.map((item) => {
     price = price + item.productPrice;
   });
@@ -802,7 +803,5 @@ exports.orderData = catchAsyncErrors(async (req, res, next) => {
     sellerName,
     sellerNumber,
     upi,
-    consumerName,
-    consumerNumber,
   });
 });

@@ -498,7 +498,9 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
   try {
     const location = req.params.location;
 
-    const sellers = await User.find({ "address.city": location });
+    const sellers = await User.find({
+      $or: [{ "address.city": location }, { "address.state": location }],
+    });
     const sid = sellers.map((seller) => seller._id);
     const productName = req.body.productName;
     const productData = await Inventory.find({
@@ -513,7 +515,6 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
         success: true,
         msg: "Products",
         data: productData,
-        user: { $in: sid },
       });
     } else {
       res.status(200).send({ success: true, msg: "Products not found" });
