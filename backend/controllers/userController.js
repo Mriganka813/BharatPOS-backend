@@ -13,7 +13,6 @@ const otpModel = require("../models/otpModel");
 const bcrypt = require("bcryptjs");
 const subscribedUsersModel = require("../models/subscribedUsersModel");
 const upload = require("../services/upload");
-const Rating = require("../models/ratingModel");
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
@@ -402,7 +401,8 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 // GetUser UPi
 
 exports.getUpi = catchAsyncErrors(async (req, res, next) => {
-  const user = await User.findById(req.user.id);
+  const {userId}=req.params
+  const user = await User.findById(userId);
   const upi = user.upi_id;
   res.status(200).json({
     success: true,
@@ -668,9 +668,6 @@ exports.acceptAll = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-//RATING
-exports.rating = catchAsyncErrors(async (req, res, next) => {});
-
 exports.rejectAll = catchAsyncErrors(async (req, res, next) => {
   const { orderId } = req.params;
 
@@ -775,16 +772,18 @@ exports.openCloseShop = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.orderData = catchAsyncErrors(async (req, res, next) => {
-  // const userId=req.user._id
   const { orderId } = req.params;
+  
   console.log(orderId);
   const order = await Order.findById(orderId);
+  const sellerId=order.seller
+
   let price = 0;
-  const sellerId = order.seller;
+  // const sellerId = req.user._id;
 
   const seller = await User.findById(sellerId);
   console.log(seller);
-  const upi = seller.upi_id;
+  const upi = seller.upi_id ;
 
   if (!upi || upi == "") {
     return res.send({
@@ -795,6 +794,7 @@ exports.orderData = catchAsyncErrors(async (req, res, next) => {
 
   const sellerName = seller.businessName;
   const sellerNumber = seller.phoneNumber;
+  
   order.items.map((item) => {
     price = price + item.productPrice;
   });
@@ -805,3 +805,14 @@ exports.orderData = catchAsyncErrors(async (req, res, next) => {
     upi,
   });
 });
+
+
+exports.saveTrip = catchAsyncErrors(async (req, res, next) => {
+  const {tripId, orderId}=req.body
+  const order=await Order.findById(orderId) 
+  order.tripId=tripId
+  await order.save()
+
+  res.send({success:true})
+});
+
