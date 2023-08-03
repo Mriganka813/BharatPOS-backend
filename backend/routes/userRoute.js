@@ -52,7 +52,7 @@ router.route("/signup/otp").post(signUpWithPhoneNumber);
 
 router.route("/password/reset").put(resetPassword);
 
-router.route("/getupi/:userId").get(isAuthenticatedUser, getUpi);
+router.route("/getupi/:userId").get(getUpi);
 
 router.route("/upi/updateupi").put(isAuthenticatedUser, updateUpi);
 
