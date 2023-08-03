@@ -84,7 +84,7 @@ router.route("/shop-time").post(isAuthenticatedUser, changeTiming);
 
 router.route("/change/shop-status").get(isAuthenticatedUser, openCloseShop);
 
-router.route("/order/details/:orderId").get(isAuthenticatedUser, orderData);
+router.route("/order/details/:orderId").get(orderData);
 
 //multerconnection
 const storage = multer.diskStorage({
