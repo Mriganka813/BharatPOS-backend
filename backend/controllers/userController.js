@@ -22,10 +22,12 @@ const { uploadImage } = require("../services/upload");
 exports.avgRating = catchAsyncErrors(async (req, res, next) => {
   try {
     const productId = req.params.productId;
-    const ratings = await Rating.findById(productId);
-    console.log(productId);
-    console.log(ratings);
+    const product = await Inventory.findById(productId)
+    const ratings = await Rating.find({product:productId});
+    // console.log(productId);
+    // console.log(ratings);
     const totalRatings = ratings.length;
+    console.log(totalRatings);
     let sumOfRatings = 0;
 
     ratings.forEach((rating) => {
@@ -33,7 +35,9 @@ exports.avgRating = catchAsyncErrors(async (req, res, next) => {
     });
 
     const averageRating = totalRatings > 0 ? sumOfRatings / totalRatings : 0;
-    console.log(averageRating);
+    product.avgRating=averageRating
+    await product.save()
+    res.send(averageRating)
   } catch (error) {
     res.status(400).send({ success: false, msg: error.message });
   }

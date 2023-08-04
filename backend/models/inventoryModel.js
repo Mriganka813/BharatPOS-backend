@@ -101,7 +101,9 @@ const inventorySchema = mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Consumer",
   },
-  
+  avgRating:{
+    type:Number
+  },
   sellerName:{
     type: String,
   },

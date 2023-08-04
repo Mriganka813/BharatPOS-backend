@@ -14,7 +14,7 @@ const ratingItemSchema = mongoose.Schema(
       type: Number,
       required: true,
     },
-    productId: {
+    product: {
       type: mongoose.Schema.Types.ObjectId,
     },
   },
