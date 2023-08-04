@@ -822,6 +822,7 @@ exports.rating = catchAsyncErrors(async (req, res, next) => {
   const { productId } = req.params;
 
   const product = await Inventory.findById(productId);
+  const sellerId = product.user;
   if (!product) {
     return res.send("Product Not found");
   }
@@ -829,6 +830,7 @@ exports.rating = catchAsyncErrors(async (req, res, next) => {
   const checkRating = await Rating.findOne({
     consumer: userId,
     product: productId,
+    sellerId,
   });
   if (checkRating) {
     return res.send("You can Only rate Once");
@@ -838,6 +840,7 @@ exports.rating = catchAsyncErrors(async (req, res, next) => {
     consumer: userId,
     product: productId,
     rating: rating,
+    sellerId: sellerId,
   });
   await addRating.save();
 

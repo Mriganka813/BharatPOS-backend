@@ -12,6 +12,11 @@ const userSchema = new mongoose.Schema(
     //   maxLength: [30, "Name cannot exceed 30 characters"],
     //   minLength: [4, "Name should have more than 4 characters"],
     // },
+    rating: {
+      type: Number,
+      required: true,
+    },
+
     email: {
       type: String,
       required: [true, "Please Enter Your Email"],
@@ -30,7 +35,7 @@ const userSchema = new mongoose.Schema(
       locality: { type: String },
       city: { type: String },
       state: { type: String },
-      country: { type: String, default: 'India' } // Assuming the country is always India
+      country: { type: String, default: "India" }, // Assuming the country is always India
     },
     role: {
       type: String,
@@ -75,17 +80,15 @@ const userSchema = new mongoose.Schema(
       trim: true,
       // create enum of monthly and quarterly
       enum: ["monthly", "quarterly"],
-      default: "monthly"
+      default: "monthly",
     },
     GstIN: {
       type: String,
       trim: true,
-      
     },
     upi_id: {
       type: String,
-      required: false
-
+      required: false,
     },
 
     latitude: {
@@ -104,11 +107,11 @@ const userSchema = new mongoose.Schema(
       type: String,
       // required: true
     },
-    shopOpen:{
+    shopOpen: {
       type: Boolean,
       default: true,
     },
-    
+
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },

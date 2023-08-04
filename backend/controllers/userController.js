@@ -13,10 +13,31 @@ const otpModel = require("../models/otpModel");
 const bcrypt = require("bcryptjs");
 const subscribedUsersModel = require("../models/subscribedUsersModel");
 const upload = require("../services/upload");
+const Rating = require("../models/ratingModel");
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
 const { uploadImage } = require("../services/upload");
+
+exports.avgRating = catchAsyncErrors(async (req, res, next) => {
+  try {
+    const productId = req.params.productId;
+    const ratings = await Rating.findById(productId);
+    console.log(productId);
+    console.log(ratings);
+    const totalRatings = ratings.length;
+    let sumOfRatings = 0;
+
+    ratings.forEach((rating) => {
+      sumOfRatings += rating.rating;
+    });
+
+    const averageRating = totalRatings > 0 ? sumOfRatings / totalRatings : 0;
+    console.log(averageRating);
+  } catch (error) {
+    res.status(400).send({ success: false, msg: error.message });
+  }
+});
 
 exports.verifyOtp = catchAsyncErrors(async (req, res, next) => {
   const otpHolder = await otpModel.find({
@@ -401,7 +422,7 @@ exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
 // GetUser UPi
 
 exports.getUpi = catchAsyncErrors(async (req, res, next) => {
-  const {userId}=req.params
+  const { userId } = req.params;
   const user = await User.findById(userId);
   const upi = user.upi_id;
   res.status(200).json({
@@ -773,17 +794,17 @@ exports.openCloseShop = catchAsyncErrors(async (req, res, next) => {
 
 exports.orderData = catchAsyncErrors(async (req, res, next) => {
   const { orderId } = req.params;
-  
+
   console.log(orderId);
   const order = await Order.findById(orderId);
-  const sellerId=order.seller
+  const sellerId = order.seller;
 
   let price = 0;
   // const sellerId = req.user._id;
 
   const seller = await User.findById(sellerId);
   console.log(seller);
-  const upi = seller.upi_id ;
+  const upi = seller.upi_id;
 
   if (!upi || upi == "") {
     return res.send({
@@ -794,7 +815,7 @@ exports.orderData = catchAsyncErrors(async (req, res, next) => {
 
   const sellerName = seller.businessName;
   const sellerNumber = seller.phoneNumber;
-  
+
   order.items.map((item) => {
     price = price + item.productPrice;
   });
@@ -806,13 +827,11 @@ exports.orderData = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-
 exports.saveTrip = catchAsyncErrors(async (req, res, next) => {
-  const {tripId, orderId}=req.body
-  const order=await Order.findById(orderId) 
-  order.tripId=tripId
-  await order.save()
+  const { tripId, orderId } = req.body;
+  const order = await Order.findById(orderId);
+  order.tripId = tripId;
+  await order.save();
 
-  res.send({success:true})
+  res.send({ success: true });
 });
-

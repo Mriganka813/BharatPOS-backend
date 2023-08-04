@@ -26,6 +26,7 @@ const {
   openCloseShop,
   changeTiming,
   orderData,
+  avgRating,
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -85,6 +86,8 @@ router.route("/shop-time").post(isAuthenticatedUser, changeTiming);
 router.route("/change/shop-status").get(isAuthenticatedUser, openCloseShop);
 
 router.route("/order/details/:orderId").get(orderData);
+
+router.route("/rating/:productId").get(avgRating);
 
 //multerconnection
 const storage = multer.diskStorage({
