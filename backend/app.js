@@ -209,6 +209,7 @@ const payment = require("./routes/paymentRoutes");
 const subscribedUsersModel = require("./models/subscribedUsersModel");
 const agent = require("./routes/agentRoutes");
 const bulk = require("./routes/bulkUploads");
+const getShopRating = require("./routes/getShopRatingRoute");
 
 const corsConfig = {
   origin: "http://localhost:5500",
@@ -281,6 +282,7 @@ app.use("/api/v1/consumer", consumer);
 app.use("/api/v1/payment", payment);
 app.use("/api/v1", bulk);
 app.use("/api/v1", table);
+app.use("/api/v1", getShopRating);
 
 app.use(express.static(path.join(__dirname, "build")));
 

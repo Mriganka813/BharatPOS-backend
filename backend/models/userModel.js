@@ -14,7 +14,13 @@ const userSchema = new mongoose.Schema(
     // },
     rating: {
       type: Number,
-      required: true,
+      // required: true,
+    },
+    avgRating: {
+      type: Number,
+    },
+    shopRating: {
+      type: Number,
     },
 
     email: {

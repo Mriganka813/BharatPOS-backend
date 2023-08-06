@@ -842,6 +842,8 @@ exports.rating = catchAsyncErrors(async (req, res, next) => {
     rating: rating,
     sellerId: sellerId,
   });
+  product.rating.push(userId);
+  await product.save();
   await addRating.save();
 
   return res.send({
