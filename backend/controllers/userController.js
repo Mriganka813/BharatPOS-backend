@@ -845,7 +845,7 @@ exports.addDiscount = catchAsyncErrors(async(req,res,next)=>{
   const {discount}=req.body
   console.log(userId);
   const seller = await User.findById(userId)
-
+  
   console.log(seller);
   seller.discount=discount
   await seller.save()

@@ -8,6 +8,9 @@ const inventorySchema = mongoose.Schema(
       trim: true,
       // unique: true,
     },
+    discount:{
+      type: Number
+    },
     description: {
       type: String,
       // required: [true, "Please Enter inventory Description"],

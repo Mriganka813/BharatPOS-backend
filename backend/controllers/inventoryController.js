@@ -23,7 +23,10 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const userDetail = req.user._id;
 
   const seller = await User.findById(userDetail);
-
+  let discount=0
+  if(seller.discount || seller.discount>=0){
+    discount = seller.discount
+  }
   console.log(seller.businessName);
 
   if (
@@ -60,6 +63,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const inventory = await Inventory.create({
     ...req.body,
     sellerName: seller.businessName,
+    discount
   });
 
   res.status(201).json({

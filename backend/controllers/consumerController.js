@@ -736,7 +736,7 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
     const userId = req.user._id;
     console.log(userId);
     const recentOrders = await OrderedItem.find({ consumerId: userId })
-    .select('items');
+    ;
      
     res.send(recentOrders);
   } catch (err) {
