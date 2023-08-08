@@ -305,11 +305,14 @@ exports.addToCart = async (req, res, next) => {
     const product = await Inventory.findById(productId);
     const sellerId = product.user;
     const seller = await User.findById(sellerId);
-
+    console.log(seller.discount);
+    
+    let discountPer=0
+    let price = product.sellingPrice
     if(seller.discount || seller.discount>0){
-      let price = product.sellingPrice -(product.sellingPrice * discount /100);
-    }else{
-      let price = product.sellingPrice
+      
+      discountPer=seller.discount
+       price = product.sellingPrice -(product.sellingPrice * seller.discount /100);
     }
 
 
@@ -365,7 +368,9 @@ exports.addToCart = async (req, res, next) => {
     return res.json({
       status: true,
       msg: "Product added to cart successfully",
-      cart: consumer.cart, // Return the updated cart
+      cart: consumer.cart,
+      discountPer
+       // Return the updated cart
     });
   } catch (err) {
     console.log(err);
@@ -526,7 +531,7 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
         success: true,
         msg: "Products",
         data: productData,
-        discount
+        discount,
       });
     } else {
       res.status(200).send({ success: true, msg: "Products not found" });
@@ -728,8 +733,9 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
   try {
     const userId = req.user._id;
     console.log(userId);
-    const recentOrders = await OrderedItem.find({ consumerId: userId });
-
+    const recentOrders = await OrderedItem.find({ consumerId: userId })
+    .select('items');
+     
     res.send(recentOrders);
   } catch (err) {
     console.log(err);
