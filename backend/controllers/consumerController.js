@@ -308,7 +308,7 @@ exports.addToCart = async (req, res, next) => {
     console.log(seller.discount);
     
     let discountPer=0
-    let oriignalPrice=product.sellingPrice
+    let originalPrice=product.sellingPrice
     let price = product.sellingPrice
     if(seller.discount || seller.discount>0){
       
@@ -371,7 +371,7 @@ exports.addToCart = async (req, res, next) => {
       msg: "Product added to cart successfully",
       cart: consumer.cart,
       discountPer,
-      oriignalPrice
+      originalPrice
        // Return the updated cart
     });
   } catch (err) {
