@@ -303,12 +303,19 @@ exports.addToCart = async (req, res, next) => {
 
     const consumer = await Consumer.findById(userId);
     const product = await Inventory.findById(productId);
-    const productName = product.name;
-    const price = product.sellingPrice;
-    const image = product.image || "unavailable";
     const sellerId = product.user;
-    console.log(sellerId);
     const seller = await User.findById(sellerId);
+
+    if(seller.discount || seller.discount>0){
+      let price = product.sellingPrice -(product.sellingPrice * discount /100);
+    }else{
+      let price = product.sellingPrice
+    }
+
+
+    const productName = product.name;
+    const image = product.image || "unavailable";
+    console.log(sellerId);
     const sellerName = seller.businessName;
     let latitude = seller?.latitude || "unavailable";
     let longitude = seller?.longitude || "unavailable";
@@ -501,6 +508,10 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
     const sellers = await User.find({
       $or: [{ "address.city": location }, { "address.state": location }],
     });
+    let discount =0
+    if(sellers.discount || sellers.discount>0 ){
+      discount=sellers.discount
+    }
     const sid = sellers.map((seller) => seller._id);
     const productName = req.body.productName;
     const productData = await Inventory.find({
@@ -515,6 +526,7 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
         success: true,
         msg: "Products",
         data: productData,
+        discount
       });
     } else {
       res.status(200).send({ success: true, msg: "Products not found" });

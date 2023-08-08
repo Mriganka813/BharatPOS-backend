@@ -23,8 +23,8 @@ router.post("/getShopRating/:sellerId", async (req, res) => {
     // console.log(totalRating);
     const rating = totalRating / productWithRating.length;
     // console.log(rating);
-    // seller.shopRating = rating;
-    // await seller.save();
+    seller.shopRating = rating;
+    await seller.save();
     res.send({ rating });
   } catch (error) {
     console.log(error);

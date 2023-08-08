@@ -27,6 +27,7 @@ const {
   changeTiming,
   orderData,
   avgRating,
+  addDiscount
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -88,6 +89,7 @@ router.route("/change/shop-status").get(isAuthenticatedUser, openCloseShop);
 router.route("/order/details/:orderId").get(orderData);
 
 router.route("/rating/:productId").get(avgRating);
+router.route("/discount/add/:userId").post(addDiscount)
 
 //multerconnection
 const storage = multer.diskStorage({
