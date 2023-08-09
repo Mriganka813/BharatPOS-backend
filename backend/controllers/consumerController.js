@@ -294,6 +294,23 @@ exports.updateConsumerDetails = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+const calculateDiscountedPrice = async (productId) => {
+  const product = await Inventory.findById(productId);
+  const sellerId = product.user;
+  const seller = await User.findById(sellerId);
+
+  let discountPer = 0;
+  let originalPrice = product.sellingPrice;
+  let price = originalPrice;
+
+  if (seller.discount || seller.discount > 0) {
+    discountPer = seller.discount;
+    price = originalPrice - (originalPrice * discountPer / 100);
+  }
+
+  return { originalPrice, price, discountPer };
+};
+
 exports.addToCart = async (req, res, next) => {
   try {
     console.log("inside cart");
@@ -411,33 +428,32 @@ exports.removeItem = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.showCart = catchAsyncErrors(async (req, res, next) => {
-  // console.log("jii");
   const userId = req.user._id;
-
   const consumer = await Consumer.findById(userId);
   const cart = consumer.cart;
-
   const productId = cart.product.map((item) => item.productId);
-
   const products = await Inventory.find({ _id: { $in: productId } });
 
-  const cartWithProductNames = cart.product.map((item) => {
+  const cartWithProductNames = await Promise.all(cart.product.map(async (item) => {
     const product = products.find(
       (prod) => prod._id.toString() === item.productId.toString()
     );
+    const { originalPrice, price, discountPer } = await calculateDiscountedPrice(item.productId);
     return {
-      // cart,
       productId: item.productId,
       sellerName: product.sellerName,
       sellerId: product.user,
-      price: product.sellingPrice,
+      originalPrice: originalPrice, // Original price without discount
+      discountedPrice: price, // Price after applying discount
+      discountPercentage: discountPer, // Discount percentage
       qty: item.qty,
       image: product.image || "unavailable",
-      name: product ? product.name : "Product Not Found", // Use a default name if the product is not found
+      name: product ? product.name : "Product Not Found",
     };
-  });
+  }));
   res.send(cartWithProductNames);
 });
+
 
 exports.checloutCart = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user.id;
