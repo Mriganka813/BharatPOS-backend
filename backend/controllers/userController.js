@@ -853,4 +853,18 @@ exports.addDiscount = catchAsyncErrors(async(req,res,next)=>{
   return res.send(seller)
 
 })
+exports.paymentMode=catchAsyncErrors(async(req,res,next)=>{
+  const { orderId,status } = req.params
 
+  const order=await Order.findById(orderId)
+  if(status === "paid"){
+    order.isPaid = true
+  }else if(status == "unpaid"){
+    order.isPaid=false
+  }
+
+await order.save()
+
+return res.send({order})
+  
+})
