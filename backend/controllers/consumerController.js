@@ -523,26 +523,32 @@ exports.viewAll = catchAsyncErrors(async (req, res, next) => {
 // Search Product
 // Search Product top reults  todo add pginations
 exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
-  // const productName = req.body.productName;
-  // const location = req.params.location;
   try {
     const location = req.params.location;
 
     const sellers = await User.find({
       $or: [{ "address.city": location }, { "address.state": location }],
     });
-    let discount =0
-    if(sellers.discount || sellers.discount>0 ){
-      discount=sellers.discount
+    let discount = 0;
+    if (sellers.discount || sellers.discount > 0) {
+      discount = sellers.discount;
     }
     const sid = sellers.map((seller) => seller._id);
     const productName = req.body.productName;
+
+    // Pagination
+    const page = parseInt(req.query.page, 10) || 1; // Default to page 1 if not provided
+    const limit = 20; // 20 products per page
+    const startIndex = (page - 1) * limit;
+
     const productData = await Inventory.find({
       name: { $regex: ".*" + productName + ".*", $options: "i" },
       user: {
         $in: sid,
       },
-    });
+    })
+    .skip(startIndex)
+    .limit(limit);
 
     if (productData.length > 0) {
       res.status(200).send({
@@ -558,6 +564,7 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
     res.status(400).send({ success: false, msg: error.message });
   }
 });
+
 exports.searchProduct9 = catchAsyncErrors(async (req, res, next) => {
   const productName = req.body.productName;
   const page = parseInt(req.query.page) || 1; // Default page is 1
