@@ -58,6 +58,17 @@ const orderedItemSchema = mongoose.Schema({
   consumerName:{
     type: String
   },
+  
+  upi_id: {
+    type: String,
+    required: false,
+  },
+  phoneNumber: {
+    type: Number,
+    required: true,
+    trim: true,
+    unique: true,
+  },
 
   addresses: {
     name:{
