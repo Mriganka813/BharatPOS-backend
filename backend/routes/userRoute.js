@@ -111,4 +111,4 @@ router
   .post(isAuthenticatedUser, upload.single("file"), uploadData);
 
 module.exports = router;
-router.route("/payment-status/:orderId/status").get(paymentMode)
+router.route("/payment-status/:orderId/:status").get(paymentMode)
