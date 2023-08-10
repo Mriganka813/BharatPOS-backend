@@ -14,6 +14,7 @@ const bcrypt = require("bcryptjs");
 const subscribedUsersModel = require("../models/subscribedUsersModel");
 const upload = require("../services/upload");
 const Rating = require("../models/ratingModel");
+
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
 // const cloudinary = require("cloudinary");
@@ -463,6 +464,7 @@ exports.updateUpi = catchAsyncErrors(async (req, res, next) => {
 });
 
 const multer = require("multer");
+const orderedItem = require("../models/orderedItem");
 
 exports.uploadData = catchAsyncErrors(async (req, res, next) => {
   if (!req.file) {
@@ -571,6 +573,17 @@ exports.renderBulkupload = catchAsyncErrors(async (req, res, next) => {
   console.log(req.user);
   return res.render("bulkupload");
 });
+
+exports.changeStatus = catchAsyncErrors(async(req, res, next)=>{
+  const {orderId,status} = req.params
+  if (!orderId || !status){
+    return res.send("Required field missing")
+  }
+  const order=await Order.findById(orderId)
+  order.status=status
+  await order.save()
+  return res.send({success:true,order})
+})
 
 exports.orderStatus = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user._id;

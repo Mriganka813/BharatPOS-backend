@@ -742,6 +742,7 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     consumerName: user.name,
     seller: user.cart.sellerId,
     addresses: address,
+  
   });
   await newOrder.save();
 
@@ -751,10 +752,18 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
   try {
     const userId = req.user._id;
     console.log(userId);
-    const recentOrders = await OrderedItem.find({ consumerId: userId })
-    ;
+    const recentOrders = await OrderedItem.findOne({ consumerId: userId })
+    const seller=await User.findById(recentOrders.seller)
+    const sellerNumber=seller.phoneNumber
+    const sellerUpi = seller.sellerUpi || "demoUpi@magicstep"
+    console.log(seller);
      
-    res.send(recentOrders);
+    res.send({
+      recentOrders,
+      sellerNumber,
+      sellerUpi
+      
+    });
   } catch (err) {
     console.log(err);
   }
