@@ -711,7 +711,11 @@ exports.filterProduct = catchAsyncErrors(async (req, res, next) => {
 exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user._id;
   const user = await Consumer.findById(userId);
+  console.log(user.cart);
   const sellerid = user.cart.sellerId;
+  const seller = await User.findById(sellerid)
+  console.log(seller);
+  const sellerUpi=seller.upi_id 
   // const address= user.addresses
 
   const orderedItems = user.cart.product.map((item) => {
@@ -740,35 +744,39 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     longitude: req.body.longitude,
   };
 
-  user.cart = [];
-  await user.save();
+  
 
   const newOrder = new OrderedItem({
     items: orderedItems,
     consumerId: userId,
     consumerName: user.name,
-    seller: user.cart.sellerId,
+    seller: sellerid,
     addresses: address,
-  
+    sellerNum:seller.phoneNumber,
+    sellerUpi,
+    
+    
   });
+  user.cart = [];
+  await user.save();
   await newOrder.save();
 
-  res.send(orderedItems);
+  res.send({orderedItems});
 });
 exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
   try {
     const userId = req.user._id;
     console.log(userId);
-    const recentOrders = await OrderedItem.findOne({ consumerId: userId })
-    const seller=await User.findById(recentOrders.seller)
-    const sellerNumber=seller.phoneNumber
-    const sellerUpi = seller.sellerUpi || "demoUpi@magicstep"
-    console.log(seller);
+    const recentOrders = await OrderedItem.find({ consumerId: userId })
+    // const seller=await User.findById(recentOrders.seller)
+    // const sellerNumber=seller.phoneNumber
+    // const sellerUpi = seller.sellerUpi || "demoUpi@magicstep"
+    // console.log(seller);
      
     res.send({
       recentOrders,
-      sellerNumber,
-      sellerUpi
+      // sellerNumber,
+      // sellerUpi
       
     });
   } catch (err) {

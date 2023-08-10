@@ -58,6 +58,12 @@ const orderedItemSchema = mongoose.Schema({
   consumerName:{
     type: String
   },
+  sellerNum:{
+    type: String
+  },
+  sellerUpi:{
+    type: Number
+  },
   
 
   addresses: {
