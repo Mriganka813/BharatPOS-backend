@@ -62,7 +62,7 @@ const orderedItemSchema = mongoose.Schema({
     type: String
   },
   sellerUpi:{
-    type: Number
+    type: string
   },
   
 
