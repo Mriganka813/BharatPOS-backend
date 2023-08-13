@@ -99,10 +99,13 @@ exports.getSellersAndSearch = catchAsyncErrors(async (req, res, next) => {
 
 // get all sellers from inventory where category is matched
 exports.getSellers = catchAsyncErrors(async (req, res, next) => {
-  const { category } = req.query;
+  const { category, page = 1 } = req.query; // Added default page value
+
   if (!category) {
     return next(new ErrorHandler("Please provide category", 400));
   }
+
+  const skip = (page - 1) * 12; // Calculate the number of documents to skip
 
   const apiFeature = new ApiFeatures(
     User.find({
@@ -110,9 +113,10 @@ exports.getSellers = catchAsyncErrors(async (req, res, next) => {
         $regex: category,
         $options: "i",
       },
-    }),
+    }).skip(skip).limit(12), // Added skip and limit for pagination
     req.query
-  ).pagination(10);
+  ).pagination(12); // Updated to 12 items per page
+
   const sellers = await apiFeature.query;
   if (!sellers) {
     return next(new ErrorHandler("No sellers found", 404));
@@ -122,6 +126,7 @@ exports.getSellers = catchAsyncErrors(async (req, res, next) => {
     data: sellers,
   });
 });
+
 
 // get all products from a user
 exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
