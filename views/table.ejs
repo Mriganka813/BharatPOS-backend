@@ -4,11 +4,6 @@
     <title>Table Cube</title>
     <style>
       body {
-        /* display: flex; */
-        /* justify-content: center; */
-        /* align-items: center; */
-        /* height: 100vh; */
-        /* margin: 0; */
         margin-top: 60px;
       }
 
@@ -56,10 +51,21 @@
         <td><%= data[i].productName %></td>
         <td><%= data[i].price %></td>
         <td><%= data[i].quantity %></td>
-        <td><%= data[i].quantity *  data[i].price %></td>
+        <td><%= data[i].quantity * data[i].price %></td>
       </tr>
       <% } %>
     </table>
+    <div style="text-align: center;">
+      <% if (page > 1) { %>
+        <a href="/api/table?page=<%= page - 1 %>&limit=10">Previous</a>
+      <% } %>
+      <% for (let i = 1; i <= pages; i++) { %>
+        <a href="/api/table?page=<%= i %>&limit=10"><%= i %></a>
+      <% } %>
+      <% if (page < pages) { %>
+        <a href="/api/table?page=<%= page + 1 %>&limit=10">Next</a>
+      <% } %>
+    </div>
     <script src="../backend/server.js"></script>
   </body>
 </html>
