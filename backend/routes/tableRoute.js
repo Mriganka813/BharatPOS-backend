@@ -5,15 +5,17 @@ const { response } = require("../app");
 
 router.get("/api/table", async (req, res) => {
   try {
-    // Fetch data based on the query parameters
-    const data = await tablemodel.find({});
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const data = await tablemodel.find({}).skip(skip).limit(limit);
 
     const arr = [];
     for (const order of data) {
       for (const item of order.items) {
         const dataInfo = {
           date: order.createdAt.toLocaleDateString("en-US"),
-          //   productId: item.productId,
           orderId: order._id,
           orderStatus: item.status,
           sellerName: item.sellerName,
@@ -26,10 +28,11 @@ router.get("/api/table", async (req, res) => {
         arr.push(dataInfo);
       }
     }
-    // Send the fetched data as the response
-    // res.json(arr);
+
     return res.render("table", {
       data: arr,
+      page: page,
+      pages: Math.ceil(data.length / limit),
     });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch data" });
