@@ -224,8 +224,13 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Inventory not found", 404));
   }
   if (req.files?.image) {
-    const result = await upload(req.files.image);
-    req.body.image = result.url;
+    try {
+      const result = await uploadImage(req.files.image); // Using uploadImage function
+      req.body.image = result.url;
+    } catch (error) {
+      console.log("Error uploading image:", error);
+      return next(new ErrorHandler("Error uploading image", 500));
+    }
   }
   // if (req.body.barCode !== undefined) {
   //   const existingInventory = await Inventory.findOne({
