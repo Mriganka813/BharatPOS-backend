@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 var tablemodel = require("../models/orderedItem");
-const { response } = require("../app");
 
 router.get("/api/table", async (req, res) => {
   try {
@@ -9,7 +8,9 @@ router.get("/api/table", async (req, res) => {
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
 
-    const data = await tablemodel.find({}).skip(skip).limit(limit);
+    // Fetch data in descending order by creation date (newest first)
+    const data = await tablemodel.find({}).sort({ createdAt: -1 }).skip(skip).limit(limit);
+    const totalItems = await tablemodel.countDocuments();
 
     const arr = [];
     for (const order of data) {
@@ -32,7 +33,7 @@ router.get("/api/table", async (req, res) => {
     return res.render("table", {
       data: arr,
       page: page,
-      pages: Math.ceil(data.length / limit),
+      pages: Math.ceil(totalItems / limit),
     });
   } catch (error) {
     res.status(500).json({ error: "Failed to fetch data" });

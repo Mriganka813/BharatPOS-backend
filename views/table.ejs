@@ -79,13 +79,9 @@
       <% if (page > 1) { %>
         <a href="/api/table?page=<%= page - 1 %>&limit=10">Previous</a>
       <% } %>
-      <% for (let i = 1; i <= pages; i++) { %>
-        <a href="/api/table?page=<%= i %>&limit=10"><%= i %></a>
-      <% } %>
       <% if (page < pages) { %>
         <a href="/api/table?page=<%= page + 1 %>&limit=10">Next</a>
       <% } %>
     </div>
-    <script src="../backend/server.js"></script>
   </body>
 </html>
