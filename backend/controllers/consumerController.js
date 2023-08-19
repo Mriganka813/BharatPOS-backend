@@ -916,30 +916,3 @@ exports.rating = catchAsyncErrors(async (req, res, next) => {
     msg: "Rated Successfully",
   });
 });
-const Inventory = require("../models/inventoryModel");
-
-exports.searchProductsBySeller = async (req, res, next) => {
-  try {
-    const sellerId = req.params.sellerId;
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-
-    const products = await Inventory.find({ seller: sellerId })
-      .skip(skip)
-      .limit(limit);
-
-    const totalProducts = await Inventory.countDocuments({ seller: sellerId });
-
-    res.status(200).json({
-      success: true,
-      page,
-      limit,
-      totalProducts,
-      products,
-    });
-  } catch (error) {
-    console.log("Error searching products:", error);
-    return next(new ErrorHandler("Error searching products", 500));
-  }
-};
