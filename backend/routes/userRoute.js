@@ -86,7 +86,8 @@ const multer = require("multer");
 
 router.route("/shop-time").post(isAuthenticatedUser, changeTiming);
 
-router.route("/update/order/:orderId/:status").get(changeStatus)
+router.route("/update/order/:orderId/:productId/:status").get(changeStatus);
+
 
 router.route("/change/shop-status").get(isAuthenticatedUser, openCloseShop);
 

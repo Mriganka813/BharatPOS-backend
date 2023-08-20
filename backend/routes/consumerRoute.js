@@ -140,3 +140,6 @@ router.route("/rate/:productId").post(isAuthenticatedConsumer, rating);
 
 router.route("/policy").get(policyPage);
 module.exports = router;
+const { getAllProductsFromSeller } = require('../controllers/consumerController');
+
+router.route('/seller/:sellerName/products').get(getAllProductsFromSeller);

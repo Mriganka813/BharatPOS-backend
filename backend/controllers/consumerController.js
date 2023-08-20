@@ -916,3 +916,30 @@ exports.rating = catchAsyncErrors(async (req, res, next) => {
     msg: "Rated Successfully",
   });
 });
+const InventoryModel = require('../models/inventoryModel');
+
+exports.getAllProductsFromSeller = async (req, res) => {
+  try {
+    const sellerId = req.params.sellerId;
+    const page = req.query.page || 1;
+    const limit = 20;
+    const skip = (page - 1) * limit;
+
+    const products = await InventoryModel.find({ sellerId: sellerId })
+      .skip(skip)
+      .limit(limit);
+
+    res.status(200).json({
+      status: 'success',
+      results: products.length,
+      data: {
+        products,
+      },
+    });
+  } catch (err) {
+    res.status(404).json({
+      status: 'fail',
+      message: err,
+    });
+  }
+};
