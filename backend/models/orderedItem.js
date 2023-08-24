@@ -49,6 +49,9 @@ const orderedItemSchema = mongoose.Schema({
     type: Boolean,
     default: false
   },
+  orederStatus:{
+    type: String
+  },
   consumerId:{
     type: mongoose.Schema.Types.ObjectId,
     ref: "Consumer",
