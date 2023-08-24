@@ -577,8 +577,8 @@ exports.renderBulkupload = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
-  const { orderId, status, productId } = req.params; // Assuming productId is provided in the request
-  if (!orderId || !status || !productId) {
+  const { orderId, status } = req.params; // Assuming productId is provided in the request
+  if (!orderId || !status ) {
     return res.send("Required field missing");
   }
   try {
@@ -587,19 +587,9 @@ exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
       return res.status(404).send("Order not found");
     }
 
-    // Find the specific item within the order using productId
-    const item = order.items.find(item => item.productId.toString() === productId);
-    if (!item) {
-      return res.status(404).send("Item not found");
-    }
-
-    console.log("Current Item Status:", item.status); // Log the current status
-    item.status = status;
-    const updatedOrder = await order.save();
-
-    console.log("Updated Item Status:", item.status); // Log the updated status
-
-    return res.send({ success: true, order: updatedOrder });
+    order.orederStatus = status
+    await order.save()
+    
   } catch (error) {
     console.error("An error occurred:", error);
     return res.status(500).send("An error occurred");
