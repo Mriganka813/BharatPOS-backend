@@ -112,7 +112,7 @@ const inventorySchema = mongoose.Schema(
     sellerName: {
       type: String,
     },
-    batch:{
+    batchNumber:{
       type: String
     },
     expiryDate: {
