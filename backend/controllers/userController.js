@@ -583,12 +583,20 @@ exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
   }
   try {
     const order = await mongoose.model("orderedItem").findById(orderId);
+    
+    
+
     if (!order) {
       return res.status(404).send("Order not found");
     }
 
-    order.orederStatus = status
+    order.items.map((item)=>{
+      item.status = status
+    })
+    
+    order.orederStatus=status
     await order.save()
+    return res.send({order})
     
   } catch (error) {
     console.error("An error occurred:", error);
