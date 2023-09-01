@@ -2,6 +2,8 @@ const app = require("./app");
 const cloudinary = require("cloudinary");
 const connectDatabase = require("./config/database");
 const multer = require("multer");
+const cors = require("cors");
+
 
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
@@ -19,7 +21,7 @@ const storage = multer.diskStorage({
     cb(null, uniqueSuffix + ext);
   },
 });
-
+app.use(cors());
 // Set up the multer middleware
 const upload = multer({ storage });
 

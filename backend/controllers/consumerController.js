@@ -713,6 +713,42 @@ exports.filterProduct = catchAsyncErrors(async (req, res, next) => {
   res.send(user);
 });
 
+
+async function generateUniqueInvoiceNumber() {
+  const prefix = generateRandomLetters(4);
+  let suffix;
+  do {
+    suffix = generateRandomDigits(3);
+  } while (await isInvoiceNumberExists(`${prefix}${suffix}`));
+
+  return `${prefix}${suffix}`;
+}
+
+function generateRandomLetters(length) {
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += characters.charAt(Math.floor(Math.random() * characters.length));
+  }
+  return result;
+}
+
+function generateRandomDigits(length) {
+  const digits = '0123456789';
+  let result = '';
+  for (let i = 0; i < length; i++) {
+    result += digits.charAt(Math.floor(Math.random() * digits.length));
+  }
+  return result;
+}
+
+async function isInvoiceNumberExists(invoiceNumber) {
+  // Check if the invoice number already exists in the database
+  const existingOrder = await OrderedItem.findOne({ invoiceNumber: invoiceNumber });
+  return existingOrder !== null;
+}
+
+
 exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user._id;
   const user = await Consumer.findById(userId);
@@ -723,6 +759,7 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
   const sellerUpi=seller.upi_id 
   // const address= user.addresses
 
+  const invoiceNumber = await generateUniqueInvoiceNumber();
   const orderedItems = user.cart.product.map((item) => {
     return {
       productId: item.productId,
@@ -759,6 +796,7 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     addresses: address,
     sellerNum:seller.phoneNumber,
     sellerUpi,
+    invoiceNum:invoiceNumber
     
     
   });

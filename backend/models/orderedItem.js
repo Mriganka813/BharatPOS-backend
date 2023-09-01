@@ -67,6 +67,9 @@ const orderedItemSchema = mongoose.Schema({
   sellerUpi:{
     type: String
   },
+  invoiceNum:{
+    type: String
+  },
   
 
   addresses: {

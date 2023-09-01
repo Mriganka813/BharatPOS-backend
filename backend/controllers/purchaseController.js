@@ -122,8 +122,6 @@ async function updateStock(id, quantity) {
   await inventory.save({ validateBeforeSave: false });
 }
 
-
-
 async function calcTotalAmount(orderItems) {
   let totalAmount = 0;
   orderItems.forEach((item) => {
