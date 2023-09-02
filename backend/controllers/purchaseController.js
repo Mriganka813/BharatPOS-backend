@@ -5,7 +5,7 @@ const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
 // Create new Order
 exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, modeOfPayment, party } = req.body;
+  const { orderItems, modeOfPayment, party,invoiceNum } = req.body;
   for (const item of orderItems) {
     if (item.quantity !== null) {
         inventoryController.incrementQuantity(item.product, item.quantity);
@@ -19,6 +19,7 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     party,
     total,
     user: req.user._id,
+    invoiceNum,
   });
   res.status(201).json({
     success: true,

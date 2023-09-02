@@ -40,6 +40,9 @@ const salesSchema = new mongoose.Schema({
     ref: "User",
     required: true,
   },
+  invoiceNum:{
+    type: String
+  },
   createdAt: {
     type: Date,
     default: Date.now,
