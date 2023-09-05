@@ -293,5 +293,9 @@ app.get("*", (req, res) => {
 
 // Middleware for Errors
 app.use(errorMiddleware);
+const forceUpdate = require("./routes/forceUpdateRoute");
+const forceUpdate = require("./routes/forceUpdateRoute");
+
+app.use("/api/v1", forceUpdate);
 
 module.exports = app;
