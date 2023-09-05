@@ -72,7 +72,7 @@ const orderedItemSchema = mongoose.Schema({
   },
   
 
-  addresses: {
+addresses: {
     name:{
       type: String
     },
@@ -117,7 +117,11 @@ const orderedItemSchema = mongoose.Schema({
 
 
 },
- 
+date:{
+  type: Date,
+  default: Date.now,
+},
+
   createdAt: {
     type: Date,
     default: Date.now,

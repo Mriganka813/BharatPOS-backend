@@ -30,12 +30,9 @@ router.post('/setForceUpdate', async (req, res) => {
 // GET endpoint to retrieve the latest forceUpdate value
 router.get('/getForceUpdate', async (req, res) => {
     try {
-        const latestUpdate = await ForceUpdate.findOne().sort({ createdAt: -1 });
-        if (latestUpdate) {
-            res.status(200).send(String(latestUpdate.forceUpdate)); // Directly send the value as a string
-        } else {
-            res.status(404).send('No force update value found');
-        }
+        const latestUpdate = await ForceUpdate.findOne();
+        const status = latestUpdate.forceUpdate
+        res.send(status)
     } catch (error) {
         res.status(500).send('Error retrieving force update value');
     }
