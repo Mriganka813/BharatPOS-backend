@@ -25,7 +25,7 @@ const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
       modeOfPayment,
       total,
       user: req.user._id,
-      date:currentDateTimeInIndia,
+      createdAt:currentDateTimeInIndia,
       invoiceNum,
     });
     res.status(201).json({

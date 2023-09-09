@@ -35,7 +35,8 @@ const salesSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Party",
   },
-  date:{type: String,
+  date:{type: Date,
+    default: Date.now
   },
   user: {
     type: mongoose.Schema.ObjectId,
@@ -46,8 +47,8 @@ const salesSchema = new mongoose.Schema({
     type: String
   },
   createdAt: {
-    type: Date,
-    default: Date.now,
+    type: String,
+    
   },
 });
 
