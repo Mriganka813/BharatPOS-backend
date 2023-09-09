@@ -3,10 +3,15 @@ const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
+const moment = require('moment-timezone');
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party,invoiceNum } = req.body;
-  const currentDate = new Date();
+  const indiaTime = moment.tz('Asia/Kolkata');
+
+// Get the current date and time in the India timezone
+const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
+
   
   for (const item of orderItems) {
     const product = await Inventory.findById(item.product);
@@ -20,7 +25,7 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
       modeOfPayment,
       total,
       user: req.user._id,
-      date:currentDate,
+      date:currentDateTimeInIndia,
       invoiceNum,
     });
     res.status(201).json({

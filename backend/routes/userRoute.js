@@ -1,4 +1,5 @@
 const express = require("express");
+const moment = require('moment-timezone');
 const {
   registerUser,
   loginUser,
@@ -113,9 +114,15 @@ router
 
 module.exports = router;
 router.route("/payment-status/:orderId/:status").get(paymentMode)
+
+
 router.route("/test").get(async(req,res)=>{
-  const currentDate = new Date();
-  res.send(currentDate)
+ 
+const indiaTime = moment.tz('Asia/Kolkata');
+
+// Get the current date and time in the India timezone
+const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
+res.send(currentDateTimeInIndia);
 })
 
 
