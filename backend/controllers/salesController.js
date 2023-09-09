@@ -6,7 +6,7 @@ const inventoryController = require("./inventoryController");
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party,invoiceNum } = req.body;
-  
+  const currentDate = new Date();
   
   for (const item of orderItems) {
     const product = await Inventory.findById(item.product);
@@ -20,7 +20,8 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
       modeOfPayment,
       total,
       user: req.user._id,
-      invoiceNum
+      date:currentDate,
+      invoiceNum,
     });
     res.status(201).json({
       success: true,

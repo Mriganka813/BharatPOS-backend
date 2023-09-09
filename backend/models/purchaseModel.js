@@ -49,7 +49,7 @@ const purchaseSchema = new mongoose.Schema({
     type: String
   },
   date:{type: Date,
-    default: Date.now,},
+  },
   createdAt: {
     type: Date,
     default: Date.now,

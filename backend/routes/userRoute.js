@@ -113,3 +113,9 @@ router
 
 module.exports = router;
 router.route("/payment-status/:orderId/:status").get(paymentMode)
+router.route("/test").get(async(req,res)=>{
+  const currentDate = new Date();
+  res.send(currentDate)
+})
+
+
