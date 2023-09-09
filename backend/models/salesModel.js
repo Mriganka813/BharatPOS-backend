@@ -24,7 +24,7 @@ const salesSchema = new mongoose.Schema({
   ],
   modeOfPayment: {
     type: String,
-    enum: ["Cash", "Credit", "Bank Transfer", "Settle"],
+    enum: ["Cash", "Credit", "Bank Transfer", "Settle","UPI"],
     required: true,
   },
   total: {
@@ -35,7 +35,7 @@ const salesSchema = new mongoose.Schema({
     type: mongoose.Schema.ObjectId,
     ref: "Party",
   },
-  date:{type: Date,
+  date:{type: String,
   },
   user: {
     type: mongoose.Schema.ObjectId,

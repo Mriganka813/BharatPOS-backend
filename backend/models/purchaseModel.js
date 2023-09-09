@@ -32,7 +32,7 @@ const purchaseSchema = new mongoose.Schema({
   },
   modeOfPayment: {
     type: String,
-    enum: ["Cash", "Credit", "Bank Transfer", "Settle"],
+    enum: ["Cash", "Credit", "Bank Transfer", "Settle","UPI"],
     required: true,
   },
   party: {
@@ -48,7 +48,8 @@ const purchaseSchema = new mongoose.Schema({
   invoiceNum:{
     type: String
   },
-  date:{type: Date,
+  date:{
+    type: String,
   },
   createdAt: {
     type: Date,
