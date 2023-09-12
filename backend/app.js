@@ -202,6 +202,7 @@ const sales = require("./routes/salesRoute");
 const expense = require("./routes/expenseRoute");
 const report = require("./routes/reportRoute");
 const table = require("./routes/tableRoute");
+const invoice = require("./routes/invoice")
 
 const consumer = require("./routes/consumerRoute");
 
@@ -285,6 +286,7 @@ app.use("/api/v1", bulk);
 app.use("/api/v1", table);
 app.use("/api/v1", getShopRating);
 app.use("/api/v1", forceUpdate);
+app.use("/api/v1",invoice)
 
 app.use(express.static(path.join(__dirname, "build")));
 
