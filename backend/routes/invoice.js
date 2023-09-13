@@ -2,7 +2,7 @@ const express = require("express");
 const router = express.Router();
 
 
-router.get('/invoice',async(req,res)=>{
+router.post('/invoice',async(req,res)=>{
   
   const {orderItem,invoice,address,companyName,email,phone,date} = req.body
 
