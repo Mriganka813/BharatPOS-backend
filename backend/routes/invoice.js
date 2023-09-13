@@ -9,7 +9,7 @@ router.post('/invoice',async(req,res)=>{
    try{
 
     orderItem.map((item)=>{
-      if(item.product.gstRate== null){
+      if(item.product.gstRate== null || item.product.gstRate == "null"){
         item.product.gstRate = 0
         console.log(item.product.gstRate);
       }
