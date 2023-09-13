@@ -5,11 +5,15 @@ const Invoice = require('../models/invoice')
 
 router.post('/invoice',async(req,res)=>{
   
-  const {orderItem,invoice,address,companyName,email,phone,date} = req.body
-
-  
-
+  let {orderItem,invoice,address,companyName,email,phone,date} = req.body
    try{
+
+    orderItem.map((item)=>{
+      if(item.product.gstRate== null){
+        item.product.gstRate = 0
+        console.log(item.product.gstRate);
+      }
+    })
 
     const newInvoice= new Invoice({
       companyName,
@@ -22,7 +26,7 @@ router.post('/invoice',async(req,res)=>{
 })
 
 await newInvoice.save();
-console.log(newInvoice);
+
     return res.send(newInvoice._id)
    }catch(err){
     console.log(err);
@@ -36,7 +40,7 @@ router.get('/genrate/:id', async (req, res) => {
 
   try {
     const invoiceid = await Invoice.findById(id)
-
+    console.log('ppp');
     const  orderItem = invoiceid.orderItem
     const   companyName = invoiceid.companyName 
     const   email = invoiceid.email
