@@ -80,7 +80,7 @@
                       <td><%= item.quantity %></td>
                       <td><%= item.product.baseSellingPriceGst ? item.product.baseSellingPriceGst : item.product.sellingPrice %> </td>
                       <td> <%= item.product.gstRate %> </td>
-                      <td><%= itemSubTotal %></td>
+                      <td><%= itemSubTotal + item.product.gstRate  %></td>
                     </tr>
                   <% }); %>
             </tbody>
