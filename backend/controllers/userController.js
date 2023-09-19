@@ -903,3 +903,34 @@ await order.save()
 return res.send({order})
   
 })
+
+exports.genratePin = catchAsyncErrors(async (req, res) => {
+  // Generate a random 6-digit PIN
+
+  const pin = Math.floor(100000 + Math.random() * 900000);
+  const userId = req.user._id;
+
+  const user = User.findById(userId)
+
+  user.pin = pin 
+  await user.save();
+
+  // Send the generated PIN as a response
+  res.status(200).json({ pin });
+});
+
+exports.verifyPin = catchAsyncErrors(async (req, res) => {
+  // Generate a random 6-digit PIN
+
+  const userId = req.user._id;
+  const user = User.findById(userId)
+  
+  if(user.pin !== pin){
+    return res.send({success: false, msg: "Incorrect PIN"})
+  }
+
+  return res.send({success: false, msg: "Correct PIN"})
+
+  // Send the generated PIN as a response
+  res.status(200).json({ pin });
+});

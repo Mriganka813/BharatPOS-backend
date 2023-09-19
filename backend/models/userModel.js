@@ -122,6 +122,9 @@ const userSchema = new mongoose.Schema(
       default: true,
     },
 
+    pin:{
+      type: Number
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },

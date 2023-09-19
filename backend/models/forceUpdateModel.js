@@ -1,10 +1,22 @@
 const mongoose = require('mongoose');
 
 const forceUpdateSchema = new mongoose.Schema({
-    forceUpdate: {
+    forceUpdateCube: {
         type: Boolean,
-        required: true
-    }
+        required: true,
+        default: false
+    },
+    forceUpdateBuyNow: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+    forceUpdateCute: {
+        type: Boolean,
+        required: true,
+        default: false
+    },
+   
 }, {
     timestamps: true
 });
