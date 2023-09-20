@@ -920,12 +920,13 @@ exports.genratePin = catchAsyncErrors(async (req, res) => {
 });
 
 exports.editPin=catchAsyncErrors(async(req,res)=>{
-  const {pin, oldPin}= req.body
+  const {pin, oldPin }= req.body
   const userId=req.user._id
   const user=await User.findById(userId)
 
   if(oldPin === user.pin){
     user.pin = pin
+    await user.save()
     return res.send({success: true,msg: "PIN Changed"})
   }
 
