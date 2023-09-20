@@ -905,47 +905,44 @@ return res.send({order})
 })
 
 exports.genratePin = catchAsyncErrors(async (req, res) => {
-  // Generate a random 6-digit PIN
+  // Get the userId and PIN provided by the user from the request body
+  const { userId, pin } = req.body;
 
-  const pin = Math.floor(100000 + Math.random() * 900000);
-  const userId = req.user._id;
+  const user = await User.findById(userId);
 
-  const user = User.findById(userId)
+  if (user) {
+    // If the user exists, update their pin with the provided one
+    user.pin = pin;
+    await user.save();
+  } else {
+    // If the user doesn't exist, create a new user with the provided pin
+    const newUser = new User({
+      _id: userId,
+      pin: pin,
+    });
 
-  user.pin = pin 
-  await user.save();
-
-  // Send the generated PIN as a response
-  res.status(200).json({ pin });
-});
-
-exports.editPin=catchAsyncErrors(async(req,res)=>{
-  const {pin, oldPin }= req.body
-  const userId=req.user._id
-  const user=await User.findById(userId)
-
-  if(oldPin === user.pin){
-    user.pin = pin
-    await user.save()
-    return res.send({success: true,msg: "PIN Changed"})
+    await newUser.save();
   }
 
-  return res.send({success: false,msg: "OLD PIN Incorrect"})
+  return res.json({ success: true, msg: "PIN Updated/Created" });
+});
 
-})
 
 exports.verifyPin = catchAsyncErrors(async (req, res) => {
-  // Generate a random 6-digit PIN
-  const {pin} = req.body
-  const userId = req.user._id;
-  const user = await User.findById(userId)
-  
-  if(user.pin !== pin){
-    return res.send({success: false, msg: "Incorrect PIN"})
+  const { userId, pin } = req.body;
+  const user = await User.findById(userId);
+
+  if (!user) {
+    return res.status(404).json({ success: false, msg: "User not found" });
   }
 
-  return res.send({success: false, msg: "Correct PIN"})
+  const userPin = user.pin;
+  const providedPin = Number(pin);
 
-  // Send the generated PIN as a response
-  res.status(200).json({ pin });
+  if (userPin === providedPin) {
+    return res.json({ success: true, msg: "Correct PIN" });
+  } else {
+    return res.json({ success: false, msg: "Incorrect PIN" });
+  }
 });
+

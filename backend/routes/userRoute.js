@@ -33,7 +33,7 @@ const {
   addDiscount,
   genratePin,
   verifyPin,
-  editPin
+
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -104,7 +104,7 @@ router.route("/getpin").get(genratePin)
 
 router.route('/verifypin').post(verifyPin)
 
-router.route("/editpin").post(editPin)
+
 //multerconnection
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
