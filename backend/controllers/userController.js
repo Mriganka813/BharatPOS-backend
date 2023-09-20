@@ -916,6 +916,7 @@ exports.genratePin = catchAsyncErrors(async (req, res) => {
     return res.send({success: false, msg:"Already Created"})
   }
   user.pin = pin
+  user.isPin = true
   await user.save()
 
   return res.json({success: true,msg:`Pin Created new Pin is `+ pin});
@@ -937,6 +938,7 @@ exports.deletePin = catchAsyncErrors(async(req,res)=>{
   }
 
   user.pin = undefined
+  user.isPin = false
   await user.save()
 
   return res.json({ success: true, msg: "PIN Deleted" });

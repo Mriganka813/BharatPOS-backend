@@ -125,6 +125,10 @@ const userSchema = new mongoose.Schema(
     pin:{
       type: Number
     },
+    isPin:{
+      type: Boolean,
+      default: false
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },
