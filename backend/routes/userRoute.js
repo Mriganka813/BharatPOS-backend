@@ -34,7 +34,8 @@ const {
   genratePin,
   verifyPin,
   editPin,
-  deletePin
+  deletePin,
+  getPinStatus
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -101,12 +102,13 @@ router.route("/rating/:productId").get(avgRating);
 router.route("/discount/add/:userId").post(addDiscount)
 
 router.route("/getpin").post(isAuthenticatedUser,genratePin)
+router.route('/deletepin').post(isAuthenticatedUser,deletePin)
 
 router.route('/verifypin').post(isAuthenticatedUser,verifyPin)
 
 router.route("/editpin").post(isAuthenticatedUser, editPin)
 
-router.route('/deletepin').post(isAuthenticatedUser,deletePin)
+router.route("/pinstatus").get(isAuthenticatedUser,getPinStatus)
 //multerconnection
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
