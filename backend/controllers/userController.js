@@ -906,43 +906,81 @@ return res.send({order})
 
 exports.genratePin = catchAsyncErrors(async (req, res) => {
   // Get the userId and PIN provided by the user from the request body
-  const { userId, pin } = req.body;
-
-  const user = await User.findById(userId);
-
-  if (user) {
-    // If the user exists, update their pin with the provided one
-    user.pin = pin;
-    await user.save();
-  } else {
-    // If the user doesn't exist, create a new user with the provided pin
-    const newUser = new User({
-      _id: userId,
-      pin: pin,
-    });
-
-    await newUser.save();
+  const userId = req.user._id;
+  const {pin} = req.body
+  const user = await User.findById(userId)
+  if(pin.length !=6){
+    return res.send({success: false,msg:"PIN must 6 Digit"})
   }
+  if(user.pin){
+    return res.send({success: false, msg:"Already Created"})
+  }
+  user.pin = pin
+  await user.save()
 
-  return res.json({ success: true, msg: "PIN Updated/Created" });
+  return res.json({success: true,msg:`Pin Created new Pin is `+ pin});
 });
 
+exports.deletePin = catchAsyncErrors(async(req,res)=>{
+  const userId = req.user._id;
+  const {pin} = req.body;
+
+  const user = await User.findById(userId)
+  if(pin.length !=6){
+    return res.send({success: false,msg:"PIN must 6 Digit"})
+  }
+  if(!user.pin){
+    return res.send({success: false, msg:"Please add pin"})
+  }
+  if(pin != user.pin){
+    return res.json({ success: false, msg: "Incorrect PIN" });
+  }
+
+  user.pin = undefined
+  await user.save()
+
+  return res.json({ success: true, msg: "PIN Deleted" });
+
+  
+
+})
+
+exports.editPin = catchAsyncErrors(async(req,res)=>{
+  const userId = req.user._id;
+  const { newPin, oldPin } = req.body;
+  
+  const user = await User.findById(userId)
+
+  if(newPin.length !=6 && oldPin.length !=6){
+    return res.send({success: false,msg:"PIN must 6 Digit"})
+  }
+  if(!user.pin){
+    return res.send({success: false, msg:"Please add pin"})
+  }
+  if(oldPin != user.pin){
+    return res.json({ success: false, msg: "Incorrect PIN" });
+  }
+
+  user.pin = newPin
+  await user.save()
+
+  return res.send({success: true,msg:"PIN Changed Successfully new PIN is "+newPin})
+
+})
 
 exports.verifyPin = catchAsyncErrors(async (req, res) => {
-  const { userId, pin } = req.body;
+  const userId = req.user._id;
+  const { pin } = req.body;
   const user = await User.findById(userId);
 
   if (!user) {
     return res.status(404).json({ success: false, msg: "User not found" });
   }
 
-  const userPin = user.pin;
-  const providedPin = Number(pin);
-
-  if (userPin === providedPin) {
-    return res.json({ success: true, msg: "Correct PIN" });
-  } else {
-    return res.json({ success: false, msg: "Incorrect PIN" });
+  if(pin != user.pin){
+    return res.send({success: false,msg:"incorrect pin"})
   }
+
+  return res.send({success:true})
 });
 

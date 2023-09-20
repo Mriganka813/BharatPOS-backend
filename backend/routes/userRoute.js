@@ -33,7 +33,8 @@ const {
   addDiscount,
   genratePin,
   verifyPin,
-
+  editPin,
+  deletePin
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -92,7 +93,6 @@ router.route("/shop-time").post(isAuthenticatedUser, changeTiming);
 
 router.route("/update/order/:orderId/:status").get(changeStatus);
 
-
 router.route("/change/shop-status").get(isAuthenticatedUser, openCloseShop);
 
 router.route("/order/details/:orderId").get(orderData);
@@ -100,11 +100,13 @@ router.route("/order/details/:orderId").get(orderData);
 router.route("/rating/:productId").get(avgRating);
 router.route("/discount/add/:userId").post(addDiscount)
 
-router.route("/getpin").get(genratePin)
+router.route("/getpin").post(isAuthenticatedUser,genratePin)
 
-router.route('/verifypin').post(verifyPin)
+router.route('/verifypin').post(isAuthenticatedUser,verifyPin)
 
+router.route("/editpin").post(isAuthenticatedUser, editPin)
 
+router.route('/deletepin').post(isAuthenticatedUser,deletePin)
 //multerconnection
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
