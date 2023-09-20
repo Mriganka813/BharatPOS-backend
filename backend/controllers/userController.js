@@ -919,11 +919,25 @@ exports.genratePin = catchAsyncErrors(async (req, res) => {
   res.status(200).json({ pin });
 });
 
+exports.editPin=catchAsyncErrors(async(req,res)=>{
+  const {pin, oldPin}= req.body
+  const userId=req.user._id
+  const user=await User.findById(userId)
+
+  if(oldPin === user.pin){
+    user.pin = pin
+    return res.send({success: true,msg: "PIN Changed"})
+  }
+
+  return res.send({success: false,msg: "OLD PIN Incorrect"})
+
+})
+
 exports.verifyPin = catchAsyncErrors(async (req, res) => {
   // Generate a random 6-digit PIN
-
+  const {pin} = req.body
   const userId = req.user._id;
-  const user = User.findById(userId)
+  const user = await User.findById(userId)
   
   if(user.pin !== pin){
     return res.send({success: false, msg: "Incorrect PIN"})
