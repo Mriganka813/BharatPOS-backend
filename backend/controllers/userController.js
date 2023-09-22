@@ -987,9 +987,13 @@ exports.verifyPin = catchAsyncErrors(async (req, res) => {
 });
 
 exports.getPinStatus=catchAsyncErrors(async(req,res)=>{
-  
+  const userId = req.user._id;
   const user = await User.findById(userId);
   const status = user.isPin
+
+  if(!user.isPin){
+    return res.send(false)
+  }
 
   return res.send({status})
 })
