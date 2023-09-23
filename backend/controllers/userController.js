@@ -909,9 +909,9 @@ exports.genratePin = catchAsyncErrors(async (req, res) => {
   const userId = req.user._id;
   const {pin} = req.body
   const user = await User.findById(userId)
-  if(pin.length !=6){
-    return res.send({success: false,msg:"PIN must 6 Digit"})
-  }
+  // if(pin.length !=6){
+  //   return res.send({success: false,msg:"PIN must 6 Digit"})
+  // }
   if(user.pin){
     return res.send({success: false, msg:"Already Created"})
   }
@@ -927,9 +927,9 @@ exports.deletePin = catchAsyncErrors(async(req,res)=>{
   const {pin} = req.body;
 
   const user = await User.findById(userId)
-  if(pin.length !=6){
-    return res.send({success: false,msg:"PIN must 6 Digit"})
-  }
+  // if(pin.length !=6){
+  //   return res.send({success: false,msg:"PIN must 6 Digit"})
+  // }
   if(!user.pin){
     return res.send({success: false, msg:"Please add pin"})
   }
