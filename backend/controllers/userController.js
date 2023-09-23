@@ -953,9 +953,9 @@ exports.editPin = catchAsyncErrors(async(req,res)=>{
   
   const user = await User.findById(userId)
 
-  if(newPin.length !=6 && oldPin.length !=6){
-    return res.send({success: false,msg:"PIN must 6 Digit"})
-  }
+  // if(newPin.length !=6 && oldPin.length !=6){
+  //   return res.send({success: false,msg:"PIN must 6 Digit"})
+  // }
   if(!user.pin){
     return res.send({success: false, msg:"Please add pin"})
   }
