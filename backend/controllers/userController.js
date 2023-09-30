@@ -2,7 +2,8 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const User = require("../models/userModel");
 const Order = require("../models/orderedItem");
-const Inventory = require("../models/inventoryModel");
+const Inventory = require("../models/inventoryModel");4
+const Hotel = require("../models/hotelModel")
 const Consumer = require("../models/consumerModel");
 const jwt = require("jsonwebtoken");
 const sendToken = require("../utils/jwtToken");
@@ -578,26 +579,26 @@ exports.renderBulkupload = catchAsyncErrors(async (req, res, next) => {
 
 exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
   const { orderId, status } = req.params; // Assuming productId is provided in the request
-  if (!orderId || !status ) {
+  if (!orderId || !status) {
     return res.send("Required field missing");
   }
   try {
     const order = await mongoose.model("orderedItem").findById(orderId);
-    
-    
+
+
 
     if (!order) {
       return res.status(404).send("Order not found");
     }
 
-    order.items.map((item)=>{
+    order.items.map((item) => {
       item.status = status
     })
-    
-    order.orederStatus=status
+
+    order.orederStatus = status
     await order.save()
-    return res.send({order})
-    
+    return res.send({ order })
+
   } catch (error) {
     console.error("An error occurred:", error);
     return res.status(500).send("An error occurred");
@@ -875,65 +876,65 @@ exports.saveTrip = catchAsyncErrors(async (req, res, next) => {
   res.send({ success: true });
 });
 
-exports.addDiscount = catchAsyncErrors(async(req,res,next)=>{
+exports.addDiscount = catchAsyncErrors(async (req, res, next) => {
   const { userId } = req.params
-  const {discount}=req.body
+  const { discount } = req.body
   console.log(userId);
   const seller = await User.findById(userId)
-  
+
   console.log(seller);
-  seller.discount=discount
+  seller.discount = discount
   await seller.save()
 
   return res.send(seller)
 
 })
-exports.paymentMode=catchAsyncErrors(async(req,res,next)=>{
-  const { orderId,status } = req.params
+exports.paymentMode = catchAsyncErrors(async (req, res, next) => {
+  const { orderId, status } = req.params
 
-  const order=await Order.findById(orderId)
-  if(status === "paid"){
+  const order = await Order.findById(orderId)
+  if (status === "paid") {
     order.isPaid = true
-  }else if(status == "unpaid"){
-    order.isPaid=false
+  } else if (status == "unpaid") {
+    order.isPaid = false
   }
 
-await order.save()
+  await order.save()
 
-return res.send({order})
-  
+  return res.send({ order })
+
 })
 
 exports.genratePin = catchAsyncErrors(async (req, res) => {
   // Get the userId and PIN provided by the user from the request body
   const userId = req.user._id;
-  const {pin} = req.body
+  const { pin } = req.body
   const user = await User.findById(userId)
   // if(pin.length !=6){
   //   return res.send({success: false,msg:"PIN must 6 Digit"})
   // }
-  if(user.pin){
-    return res.send({success: false, msg:"Already Created"})
+  if (user.pin) {
+    return res.send({ success: false, msg: "Already Created" })
   }
   user.pin = pin
   user.isPin = true
   await user.save()
 
-  return res.json({success: true,msg:`Pin Created new Pin is `+ pin});
+  return res.json({ success: true, msg: `Pin Created new Pin is ` + pin });
 });
 
-exports.deletePin = catchAsyncErrors(async(req,res)=>{
+exports.deletePin = catchAsyncErrors(async (req, res) => {
   const userId = req.user._id;
-  const {pin} = req.body;
+  const { pin } = req.body;
 
   const user = await User.findById(userId)
   // if(pin.length !=6){
   //   return res.send({success: false,msg:"PIN must 6 Digit"})
   // }
-  if(!user.pin){
-    return res.send({success: false, msg:"Please add pin"})
+  if (!user.pin) {
+    return res.send({ success: false, msg: "Please add pin" })
   }
-  if(pin != user.pin){
+  if (pin != user.pin) {
     return res.json({ success: false, msg: "Incorrect PIN" });
   }
 
@@ -943,30 +944,30 @@ exports.deletePin = catchAsyncErrors(async(req,res)=>{
 
   return res.json({ success: true, msg: "PIN Deleted" });
 
-  
+
 
 })
 
-exports.editPin = catchAsyncErrors(async(req,res)=>{
+exports.editPin = catchAsyncErrors(async (req, res) => {
   const userId = req.user._id;
   const { newPin, oldPin } = req.body;
-  
+
   const user = await User.findById(userId)
 
   // if(newPin.length !=6 && oldPin.length !=6){
   //   return res.send({success: false,msg:"PIN must 6 Digit"})
   // }
-  if(!user.pin){
-    return res.send({success: false, msg:"Please add pin"})
+  if (!user.pin) {
+    return res.send({ success: false, msg: "Please add pin" })
   }
-  if(oldPin != user.pin){
+  if (oldPin != user.pin) {
     return res.json({ success: false, msg: "Incorrect PIN" });
   }
 
   user.pin = newPin
   await user.save()
 
-  return res.send({success: true,msg:"PIN Changed Successfully new PIN is "+newPin})
+  return res.send({ success: true, msg: "PIN Changed Successfully new PIN is " + newPin })
 
 })
 
@@ -979,21 +980,80 @@ exports.verifyPin = catchAsyncErrors(async (req, res) => {
     return res.status(404).json({ success: false, msg: "User not found" });
   }
 
-  if(pin != user.pin){
-    return res.send({success: false,msg:"incorrect pin"})
+  if (pin != user.pin) {
+    return res.send({ success: false, msg: "incorrect pin" })
   }
 
-  return res.send({success:true})
+  return res.send({ success: true })
 });
 
-exports.getPinStatus=catchAsyncErrors(async(req,res)=>{
+exports.getPinStatus = catchAsyncErrors(async (req, res) => {
   const userId = req.user._id;
   const user = await User.findById(userId);
   const status = user.isPin
 
-  if(!user.isPin){
+  if (!user.isPin) {
     return res.send(false)
   }
 
-  return res.send({status})
+  return res.send({ status })
+})
+
+
+// code for hotel usre seprate it in future
+
+exports.addGuest = catchAsyncErrors(async (req, res) => {
+  const { invoiceNum,
+    guestName,
+    numberOfGuest,
+    address,
+    number,
+    company,
+    gst,
+    checkIn,
+    checkOut,
+    days,
+    roomNo,
+    otherCharges,
+    billDate,
+    // adv,
+    // dis,
+
+
+  } = req.body
+
+
+
+  const { roomId } = req.params // Product Id 
+
+  const userId = req.user._id;
+  const owner = await User.findById(userId);
+
+  const newHotel = new Hotel ({
+    ...req.body,
+    owner,
+    roomId,
+})
+
+  await newHotel.save()
+  return res.send({id:newHotel.id})
+
+})
+
+exports.hotelbill = catchAsyncErrors(async (req, res) => {
+  const id=req.params.id
+  const room = await Hotel.findById(id)
+  console.log(room);
+  res.send(room.RoomId)
+  
+
+})
+
+exports.reports = catchAsyncErrors(async (req, res) => {
+  const id=req.params.id 
+  const room = await Hotel.find({owner:id})
+  console.log(room);
+  res.send(room.RoomId)
+  
+
 })

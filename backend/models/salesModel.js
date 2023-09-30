@@ -48,8 +48,17 @@ const salesSchema = new mongoose.Schema({
   },
   createdAt: {
     type: String,
-    
   },
+  reciverName:{
+    type: String
+  },
+  businessName:{
+    type: String
+  },
+  gst:{
+    type: String
+  }
+
 });
 
 module.exports = mongoose.model("salesModel", salesSchema);

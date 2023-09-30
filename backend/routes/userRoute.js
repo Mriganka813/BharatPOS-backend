@@ -35,7 +35,10 @@ const {
   verifyPin,
   editPin,
   deletePin,
-  getPinStatus
+  getPinStatus,
+  addGuest,
+  hotelbill,
+  reports
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -109,6 +112,19 @@ router.route('/verifypin').post(isAuthenticatedUser,verifyPin)
 router.route("/editpin").post(isAuthenticatedUser, editPin)
 
 router.route("/pinstatus").get(isAuthenticatedUser,getPinStatus)
+
+router.route("/hoteldata/:roomId").post(isAuthenticatedUser,addGuest)
+
+router.route("/hotelbill/:id").get(hotelbill)
+router.route("/reports/:id").get(reports)
+
+
+
+
+
+
+
+
 //multerconnection
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
