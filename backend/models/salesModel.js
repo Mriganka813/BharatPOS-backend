@@ -55,6 +55,9 @@ const salesSchema = new mongoose.Schema({
   businessName:{
     type: String
   },
+  businessAddress:{
+    type: String
+  },
   gst:{
     type: String
   }
