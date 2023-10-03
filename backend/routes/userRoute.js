@@ -113,7 +113,9 @@ router.route("/editpin").post(isAuthenticatedUser, editPin)
 
 router.route("/pinstatus").get(isAuthenticatedUser,getPinStatus)
 
-router.route("/hoteldata/:roomId").post(isAuthenticatedUser,addGuest)
+
+
+router.route("/hoteldata").post(isAuthenticatedUser,addGuest)
 
 router.route("/hotelbill/:id").get(hotelbill)
 router.route("/reports/:id").get(reports)

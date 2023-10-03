@@ -1003,7 +1003,8 @@ exports.getPinStatus = catchAsyncErrors(async (req, res) => {
 // code for hotel usre seprate it in future
 
 exports.addGuest = catchAsyncErrors(async (req, res) => {
-  const { invoiceNum,
+  const { 
+    invoiceNum,
     guestName,
     numberOfGuest,
     address,
@@ -1016,6 +1017,7 @@ exports.addGuest = catchAsyncErrors(async (req, res) => {
     roomNo,
     otherCharges,
     billDate,
+    roomId,
     // adv,
     // dis,
 
@@ -1024,7 +1026,7 @@ exports.addGuest = catchAsyncErrors(async (req, res) => {
 
 
 
-  const { roomId } = req.params // Product Id 
+  // const { roomId } = req.params // Product Id 
 
   const userId = req.user._id;
   const owner = await User.findById(userId);
@@ -1032,7 +1034,7 @@ exports.addGuest = catchAsyncErrors(async (req, res) => {
   const newHotel = new Hotel ({
     ...req.body,
     owner,
-    roomId,
+    
 })
 
   await newHotel.save()

@@ -20,6 +20,9 @@ const salesSchema = new mongoose.Schema({
         ref: "Product",
         required: true,
       },
+      productGst:{
+        type: String
+      }
     },
   ],
   modeOfPayment: {

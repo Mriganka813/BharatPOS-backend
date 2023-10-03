@@ -51,10 +51,10 @@ company:{
  adv:{
     type: Number
  },
- roomId:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "inventory",
- },
+ roomId: [{
+   type: mongoose.Schema.Types.ObjectId,
+   ref: "inventory",
+}],
  owner:{
     type: mongoose.Schema.Types.ObjectId,
     ref: "user",
@@ -65,6 +65,9 @@ company:{
  checkOutStatus:{
     type:Boolean,
     default: true
+ },
+ paidAmt:{
+   type:String
  }
 });
 

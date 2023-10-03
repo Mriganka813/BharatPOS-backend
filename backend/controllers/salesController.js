@@ -4,9 +4,10 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
 const moment = require('moment-timezone');
+
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, modeOfPayment, party,invoiceNum,reciverName,gst,businessName, } = req.body;
+  const { orderItems,discount, modeOfPayment, party,invoiceNum,reciverName,gst,businessName, } = req.body;
   const indiaTime = moment.tz('Asia/Kolkata');
 
 // Get the current date and time in the India timezone
@@ -15,10 +16,10 @@ const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
   
   for (const item of orderItems) {
     const product = await Inventory.findById(item.product);
-   
-  }
+   }
   try {
     const total = calcTotalAmount(orderItems);
+
     const salesOrder = await SalesOrder.create({
       orderItems,
       party,
