@@ -38,7 +38,10 @@ const {
   getPinStatus,
   addGuest,
   hotelbill,
-  reports
+  reports,
+  kotaGet,
+  kotPush,
+  kotaGetAll
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -121,7 +124,11 @@ router.route("/hotelbill/:id").get(hotelbill)
 router.route("/reports/:id").get(reports)
 
 
+router.route('/kot/push').post(isAuthenticatedUser, kotPush)
 
+router.route('/kot/get/:kotId').get(isAuthenticatedUser, kotaGet)
+
+router.route('/kot/get').get(isAuthenticatedUser, kotaGetAll)
 
 
 

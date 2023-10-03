@@ -16,7 +16,7 @@ const subscribedUsersModel = require("../models/subscribedUsersModel");
 const upload = require("../services/upload");
 const Rating = require("../models/ratingModel");
 const mongoose = require('mongoose');
-
+const KOT = require('../models/kotModel')
 
 // const sendEmail = require("../utils/sendEmail");
 // const crypto = require("crypto");
@@ -1058,4 +1058,43 @@ exports.reports = catchAsyncErrors(async (req, res) => {
   res.send(room.RoomId)
   
 
+})
+
+
+exports.kotPush = catchAsyncErrors(async (req, res) => {
+  const user = req.user._id;
+
+  const {item, date, qty}=req.body
+  const kotData = new KOT({
+    ...req.body,
+    user
+  })
+
+  await kotData.save()
+
+  return res.send({kotData,success:true})
+
+})
+
+exports.kotaGet=catchAsyncErrors(async(req,res)=>{
+  const userId = req.user._id;
+ 
+  const kot= await KOT.find({user:userId})
+ 
+  if(!kot){
+    return res.send({succes: false})
+  }
+
+  return res.send(kot)
+})
+
+exports.kotaGetAll=catchAsyncErrors(async(req,res)=>{
+
+  const {kotId}=req.params
+  const kot= await KOT.findById(kotId)
+  if(!kot){
+    return res.send({succes: false})
+  }
+
+  return res.send(kot)
 })
