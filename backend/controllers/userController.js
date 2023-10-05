@@ -1034,8 +1034,7 @@ exports.addGuest = catchAsyncErrors(async (req, res) => {
   const newHotel = new Hotel ({
     ...req.body,
     owner,
-    
-})
+ })
 
   await newHotel.save()
   return res.send({id:newHotel.id})
@@ -1047,8 +1046,6 @@ exports.hotelbill = catchAsyncErrors(async (req, res) => {
   const room = await Hotel.findById(id)
   console.log(room);
   res.send(room.RoomId)
-  
-
 })
 
 exports.reports = catchAsyncErrors(async (req, res) => {
