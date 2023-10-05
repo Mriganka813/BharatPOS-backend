@@ -41,7 +41,8 @@ const {
   reports,
   kotaGet,
   kotPush,
-  kotaGetAll
+  kotaGetAll,
+  getReport
 } = require("../controllers/userController");
 const cntlr = require("../controllers/userController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
@@ -120,8 +121,11 @@ router.route("/pinstatus").get(isAuthenticatedUser,getPinStatus)
 
 router.route("/hoteldata").post(isAuthenticatedUser,addGuest)
 
-router.route("/hotelbill/:id").get(hotelbill)
-router.route("/reports/:id").get(reports)
+router.route("/hotelbill/:id").get(isAuthenticatedUser,hotelbill)
+
+router.route("/reports/:id").get(isAuthenticatedUser,reports)
+
+router.route('/get-report').post(isAuthenticatedUser,getReport)
 
 
 router.route('/kot/push').post(isAuthenticatedUser, kotPush)

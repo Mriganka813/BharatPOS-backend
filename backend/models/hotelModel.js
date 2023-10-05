@@ -69,6 +69,9 @@ company:{
  paidAmt:{
    type:String
  }
+},{
+   timestamps: true
+
 });
 
 module.exports = mongoose.model("hotelModel", hotelSchema);
