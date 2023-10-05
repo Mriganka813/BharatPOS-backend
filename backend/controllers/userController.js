@@ -1059,7 +1059,7 @@ exports.reports = catchAsyncErrors(async (req, res) => {
 
 modules.getReport=catchAsyncErrors(async(req,res)=>{
   try {
-    const { startDate, endDate } = req.query; // Assuming startDate and endDate are passed as query parameters
+    const { startDate, endDate } = req.body; // Assuming startDate and endDate are passed as query parameters
     const userId = req.user._id;
     // Parse the date strings to Date objects (if needed)
     const startDateObj = new Date(startDate);
