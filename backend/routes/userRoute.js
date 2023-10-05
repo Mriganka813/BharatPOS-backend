@@ -125,7 +125,7 @@ router.route("/hotelbill/:id").get(isAuthenticatedUser,hotelbill)
 
 router.route("/reports/:id").get(isAuthenticatedUser,reports)
 
-router.route('/get-report').post(isAuthenticatedUser,getReport)
+// router.route('/get-report').post(isAuthenticatedUser,getReport)
 
 
 router.route('/kot/push').post(isAuthenticatedUser, kotPush)

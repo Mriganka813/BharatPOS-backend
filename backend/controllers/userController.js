@@ -1057,26 +1057,26 @@ exports.reports = catchAsyncErrors(async (req, res) => {
 
 })
 
-modules.getReport=catchAsyncErrors(async(req,res)=>{
-  try {
-    const { startDate, endDate } = req.body; // Assuming startDate and endDate are passed as query parameters
-    const userId = req.user._id;
-    // Parse the date strings to Date objects (if needed)
-    const startDateObj = new Date(startDate);
-    const endDateObj = new Date(endDate);
+// exports.getReport=catchAsyncErrors(async(req,res)=>{
+//   try {
+//     const { startDate, endDate } = req.body; // Assuming startDate and endDate are passed as query parameters
+//     const userId = req.user._id;
+//     // Parse the date strings to Date objects (if needed)
+//     const startDateObj = new Date(startDate);
+//     const endDateObj = new Date(endDate);
 
-    // Query the database to find data between the specified dates
-    const data = await Hotel.find({
-      invoiceDate: { $gte: startDateObj, $lte: endDateObj },
-      owner: userId, // Check that the owner matches the logged-in user's userId
-    });
+//     // Query the database to find data between the specified dates
+//     const data = await Hotel.find({
+//       invoiceDate: { $gte: startDateObj, $lte: endDateObj },
+//       owner: userId, // Check that the owner matches the logged-in user's userId
+//     });
 
-    res.json(data);
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Internal Server Error' });
-  }
-})
+//     res.json(data);
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ error: 'Internal Server Error' });
+//   }
+// })
 
 exports.kotPush = catchAsyncErrors(async (req, res) => {
   const user = req.user._id;
