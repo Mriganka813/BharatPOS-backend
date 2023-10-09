@@ -20,6 +20,18 @@ const salesSchema = new mongoose.Schema({
         ref: "Product",
         required: true,
       },
+      saleSGST:{
+        type:Number
+      },
+      saleCGST:{
+        type:Number
+      },
+      saleIGST:{
+        type:Number
+      },
+      baseSellingPrice:{
+        type: Number
+      },
       productGst:{
         type: String
       }
