@@ -8,7 +8,7 @@ const PartyModel = require("../models/partyModel");
 const User = require("../models/userModel");
 // to get report of user sales , purchase and expense between starting date and end date
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
-  const { start_date, end_date, type } = req.body;
+  const { start_date, end_date, type } = req.params;
 
   
   const user = req.user._id;
