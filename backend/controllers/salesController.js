@@ -15,7 +15,10 @@ const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
 
   
   for (const item of orderItems) {
-    const product = await Inventory.findById(item.product);
+      const product = await Inventory.findById(item.product);
+      product.quantity=product.quantity - orderItems.quantity
+      await product.save()
+      
    }
   try {
     const total = calcTotalAmount(orderItems);
