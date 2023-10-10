@@ -7,20 +7,24 @@ const moment = require('moment-timezone');
 
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  console.log('test');
+  console.log('new Sales');
   const { orderItems,discount, modeOfPayment, party,invoiceNum,reciverName,gst,businessName, } = req.body;
-  console.log(orderItems);
+  console.log(req.body);
   const indiaTime = moment.tz('Asia/Kolkata');
 
+   
+  console.log(orderItems);
 
 // Get the current date and time in the India timezone
 const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
  
   for (const item of orderItems) {
       const product = await Inventory.findById(item.product);
-      product.quantity = product.quantity-item.quantity
-      await product.save()
       console.log(product);
+      product.quantity = product.quantity-item.quantity
+
+
+      await product.save()
       
     }
   try {

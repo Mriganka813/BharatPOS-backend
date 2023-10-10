@@ -23,17 +23,14 @@ const salesSchema = new mongoose.Schema({
       saleSGST:{
         type:Number
       },
-      saleCGST:{
-        type:Number
-      },
-      saleIGST:{
+      saleCGST:{ 
         type:Number
       },
       baseSellingPrice:{
         type: Number
       },
-      productGst:{
-        type: String
+      saleIGST:{
+        type: Number
       }
     },
   ],
