@@ -7,14 +7,20 @@ const moment = require('moment-timezone');
 
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
+  console.log('test');
   const { orderItems,discount, modeOfPayment, party,invoiceNum,reciverName,gst,businessName, } = req.body;
+  console.log(orderItems);
   const indiaTime = moment.tz('Asia/Kolkata');
+
 
 // Get the current date and time in the India timezone
 const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
  
   for (const item of orderItems) {
-      const product = await Inventory.findById(item._id);
+      const product = await Inventory.findById(item.product);
+      product.quantity = product.quantity-item.quantity
+      await product.save()
+      console.log(product);
       
     }
   try {
@@ -52,6 +58,7 @@ const calcTotalAmount = (orderItems) => {
 
 // get Single sales Order
 exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
+  console.log();
   const salesOrder = await SalesOrder.findById(req.params.id).populate(
     "user",
     "name email"

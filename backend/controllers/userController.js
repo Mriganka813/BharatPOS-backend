@@ -70,7 +70,7 @@ exports.verifyOtp = catchAsyncErrors(async (req, res, next) => {
 
     // console.log(user);
     // const user = new User(_.pick(req.body, ["phoneNumber"]));
-    console.log(user);
+    // console.log(user);
     // sendToken(user, 201, res);
     const token = sendToken(user, 201, res);
 
@@ -168,11 +168,11 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
   if (req.files?.image) {
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
-    console.log(req.body.image);
+    // console.log(req.body.image);
   }
 
   const { locality, city, state } = req.body; // Extracting address subfields
-  console.log(city);
+  // console.log(city);
   const trimmedCity = city.trim();
   const lowercaseLocality = locality.toLowerCase();
   const lowercaseCity = trimmedCity.toLowerCase();
@@ -561,7 +561,7 @@ exports.webLogin = catchAsyncErrors(async (req, res, nex) => {
     return next(new ErrorHandler("Invalid email or password", 400));
   }
 
-  console.log(user);
+  // console.log(user);
   // sendTokenlogin(user, 200, res)
   // return res.redirect('/api/v1/renderbnulk')
   const responseData = {
@@ -610,7 +610,7 @@ exports.changeStatus = catchAsyncErrors(async (req, res, next) => {
 
 exports.orderStatus = catchAsyncErrors(async (req, res, next) => {
   const userId = req.user._id;
-  console.log(userId);
+  // console.log(userId);
 
   const orders = await Order.find({
     items: {
