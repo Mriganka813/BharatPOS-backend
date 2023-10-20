@@ -21,7 +21,7 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     total,
     user: req.user._id,
     invoiceNum,
-    createdAt:currentDate
+    createdAt:createdAt:currentDateTimeInIndia,
   });
   res.status(201).json({
     success: true,
