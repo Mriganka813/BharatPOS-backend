@@ -3,10 +3,13 @@ const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
+const moment = require('moment-timezone');
 // Create new Order
 exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party,invoiceNum } = req.body;
-  const currentDate = new Date();
+
+  const indiaTime = moment.tz('Asia/Kolkata');
+  const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
   for (const item of orderItems) {
     if (item.quantity !== null) {
         inventoryController.incrementQuantity(item.product, item.quantity);
