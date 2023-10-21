@@ -24,6 +24,20 @@ const purchaseSchema = new mongoose.Schema({
         ref: "Product",
         required: true,
       },
+      purchaseSGST: {
+        type: Number,
+       
+      },
+      purchaseCGST: {
+        type: Number,
+     
+      },
+      purchaseIGST: {
+        type: Number,
+      },
+      basePurchasePrice: {
+        type: Number,
+      },
     },
   ],
   total: {
