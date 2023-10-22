@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 // Define the main Invoice schema
 const invoiceSchema = new mongoose.Schema({
-  orderItem: [
+  orderInput: [
     {
       price: Number,
       quantity: Number,

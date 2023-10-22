@@ -5,10 +5,10 @@ const Invoice = require('../models/invoice')
 
 router.post('/invoice',async(req,res)=>{
   
-  let {orderItem,invoice,address,companyName,email,phone,date} = req.body
+  let {orderInput,invoice,address,companyName,email,phone,date} = req.body
    try{
 
-    orderItem.map((item)=>{
+    orderInput.map((item)=>{
       if(item.product.gstRate== null || item.product.gstRate == "null"){
         item.product.gstRate = 0
         console.log(item.product.gstRate);
@@ -41,7 +41,7 @@ router.get('/genrate/:id', async (req, res) => {
   try {
     const invoiceid = await Invoice.findById(id)
     console.log('ppp');
-    const  orderItem = invoiceid.orderItem
+    const  orderItem = invoiceid.orderInput
     const   companyName = invoiceid.companyName 
     const   email = invoiceid.email
     const   phone = invoiceid.phone
@@ -58,8 +58,6 @@ router.get('/genrate/:id', async (req, res) => {
       invoice,
       orderItem,
       date
-
-
   })
 
   } catch (err) {
