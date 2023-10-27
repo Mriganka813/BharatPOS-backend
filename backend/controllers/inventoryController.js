@@ -10,7 +10,8 @@ const { uploadImage } = require("../services/upload");
 const User = require("../models/userModel");
 exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
   const barcode = req.params.code;
-  const inventory = await Inventory.findOne({ barCode: barcode });
+  const user = req.user._id;
+  const inventory = await Inventory.findOne({ barCode: barcode,user });
   res.status(200).json({
     success: true,
     inventory,

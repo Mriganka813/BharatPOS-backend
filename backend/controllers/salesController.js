@@ -9,18 +9,18 @@ const moment = require('moment-timezone');
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   console.log('new Sales');
   const { orderItems,discount, modeOfPayment, party,invoiceNum,reciverName,gst,businessName, } = req.body;
-  console.log(req.body);
+  
   const indiaTime = moment.tz('Asia/Kolkata');
 
    
-  console.log(orderItems);
+  // console.log(orderItems);
 
 // Get the current date and time in the India timezone
 const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
  
   for (const item of orderItems) {
       const product = await Inventory.findById(item.product);
-      console.log(product);
+      // console.log(product);
       product.quantity = product.quantity-item.quantity
 
 
@@ -43,6 +43,8 @@ const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
       gst
 
     });
+
+    console.log(salesOrder);
     res.status(201).json({
       success: true,
       salesOrder,
@@ -145,6 +147,7 @@ exports.deleteSalesOrder = catchAsyncErrors(async (req, res, next) => {
     success: true,
   });
 });
+
 exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
   const data = await SalesOrder.aggregate([
