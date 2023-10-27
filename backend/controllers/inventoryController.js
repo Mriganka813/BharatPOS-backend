@@ -22,6 +22,7 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const { barCode } = req.body;
   const userDetail = req.user._id;
+  console.log(barCode);
 
   const seller = await User.findById(userDetail);
   let discount=0
@@ -45,22 +46,27 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     console.log("image");
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
-    console.log(req.body.image);
+    // console.log(req.body.image);
   }
   req.body.user = userDetail;
   console.log(req.body.barcode);
-  /// Check if barcode is unique to that particular user
-  // if (req.body.barCode !== undefined || req.body.barCode !== "") {
-  //   const existingInventory = await Inventory.findOne({
-  //     barCode: barCode,
-  //     user: req.user._id,
-  //   });
-  //   if (!lodash.isEmpty(existingInventory)) {
-  //     return next(
-  //       new ErrorHandler("Product with this barcode already exists ", 400)
-  //     );
-  //   }
-  // }
+  // Check if barcode is unique to that particular user
+  if (req.body.barCode !== undefined && req.body.barCode !== "") {
+    console.log('no barcode');
+    const existingInventory = await Inventory.findOne({
+      barCode: barCode,
+      user: req.user._id,
+    });
+    if(existingInventory){
+      console.log('change abrcode');
+      return res.send({success:false,msg:'Product with this barcode already exists'})
+    }
+    // if (!lodash.isEmpty(existingInventory)) {
+    //   return next(
+    //     new ErrorHandler("Product with this barcode already exists ", 400)
+    //   );
+    // }
+  }
   const inventory = await Inventory.create({
     ...req.body,
     sellerName: seller.businessName,
