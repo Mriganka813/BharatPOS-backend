@@ -22,7 +22,8 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const { barCode } = req.body;
   const userDetail = req.user._id;
-  console.log(barCode);
+  console.log(barCode,'barcode');
+  console.log(barCode.length,'barcode size');
 
   const seller = await User.findById(userDetail);
   let discount=0
@@ -43,7 +44,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 
   // console.log(req.files)
   if (req.files?.image) {
-    console.log("image");
+    // console.log("image");
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
     // console.log(req.body.image);
@@ -51,14 +52,14 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   req.body.user = userDetail;
   console.log(req.body.barcode);
   // Check if barcode is unique to that particular user
-  if (req.body.barCode !== undefined && req.body.barCode !== "") {
-    console.log('no barcode');
+  if (barCode !== undefined && barCode !== "" && barCode.length !== 0  ) {
+    console.log('barcoed isTrue');
     const existingInventory = await Inventory.findOne({
       barCode: barCode,
       user: req.user._id,
     });
     if(existingInventory){
-      console.log('change abrcode');
+      console.log('barcode exist');
       return res.send({success:false,msg:'Product with this barcode already exists'})
     }
     // if (!lodash.isEmpty(existingInventory)) {
@@ -226,6 +227,7 @@ exports.incrementQuantity = catchAsyncErrors(async (id, quantity) => {
 
 // Update Inventory
 exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
+  const {barCode} = req.body
   let inventory = await Inventory.findById(req.params.id);
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
@@ -239,17 +241,17 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("Error uploading image", 500));
     }
   }
-  // if (req.body.barCode !== undefined) {
-  //   const existingInventory = await Inventory.findOne({
-  //     barCode: req.body.barCode,
-  //     user: req.user._id,
-  //   });
-  //   if (!lodash.isEmpty(existingInventory)) {
-  //     return next(
-  //       new ErrorHandler("Product with this barcode already exists ", 400)
-  //     );
-  //   }
-  // }
+  if (barCode !== undefined && barCode !== "" && barCode.length !== 0 ) {
+    const existingInventory = await Inventory.findOne({
+      barCode: req.body.barCode,
+      user: req.user._id,
+    });
+    if (!lodash.isEmpty(existingInventory)) {
+      return next(
+        new ErrorHandler("Product with this barcode already exists ", 400)
+      );
+    }
+  }
 
   console.log("ppp");
   console.log(req.body.expiryDate);
