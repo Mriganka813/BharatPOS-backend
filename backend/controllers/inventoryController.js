@@ -227,7 +227,28 @@ exports.incrementQuantity = catchAsyncErrors(async (id, quantity) => {
 
 // Update Inventory
 exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
-  const {barCode} = req.body
+
+  const {
+    name,
+    purchasePrice,
+    sellingPrice,
+    barCode,
+    quantity,
+    id,
+    GSTRate,
+    saleSGST,
+    saleCGST,
+    saleIGST,
+    purchaseSGST,
+    purchaseCGST,
+    purchaseIGST,
+    condition,
+    baseSellingPrice,
+    basePurchasePrice,
+    sellerName,
+    available
+  } = req.body;
+  // const {barCode} = req.body
   let inventory = await Inventory.findById(req.params.id);
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
@@ -241,29 +262,56 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("Error uploading image", 500));
     }
   }
-  if (barCode !== undefined && barCode !== "" && barCode.length !== 0 ) {
+  // console.log(req.body);
+  if(barCode != inventory.barCode){
+  if (  barCode !== undefined && barCode !== "" && barCode.length !== 0 ) {
     const existingInventory = await Inventory.findOne({
       barCode: req.body.barCode,
       user: req.user._id,
     });
+    console.log(existingInventory);
     if (!lodash.isEmpty(existingInventory)) {
       return next(
+        // console.log('Product with this barcode already exists')
         new ErrorHandler("Product with this barcode already exists ", 400)
-      );
+        );
+      }
     }
   }
+    console.log(req.params.id);
+    
+      
+      
+      console.log(inventory);
 
-  console.log("ppp");
-  console.log(req.body.expiryDate);
-  inventory = await Inventory.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true,
-    useFindAndModify: false,
-  });
+      inventory.name = name;
+      inventory.purchasePrice = purchasePrice;
+      inventory.sellingPrice = sellingPrice;
+      inventory.barCode = barCode;
+      inventory.quantity = quantity;
+      inventory.GSTRate = GSTRate;
+      inventory.saleSGST = saleSGST;
+      inventory.saleCGST = saleCGST;
+      inventory.saleIGST = saleIGST;
+      inventory.purchaseSGST = purchaseSGST;
+      inventory.purchaseCGST = purchaseCGST;
+      inventory.purchaseIGST = purchaseIGST;
+      inventory.condition = condition;
+      inventory.baseSellingPrice = baseSellingPrice;
+      inventory.basePurchasePrice = basePurchasePrice;
+      inventory.sellerName = sellerName;
+      inventory.available = available;
+  
+      // Save the updated inventory
+      inventory = await inventory.save();
+      
+    
+  
   res.status(200).json({
     success: true,
     inventory,
   });
+
 });
 
 // Delete Inventory
