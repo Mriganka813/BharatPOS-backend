@@ -83,7 +83,9 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 // Get All Inventory count and search
 exports.getAllInventoriesAndSearch1 = catchAsyncErrors(
   async (req, res, next) => {
+    console.log('rrr');
     const { keyword } = req.query;
+
     const findInventories = await Inventory.find({ ...keyword });
 
     console.log(findInventories);
@@ -91,6 +93,7 @@ exports.getAllInventoriesAndSearch1 = catchAsyncErrors(
 );
 exports.getAllInventoriesAndSearch = catchAsyncErrors(
   async (req, res, next) => {
+    console.log('oooo');
     const resultPerPage = 8;
     const inventoriesCount = await Inventory.countDocuments();
     const key = req.query.keyword
@@ -101,6 +104,7 @@ exports.getAllInventoriesAndSearch = catchAsyncErrors(
           },
         }
       : {};
+
 
     const InventoriesRes = await Inventory.find({ ...key });
 
@@ -165,21 +169,54 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-exports.getInventoryForUser = catchAsyncErrors(async (req, res, next) => {
+// const Inventory = require('./path-to-inventory-model'); // Make sure to provide the correct path to your Inventory model
+
+
+exports.getInventoryForUser = catchAsyncErrors(async (req, res) => {
   const page = parseInt(req.query.page) || 1; // Current page number
   const limit = parseInt(req.query.limit) || 20; // Number of results per page
+  const startIndex = (page - 1) * limit;
+  console.log(req.query);
+  // Use a regular expression for a flexible search
+  const keywordRegex = new RegExp(req.query.keyword, 'i');
 
+  // Use the find method with a regular expression for a flexible search and chaining for pagination
+  const inventories = await Inventory.find({ user: req.user._id, name: keywordRegex })
+    .skip(startIndex)
+    .limit(limit);
+
+  // You might want to separately query for the total count without pagination
+  const totalCount = await Inventory.countDocuments({ user: req.user._id, name: keywordRegex });
+
+  res.status(200).json({
+    success: true,
+    page,
+    count: inventories.length,
+    totalCount,
+    inventories,
+  });
+});
+
+
+
+exports.getInventoryForUser0 = catchAsyncErrors(async (req, res, next) => {
+  const page = parseInt(req.query.page) || 1; // Current page number
+  const limit = parseInt(req.query.limit) || 20; // Number of results per page
+  
   const startIndex = (page - 1) * limit;
 
   const query = Inventory.find({ user: req.user._id });
 
+
+  console.log(req.query);
   // Apply search filters if required
   const ApiFeature = new ApiFeatures(query, req.query).search();
-
+ 
   // Apply pagination
   ApiFeature.query = ApiFeature.query.skip(startIndex).limit(limit);
 
   const inventories = await ApiFeature.query;
+  
 
   res.status(200).json({
     success: true,
@@ -422,30 +459,3 @@ exports.availablility = catchAsyncErrors(async (req, res, next) => {
     data: product,
   });
 });
-
-// exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
-//   try {
-
-//     const filePath = req.file.path;
-//     if (!req.file) {
-//       return res.status(400).json({ error: 'No file found' });
-//     }
-
-//     // Read the uploaded Excel file
-//     const workbook = XLSX.readFile(req.file.path);
-//     const worksheet = workbook.Sheets[workbook.SheetNames[0]];
-
-//     // Extract data from the sheet
-//     const data = XLSX.utils.sheet_to_json(worksheet);
-
-//     // Process the data and save it to the MongoDB database
-//     const inventory = await Inventory.insertMany(data);
-
-//     // Send a response
-//     res.status(200).json({ success: true, inventory, message: 'Data uploaded successfully' });
-//   } catch (err) {
-//     // Handle errors
-//     console.error(err);
-//     res.status(500).json({ error: 'An error occurred' });
-//   }
-// });

@@ -17,7 +17,9 @@ class ApiFeatures {
     this.query = this.query.find({
       ...keyword,
     });
-    // console.log(keyword);
+    console.log(keyword);
+    // console.log(this.query);
+
     return this;
   }
 

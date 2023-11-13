@@ -279,6 +279,7 @@ exports.loginUser = catchAsyncErrors(async (req, res, next) => {
   }
 
   const user = await User.findOne({ email }).select("+password");
+  // console.log(user._id);
 
   if (!user) {
     console.log("wrong password");
