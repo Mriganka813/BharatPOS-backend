@@ -22,8 +22,6 @@ const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
       const product = await Inventory.findById(item.product);
       // console.log(product);
       product.quantity = product.quantity-item.quantity
-
-
       await product.save()
       
     }

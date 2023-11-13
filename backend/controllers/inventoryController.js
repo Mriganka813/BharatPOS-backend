@@ -32,6 +32,13 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   }
   console.log(seller.businessName);
 
+  if(quantity>99999){
+    return res.send({
+      success:false,
+      msg:"qty cant be 99999 or more"
+    })
+  }
+
   if (
     req.body.quantity == undefined ||
     req.body.quantity === null ||
@@ -285,6 +292,21 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     sellerName,
     available
   } = req.body;
+
+  if(quantity<1){
+    return res.send({
+      success:false,
+      msg:"QTY cant be 0 or less"
+    })
+  }
+
+
+  if(quantity>99999){
+    return res.send({
+      success:false,
+      msg:"qty cant be 99999 or more"
+    })
+  }
   // const {barCode} = req.body
   let inventory = await Inventory.findById(req.params.id);
   if (!inventory) {
