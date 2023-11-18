@@ -1,5 +1,5 @@
 const Inventory = require("../models/inventoryModel");
-var XLSX = require("xlsx");
+const XLSX = require("xlsx");
 const path = require("path");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
@@ -8,10 +8,12 @@ const upload = require("../services/upload");
 const ApiFeatures = require("../utils/apiFeatures");
 const { uploadImage } = require("../services/upload");
 const User = require("../models/userModel");
+
+// Find Inventory by Barcode
 exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
   const barcode = req.params.code;
   const user = req.user._id;
-  const inventory = await Inventory.findOne({ barCode: barcode,user });
+  const inventory = await Inventory.findOne({ barCode: barcode, user });
   res.status(200).json({
     success: true,
     inventory,
@@ -20,23 +22,35 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
 
 // Create Inventory
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
-  const { barCode } = req.body;
+  const { barCode, quantity } = req.body;
   const userDetail = req.user._id;
-  console.log(barCode,'barcode');
-  console.log(barCode.length,'barcode size');
+
+
+  // Check if quantity is undefined
+  if (quantity === undefined || quantity === null || quantity === "") {
+    console.log("Undefined quantity, setting it to 99999");
+    req.body.quantity = 99999;
+  }
+
+  // Check if quantity exceeds 99999
+  if (quantity > 99999) {
+    return res.status(400).json({
+      success: false,
+      msg: "Quantity cannot be 99999 or more",
+    });
+  }
 
   const seller = await User.findById(userDetail);
-  let discount=0
-  if(seller.discount || seller.discount>=0){
-    discount = seller.discount
+  let discount = 0;
+  if (seller.discount || seller.discount >= 0) {
+    discount = seller.discount;
   }
-  console.log(seller.businessName);
 
-  if(quantity>99999){
+  if (quantity > 99999) {
     return res.send({
-      success:false,
-      msg:"qty cant be 99999 or more"
-    })
+      success: false,
+      msg: "Quantity cannot be 99999 or more",
+    });
   }
 
   if (
@@ -44,41 +58,35 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     req.body.quantity === null ||
     req.body.quantity == ""
   ) {
-    console.log("undefine qty");
+    console.log("undefined qty");
     req.body.quantity = 99999;
   }
-  /// if has image, then create and save on cloudinary
 
-  // console.log(req.files)
   if (req.files?.image) {
-    // console.log("image");
     const result = await uploadImage(req.files.image);
     req.body.image = result.url;
-    // console.log(req.body.image);
   }
+
   req.body.user = userDetail;
-  console.log(req.body.barcode);
-  // Check if barcode is unique to that particular user
-  if (barCode !== undefined && barCode !== "" && barCode.length !== 0  ) {
-    console.log('barcoed isTrue');
+
+  if (barCode !== undefined && barCode !== "" && barCode.length !== 0) {
     const existingInventory = await Inventory.findOne({
       barCode: barCode,
       user: req.user._id,
     });
-    if(existingInventory){
-      console.log('barcode exist');
-      return res.send({success:false,msg:'Product with this barcode already exists'})
+
+    if (existingInventory) {
+      return res.status(400).json({
+        success: false,
+        msg: "Product with this barcode already exists",
+      });
     }
-    // if (!lodash.isEmpty(existingInventory)) {
-    //   return next(
-    //     new ErrorHandler("Product with this barcode already exists ", 400)
-    //   );
-    // }
   }
+
   const inventory = await Inventory.create({
     ...req.body,
     sellerName: seller.businessName,
-    discount
+    discount,
   });
 
   res.status(201).json({
@@ -88,84 +96,78 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 });
 
 // Get All Inventory count and search
-exports.getAllInventoriesAndSearch1 = catchAsyncErrors(
-  async (req, res, next) => {
-    console.log('rrr');
-    const { keyword } = req.query;
+exports.getAllInventoriesAndSearch1 = catchAsyncErrors(async (req, res, next) => {
+  console.log('rrr');
+  const { keyword } = req.query;
 
-    const findInventories = await Inventory.find({ ...keyword });
+  const findInventories = await Inventory.find({ ...keyword });
 
-    console.log(findInventories);
-  }
-);
-exports.getAllInventoriesAndSearch = catchAsyncErrors(
-  async (req, res, next) => {
-    console.log('oooo');
-    const resultPerPage = 8;
-    const inventoriesCount = await Inventory.countDocuments();
-    const key = req.query.keyword
-      ? {
-          name: {
-            $regex: req.query.keyword,
-            $options: "i",
-          },
-        }
-      : {};
+  console.log(findInventories);
+});
 
+exports.getAllInventoriesAndSearch = catchAsyncErrors(async (req, res, next) => {
+  console.log('oooo');
+  const resultPerPage = 8;
+  const inventoriesCount = await Inventory.countDocuments();
+  const key = req.query.keyword
+    ? {
+        name: {
+          $regex: req.query.keyword,
+          $options: "i",
+        },
+      }
+    : {};
 
-    const InventoriesRes = await Inventory.find({ ...key });
+  const InventoriesRes = await Inventory.find({ ...key });
 
-    const queryCopy = { ...req.query };
+  const queryCopy = { ...req.query };
 
-    const removeFields = ["keyword", "page", "limit"];
+  const removeFields = ["keyword", "page", "limit"];
 
-    removeFields.forEach((key) => delete queryCopy[key]);
+  removeFields.forEach((key) => delete queryCopy[key]);
 
-    let queryStr = JSON.stringify(queryCopy);
-    queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
+  let queryStr = JSON.stringify(queryCopy);
+  queryStr = queryStr.replace(/\b(gt|gte|lt|lte)\b/g, (key) => `$${key}`);
 
-    let filteredInventories = await Inventory.find(JSON.parse(queryStr));
+  let filteredInventories = await Inventory.find(JSON.parse(queryStr));
 
-    let filteredInventoriesCount = InventoriesRes.length;
-    const currentPage = Number(req.query.page) || 1;
-    const skip = resultPerPage * (currentPage - 1);
-    let InventoriesPage = await Inventory.find()
-      .limit(resultPerPage)
-      .skip(skip);
+  let filteredInventoriesCount = InventoriesRes.length;
+  const currentPage = Number(req.query.page) || 1;
+  const skip = resultPerPage * (currentPage - 1);
+  let InventoriesPage = await Inventory.find()
+    .limit(resultPerPage)
+    .skip(skip);
 
-    res.status(200).json({
-      success: true,
-      InventoriesRes,
-      inventoriesCount,
-      resultPerPage,
-      filteredInventoriesCount,
-      filteredInventories,
-      InventoriesPage,
-    });
-  }
-);
+  res.status(200).json({
+    success: true,
+    InventoriesRes,
+    inventoriesCount,
+    resultPerPage,
+    filteredInventoriesCount,
+    filteredInventories,
+    InventoriesPage,
+  });
+});
 
-// get all inventries and search
-exports.getAllInventorieswithSearch = catchAsyncErrors(
-  async (req, res, next) => {
-    const ApiFeature = new ApiFeatures(
-      Inventory.find().populate("user", [
-        "phoneNumber",
-        "email",
-        "address",
-        "businessName",
-      ]),
-      req.query
-    )
-      .pagination(10)
-      .search();
-    const inventories = await ApiFeature.query;
-    res.status(200).json({
-      success: true,
-      inventories,
-    });
-  }
-);
+// get all inventories and search
+exports.getAllInventorieswithSearch = catchAsyncErrors(async (req, res, next) => {
+  const ApiFeature = new ApiFeatures(
+    Inventory.find().populate("user", [
+      "phoneNumber",
+      "email",
+      "address",
+      "businessName",
+    ]),
+    req.query
+  )
+    .pagination(10)
+    .search();
+  const inventories = await ApiFeature.query;
+  res.status(200).json({
+    success: true,
+    inventories,
+  });
+});
 
 // Get All Inventory
 exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
@@ -175,9 +177,6 @@ exports.getAllInventories = catchAsyncErrors(async (req, res, next) => {
     Inventories,
   });
 });
-
-// const Inventory = require('./path-to-inventory-model'); // Make sure to provide the correct path to your Inventory model
-
 
 exports.getInventoryForUser = catchAsyncErrors(async (req, res) => {
   const page = parseInt(req.query.page) || 1; // Current page number
@@ -204,8 +203,6 @@ exports.getInventoryForUser = catchAsyncErrors(async (req, res) => {
   });
 });
 
-
-
 exports.getInventoryForUser0 = catchAsyncErrors(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1; // Current page number
   const limit = parseInt(req.query.limit) || 20; // Number of results per page
@@ -213,7 +210,6 @@ exports.getInventoryForUser0 = catchAsyncErrors(async (req, res, next) => {
   const startIndex = (page - 1) * limit;
 
   const query = Inventory.find({ user: req.user._id });
-
 
   console.log(req.query);
   // Apply search filters if required
@@ -224,7 +220,6 @@ exports.getInventoryForUser0 = catchAsyncErrors(async (req, res, next) => {
 
   const inventories = await ApiFeature.query;
   
-
   res.status(200).json({
     success: true,
     page,
@@ -271,7 +266,6 @@ exports.incrementQuantity = catchAsyncErrors(async (id, quantity) => {
 
 // Update Inventory
 exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
-
   const {
     name,
     purchasePrice,
@@ -300,14 +294,13 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     })
   }
 
-
   if(quantity>99999){
     return res.send({
       success:false,
       msg:"qty cant be 99999 or more"
     })
   }
-  // const {barCode} = req.body
+  
   let inventory = await Inventory.findById(req.params.id);
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
@@ -321,56 +314,45 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
       return next(new ErrorHandler("Error uploading image", 500));
     }
   }
-  // console.log(req.body);
+
   if(barCode != inventory.barCode){
-  if (  barCode !== undefined && barCode !== "" && barCode.length !== 0 ) {
-    const existingInventory = await Inventory.findOne({
-      barCode: req.body.barCode,
-      user: req.user._id,
-    });
-    console.log(existingInventory);
-    if (!lodash.isEmpty(existingInventory)) {
-      return next(
-        // console.log('Product with this barcode already exists')
-        new ErrorHandler("Product with this barcode already exists ", 400)
+    if (barCode !== undefined && barCode !== "" && barCode.length !== 0 ) {
+      const existingInventory = await Inventory.findOne({
+        barCode: req.body.barCode,
+        user: req.user._id,
+      });
+      if (!lodash.isEmpty(existingInventory)) {
+        return next(
+          new ErrorHandler("Product with this barcode already exists ", 400)
         );
       }
     }
   }
-    console.log(req.params.id);
     
-      
-      
-      console.log(inventory);
+  inventory.name = name;
+  inventory.purchasePrice = purchasePrice;
+  inventory.sellingPrice = sellingPrice;
+  inventory.barCode = barCode;
+  inventory.quantity = quantity;
+  inventory.GSTRate = GSTRate;
+  inventory.saleSGST = saleSGST;
+  inventory.saleCGST = saleCGST;
+  inventory.saleIGST = saleIGST;
+  inventory.purchaseSGST = purchaseSGST;
+  inventory.purchaseCGST = purchaseCGST;
+  inventory.purchaseIGST = purchaseIGST;
+  inventory.condition = condition;
+  inventory.baseSellingPrice = baseSellingPrice;
+  inventory.basePurchasePrice = basePurchasePrice;
+  inventory.sellerName = sellerName;
+  inventory.available = available;
 
-      inventory.name = name;
-      inventory.purchasePrice = purchasePrice;
-      inventory.sellingPrice = sellingPrice;
-      inventory.barCode = barCode;
-      inventory.quantity = quantity;
-      inventory.GSTRate = GSTRate;
-      inventory.saleSGST = saleSGST;
-      inventory.saleCGST = saleCGST;
-      inventory.saleIGST = saleIGST;
-      inventory.purchaseSGST = purchaseSGST;
-      inventory.purchaseCGST = purchaseCGST;
-      inventory.purchaseIGST = purchaseIGST;
-      inventory.condition = condition;
-      inventory.baseSellingPrice = baseSellingPrice;
-      inventory.basePurchasePrice = basePurchasePrice;
-      inventory.sellerName = sellerName;
-      inventory.available = available;
-  
-      // Save the updated inventory
-      inventory = await inventory.save();
-      
+  inventory = await inventory.save();
     
-  
   res.status(200).json({
     success: true,
     inventory,
   });
-
 });
 
 // Delete Inventory
@@ -394,15 +376,11 @@ exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
     }
     const filePath = req.file.path;
 
-    // Get field names from the first row of the sheet
-
-    // Read the uploaded Excel file
     const workbook = XLSX.readFile(filePath);
     const sheet = workbook.Sheets[workbook.SheetNames[0]];
     const jsonData = XLSX.utils.sheet_to_json(sheet);
 
     const fieldNames = Object.keys(jsonData[0]);
-    // Create an array of user documents
     const inventoryData = jsonData.map((data) => {
       const user = {};
       fieldNames.forEach((fieldName) => {
@@ -415,23 +393,19 @@ exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
 
     await Inventory.insertMany(users, { timeout: 30000 });
 
-    // Delete the file
     fs.unlinkSync(filePath);
 
-    // Send a response
     res.status(200).json({
       success: true,
       inventory,
       message: "Data uploaded successfully",
     });
   } catch (err) {
-    // Handle errors
     console.error(err);
     res.status(500).json({ error: "An error occurred" });
   }
 });
 
-// Update existing inventories
 exports.updateExistingInventories = catchAsyncErrors(async (req, res, next) => {
   const inventoriesToUpdate = await Inventory.find({ quantity: 1 });
 
@@ -443,6 +417,7 @@ exports.updateExistingInventories = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     message: "Existing inventories updated successfully",
+
   });
 });
 

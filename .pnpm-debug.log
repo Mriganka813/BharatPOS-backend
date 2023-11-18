@@ -7,7 +7,7 @@
     "errno": "ENOENT",
     "syscall": "spawn",
     "file": "sh",
-    "pkgid": "inventory@1.0.0",
+    "pkgid": "@1.0.0",
     "stage": "dev",
     "script": "nodemon backend/server.js",
     "pkgname": "inventory",
