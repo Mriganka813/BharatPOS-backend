@@ -126,9 +126,9 @@ const inventorySchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    hsn: {
-      type: String,
-    },
+    // hsn: {
+    //   type: String,
+    // },
   },
   { timestamps: true }
 );
