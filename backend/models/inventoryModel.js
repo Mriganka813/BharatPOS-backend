@@ -126,7 +126,7 @@ const inventorySchema = mongoose.Schema(
       type: Boolean,
       default: true,
     },
-    hsn:{
+    hsn: {
       type: String,
     },
   },
