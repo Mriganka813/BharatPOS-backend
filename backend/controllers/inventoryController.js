@@ -284,7 +284,8 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     baseSellingPrice,
     basePurchasePrice,
     sellerName,
-    available
+    available,
+    expiryDate,
   } = req.body;
 
   if(quantity<1){
@@ -346,6 +347,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   inventory.basePurchasePrice = basePurchasePrice;
   inventory.sellerName = sellerName;
   inventory.available = available;
+  inventory.expiryDate = expiryDate;
 
   inventory = await inventory.save();
     
