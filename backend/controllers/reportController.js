@@ -10,7 +10,6 @@ const User = require("../models/userModel");
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
 
-  
   const user = req.user._id;
   if (!type) {
     res.status(404).json({
