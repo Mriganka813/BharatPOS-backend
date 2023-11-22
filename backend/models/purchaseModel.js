@@ -38,6 +38,12 @@ const purchaseSchema = new mongoose.Schema({
       basePurchasePrice: {
         type: Number,
       },
+      hsn:{
+        typeLString
+      },
+      discountAmt:{
+        type:Number
+      }
     },
   ],
   total: {
@@ -69,6 +75,12 @@ const purchaseSchema = new mongoose.Schema({
     type: String,
     // default: Date.now,
   },
+  businessName:{
+    type:String
+  },
+  businessGST:{
+    type:String
+  }
 });
 
 module.exports = mongoose.model("PurchaseModel", purchaseSchema);

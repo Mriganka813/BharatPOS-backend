@@ -31,6 +31,12 @@ const salesSchema = new mongoose.Schema({
       },
       saleIGST:{
         type: Number
+      },
+      hsn:{
+        typeLString
+      },
+      discountAmt:{
+        type:Number
       }
     },
   ],
