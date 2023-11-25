@@ -37,6 +37,9 @@ const salesSchema = new mongoose.Schema({
       },
       discountAmt:{
         type:Number
+      },
+      originalbaseSellingPrice:{
+        type: Number
       }
     },
   ],
