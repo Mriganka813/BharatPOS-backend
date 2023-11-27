@@ -273,6 +273,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     barCode,
     quantity,
     id,
+    GSTincluded,
     GSTRate,
     saleSGST,
     saleCGST,
@@ -350,6 +351,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   inventory.available = available;
   inventory.expiryDate = expiryDate;
   inventory.hsn = hsn;
+  inventory.GSTincluded = GSTincluded;
 
   inventory = await inventory.save();
     
