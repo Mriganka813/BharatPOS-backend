@@ -59,6 +59,9 @@ const inventorySchema = mongoose.Schema(
       maxLength: [7, "Stock cannot exceed 4 characters"],
       default: 1,
     },
+    GSTincluded: {
+      type: Boolean,
+    },
     GSTRate: {
       type: Number,
       maxLength: [5, "GST Rate cannot exceed 5 characters"],
