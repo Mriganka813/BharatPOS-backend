@@ -130,7 +130,6 @@ async function updateStock(id, quantity) {
 }
 
 
-
 // delete Order -- Admin
 exports.deleteSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const salesOrder = await SalesOrder.findById(req.params.id);
@@ -212,4 +211,44 @@ exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
     .catch((err) => {
       ErrorHandler(err);
     });
+});
+const SalesReturn = require("../models/SalesReturnModel"); // Import the SalesReturn model
+
+exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
+  console.log('Sales Return');
+  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName } = req.body;
+  
+  const indiaTime = moment.tz('Asia/Kolkata');
+  const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
+ 
+  for (const item of orderItems) {
+    const product = await Inventory.findById(item.product);
+    product.quantity = product.quantity + item.quantity; // Increase the quantity for returned items
+    await product.save();
+  }
+  
+  try {
+    const total = calcTotalAmount(orderItems);
+
+    const salesReturn = await SalesReturn.create({ // Use the SalesReturn model here
+      orderItems,
+      party,
+      modeOfPayment,
+      total,
+      user: req.user._id,
+      createdAt: currentDateTimeInIndia,
+      invoiceNum,
+      reciverName,
+      businessName,
+      gst
+    });
+
+    console.log(salesReturn);
+    res.status(201).json({
+      success: true,
+      salesReturn,
+    });
+  } catch (err) {
+    return next(new ErrorHandler("Could not process return", 403));
+  }
 });

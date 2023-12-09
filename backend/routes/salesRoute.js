@@ -7,6 +7,7 @@ const {
   deleteSalesOrder,
   getCreditSaleOrders,
   UpdateSalesOrder,
+  salesReturn,
 } = require("../controllers/salesController");
 const cntlr = require("../controllers/salesController");
 const router = express.Router();
@@ -53,3 +54,7 @@ router
   .route("/upd/salesOrder/:id")
   .put(isAuthenticatedUser,  UpdateSalesOrder);
 module.exports = router;
+
+router
+  .route("/salesOrder/return")
+  .post(isAuthenticatedUser, salesReturn);
