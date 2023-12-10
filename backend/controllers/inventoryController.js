@@ -462,3 +462,49 @@ exports.availablility = catchAsyncErrors(async (req, res, next) => {
     data: product,
   });
 });
+
+// Get items expiring within a specified number of days for a specific user
+exports.getExpiringItemsForUser = async (req, res, next) => {
+  const { days, userId } = req.params;  // Get the user ID from the parameters
+
+  // Calculate the date range
+  const currentDate = new Date();
+  currentDate.setHours(0, 0, 0, 0); // set the time to 00:00:00
+  const expiryDateRange = new Date();
+  expiryDateRange.setDate(currentDate.getDate() + parseInt(days));
+  expiryDateRange.setHours(23, 59, 59, 999); // set the time to 23:59:59
+
+  try {
+    // Find items for the specific user with expiry dates within the range
+    const expiringItems = await Inventory.find({
+      user: userId,
+      expiryDate: {
+        $gte: currentDate,
+        $lte: expiryDateRange,
+      },
+    });
+
+    // If no items found, send a message to the user
+    if (!expiringItems.length) {
+      return res.status(200).json({
+        success: true,
+        message: 'No items expiring within the specified days.',
+      });
+    }
+
+    // If items found, send them to the user
+    res.status(200).json({
+      success: true,
+      expiringItems,
+    });
+  } catch (error) {
+    // Handle any errors that might occur during the database query
+    console.error("Error fetching expiring items:", error);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
+

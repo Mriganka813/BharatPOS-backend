@@ -11,6 +11,7 @@ const {
 } = require("../controllers/salesController");
 const cntlr = require("../controllers/salesController");
 const router = express.Router();
+const expiringItemsController = require("../controllers/inventoryController");
 
 const cntrl = require("../controllers/salesController");
 const {
@@ -58,3 +59,11 @@ module.exports = router;
 router
   .route("/salesOrder/return")
   .post(isAuthenticatedUser, salesReturn);
+
+  router
+  .route("/inventory/:userId/expiring/:days")
+  .get(expiringItemsController.getExpiringItemsForUser);
+
+
+module.exports = router;
+
