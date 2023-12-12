@@ -463,9 +463,11 @@ exports.availablility = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
-// Get items expiring within a specified number of days for a specific user
 exports.getExpiringItemsForUser = async (req, res, next) => {
   const { days, userId } = req.params;  // Get the user ID from the parameters
+  const page = parseInt(req.query.page) || 1; // Current page number
+  const limit = parseInt(req.query.limit) || 20; // Number of results per page
+  const startIndex = (page - 1) * limit;
 
   // Calculate the date range
   const currentDate = new Date();
@@ -482,7 +484,9 @@ exports.getExpiringItemsForUser = async (req, res, next) => {
         $gte: currentDate,
         $lte: expiryDateRange,
       },
-    });
+    })
+    .skip(startIndex)
+    .limit(limit);
 
     // If no items found, send a message to the user
     if (!expiringItems.length) {
@@ -492,9 +496,11 @@ exports.getExpiringItemsForUser = async (req, res, next) => {
       });
     }
 
-    // If items found, send them to the user
+    // If items found, send them to the user along with pagination details
     res.status(200).json({
       success: true,
+      page,
+      count: expiringItems.length,
       expiringItems,
     });
   } catch (error) {
