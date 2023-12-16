@@ -6,6 +6,7 @@ const SalesModel = require("../models/salesModel");
 const InventoryModel = require("../models/inventoryModel");
 const PartyModel = require("../models/partyModel");
 const User = require("../models/userModel");
+const SalesReturnModel = require("../models/SalesReturnModel")
 // to get report of user sales , purchase and expense between starting date and end date
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
@@ -69,6 +70,25 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       expense,
     });
   }
+  if (type === "sale return") {
+    const sales = await SalesReturnModel.find({
+      createdAt: { $gte: start_date, $lte: end_date },
+      user: user,
+    }).populate([
+      {
+        path: "orderItems",
+        populate: { path: "product", model: InventoryModel },
+      },
+      "party",
+      { path: "user", select: "taxFile" },
+    ]);
+  
+    console.log(sales);
+    res.status(200).json({
+      success: true,
+      sales,
+    });
+  }
   
   if (type === "report") {
     // return item names , stock quantity and stock value
@@ -82,3 +102,4 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     });
   }
 });
+
