@@ -1,5 +1,16 @@
 const mongoose = require("mongoose");
 
+const subProductSchema = new mongoose.Schema({
+  inventoryId: {
+    type: mongoose.Schema.ObjectId,
+    required: true,
+  },
+  quantity: {
+    type: Number,
+    required: true,
+  },
+});
+
 const inventorySchema = mongoose.Schema(
   {
     name: {
@@ -8,7 +19,7 @@ const inventorySchema = mongoose.Schema(
       trim: true,
       // unique: true,
     },
-    discount:{
+    discount: {
       type: Number
     },
     description: {
@@ -59,6 +70,12 @@ const inventorySchema = mongoose.Schema(
       maxLength: [7, "Stock cannot exceed 4 characters"],
       default: 1,
     },
+
+    subProducts: {
+      type: [subProductSchema],
+      required: false,
+    },
+
     GSTincluded: {
       type: Boolean,
     },
@@ -115,7 +132,7 @@ const inventorySchema = mongoose.Schema(
     sellerName: {
       type: String,
     },
-    batchNumber:{
+    batchNumber: {
       type: String
     },
     expiryDate: {

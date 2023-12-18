@@ -23,8 +23,8 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
 // Create Inventory
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const { barCode, quantity } = req.body;
+  
   const userDetail = req.user._id;
-
 
   // Check if quantity is undefined
   if (quantity === undefined || quantity === null || quantity === "") {
@@ -44,13 +44,6 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   let discount = 0;
   if (seller.discount || seller.discount >= 0) {
     discount = seller.discount;
-  }
-
-  if (quantity > 99999) {
-    return res.send({
-      success: false,
-      msg: "Quantity cannot be 99999 or more",
-    });
   }
 
   if (
@@ -86,14 +79,15 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const inventory = await Inventory.create({
     ...req.body,
     sellerName: seller.businessName,
-    discount,
+    discount
   });
 
   res.status(201).json({
     success: true,
-    inventory,
+    inventory
   });
 });
+
 
 // Get All Inventory count and search
 exports.getAllInventoriesAndSearch1 = catchAsyncErrors(async (req, res, next) => {

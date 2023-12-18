@@ -7,55 +7,61 @@ const moment = require('moment-timezone');
 
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  console.log('new Sales');
-  const { orderItems,discount, modeOfPayment, party,invoiceNum,reciverName,gst,businessName, } = req.body;
-  
+  const { orderItems, discount, modeOfPayment, party, invoiceNum, reciverName, gst, businessName } = req.body;
   const indiaTime = moment.tz('Asia/Kolkata');
+  const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
 
-   
-  // console.log(orderItems);
-
-// Get the current date and time in the India timezone
-const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
- 
   for (const item of orderItems) {
       const product = await Inventory.findById(item.product);
-      // console.log(product);
-      product.quantity = product.quantity-item.quantity
-      await product.save()
-      
-    }
+      if (!product) {
+          return next(new ErrorHandler("Product not found", 404));
+      }
+
+      // Reduce main product quantity
+      product.quantity -= item.quantity;
+      await product.save();
+
+      // Reduce subproduct quantities
+      if (product.subProducts && product.subProducts.length > 0) {
+          for (const subProduct of product.subProducts) {
+              const subProductItem = await Inventory.findById(subProduct.inventoryId);
+              if (subProductItem) {
+                  subProductItem.quantity -= subProduct.quantity;
+                  await subProductItem.save();
+              }
+          }
+      }
+  }
+
   try {
-    const total = calcTotalAmount(orderItems);
+      const total = calcTotalAmount(orderItems);
 
-    const salesOrder = await SalesOrder.create({
-      orderItems,
-      party,
-      modeOfPayment,
-      total,
-      user: req.user._id,
-      createdAt:currentDateTimeInIndia,
-      invoiceNum,
-      reciverName,
-      businessName,
-      gst
+      const salesOrder = await SalesOrder.create({
+          orderItems,
+          party,
+          modeOfPayment,
+          total,
+          user: req.user._id,
+          createdAt: currentDateTimeInIndia,
+          invoiceNum,
+          reciverName,
+          businessName,
+          gst
+      });
 
-    });
-
-    console.log(salesOrder);
-    res.status(201).json({
-      success: true,
-      salesOrder,
-    });
+      res.status(201).json({
+          success: true,
+          salesOrder,
+      });
   } catch (err) {
-    return next(new ErrorHandler("Could not create order", 403));
+      return next(new ErrorHandler("Could not create order", 403));
   }
 });
 
 const calcTotalAmount = (orderItems) => {
   let total = 0;
   for (const item of orderItems) {
-    total += item.price * item.quantity;
+      total += item.price * item.quantity;
   }
   return total;
 };
@@ -163,11 +169,14 @@ exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
 exports.addCreditSettleTransaction = catchAsyncErrors(
   async (req, res, next) => {
     const partyId = req.params.id;
+    const indiaTime = moment.tz('Asia/Kolkata');
+    const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
     const { amount, modeOfPayment } = req.body;
     const order = {
       party: partyId,
       total: amount,
       user: req.user._id,
+      createdAt: currentDateTimeInIndia,
       modeOfPayment: modeOfPayment,
       orderItems: [],
     };
@@ -185,14 +194,20 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
     party: id,
     modeOfPayment: { $in: ["Credit", "Settle"] },
   }).sort({ createdAt: -1 });
+
+  // Print the retrieved data for debugging
+  console.log("Retrieved Sales Order Data:", data);
+
   if (!data) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
+
   res.status(200).json({
     success: true,
     data,
   });
 });
+
 
 exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const data = await SalesOrder.findByIdAndUpdate(
@@ -220,35 +235,52 @@ exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
   
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
- 
+
   for (const item of orderItems) {
-    const product = await Inventory.findById(item.product);
-    product.quantity = product.quantity + item.quantity; // Increase the quantity for returned items
-    await product.save();
+      const product = await Inventory.findById(item.product);
+      if (!product) {
+          return next(new ErrorHandler("Product not found", 404));
+      }
+
+      // Increase main product quantity
+      product.quantity += item.quantity;
+      
+      // Increase subproduct quantities
+      if (product.subProducts && product.subProducts.length > 0) {
+          for (const subProduct of product.subProducts) {
+              const subProductItem = await Inventory.findById(subProduct.inventoryId);
+              if (subProductItem) {
+                  subProductItem.quantity += subProduct.quantity;
+                  await subProductItem.save();
+              }
+          }
+      }
+
+      await product.save();
   }
-  
+
   try {
-    const total = calcTotalAmount(orderItems);
+      const total = calcTotalAmount(orderItems);
 
-    const salesReturn = await SalesReturn.create({ // Use the SalesReturn model here
-      orderItems,
-      party,
-      modeOfPayment,
-      total,
-      user: req.user._id,
-      createdAt: currentDateTimeInIndia,
-      invoiceNum,
-      reciverName,
-      businessName,
-      gst
-    });
+      const salesReturn = await SalesReturn.create({
+          orderItems,
+          party,
+          modeOfPayment,
+          total,
+          user: req.user._id,
+          createdAt: currentDateTimeInIndia,
+          invoiceNum,
+          reciverName,
+          businessName,
+          gst
+      });
 
-    console.log(salesReturn);
-    res.status(201).json({
-      success: true,
-      salesReturn,
-    });
+      console.log(salesReturn);
+      res.status(201).json({
+          success: true,
+          salesReturn,
+      });
   } catch (err) {
-    return next(new ErrorHandler("Could not process return", 403));
+      return next(new ErrorHandler("Could not process return", 403));
   }
 });
