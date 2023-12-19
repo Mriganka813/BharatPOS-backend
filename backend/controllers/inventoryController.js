@@ -266,6 +266,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     sellingPrice,
     barCode,
     quantity,
+    subProducts,
     id,
     GSTincluded,
     GSTRate,
@@ -284,20 +285,20 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     hsn,
   } = req.body;
 
-  if(quantity<1){
+  if (quantity < 1) {
     return res.send({
-      success:false,
-      msg:"QTY cant be 0 or less"
+      success: false,
+      msg: "QTY cant be 0 or less"
     })
   }
 
-  if(quantity>99999){
+  if (quantity > 99999) {
     return res.send({
-      success:false,
-      msg:"qty cant be 99999 or more"
+      success: false,
+      msg: "qty cant be 99999 or more"
     })
   }
-  
+
   let inventory = await Inventory.findById(req.params.id);
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
@@ -312,8 +313,8 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     }
   }
 
-  if(barCode != inventory.barCode){
-    if (barCode !== undefined && barCode !== "" && barCode.length !== 0 ) {
+  if (barCode != inventory.barCode) {
+    if (barCode !== undefined && barCode !== "" && barCode.length !== 0) {
       const existingInventory = await Inventory.findOne({
         barCode: req.body.barCode,
         user: req.user._id,
@@ -325,7 +326,30 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
       }
     }
   }
-    
+
+  // Handle subProducts update
+  if (subProducts && Array.isArray(subProducts)) {
+    subProducts.forEach((subProduct) => {
+      const { inventoryId, quantity: subProductQuantity } = subProduct;
+
+      const existingSubProductIndex = inventory.subProducts.findIndex(
+        (sp) => sp.inventoryId.toString() === inventoryId
+      );
+
+      if (existingSubProductIndex !== -1) {
+        // Update existing subProduct
+        inventory.subProducts[existingSubProductIndex].quantity =
+          subProductQuantity;
+      } else {
+        // Add new subProduct
+        inventory.subProducts.push({
+          inventoryId,
+          quantity: subProductQuantity,
+        });
+      }
+    });
+  }
+
   inventory.name = name;
   inventory.purchasePrice = purchasePrice;
   inventory.sellingPrice = sellingPrice;
@@ -348,12 +372,13 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   inventory.GSTincluded = GSTincluded;
 
   inventory = await inventory.save();
-    
+
   res.status(200).json({
     success: true,
     inventory,
   });
 });
+
 
 // Delete Inventory
 exports.deleteInventory = catchAsyncErrors(async (req, res, next) => {
