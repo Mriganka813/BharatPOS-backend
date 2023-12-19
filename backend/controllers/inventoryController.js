@@ -266,7 +266,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     sellingPrice,
     barCode,
     quantity,
-    id,
+    subProducts,
     GSTincluded,
     GSTRate,
     saleSGST,
@@ -284,24 +284,25 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     hsn,
   } = req.body;
 
-  if(quantity<1){
+  if (quantity < 1) {
     return res.send({
-      success:false,
-      msg:"QTY cant be 0 or less"
-    })
+      success: false,
+      msg: "QTY cant be 0 or less"
+    });
   }
 
-  if(quantity>99999){
+  if (quantity > 99999) {
     return res.send({
-      success:false,
-      msg:"qty cant be 99999 or more"
-    })
+      success: false,
+      msg: "qty cant be 99999 or more"
+    });
   }
-  
+
   let inventory = await Inventory.findById(req.params.id);
   if (!inventory) {
     return next(new ErrorHandler("Inventory not found", 404));
   }
+
   if (req.files?.image) {
     try {
       const result = await uploadImage(req.files.image); // Using uploadImage function
@@ -312,8 +313,8 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     }
   }
 
-  if(barCode != inventory.barCode){
-    if (barCode !== undefined && barCode !== "" && barCode.length !== 0 ) {
+  if (barCode != inventory.barCode) {
+    if (barCode !== undefined && barCode !== "" && barCode.length !== 0) {
       const existingInventory = await Inventory.findOne({
         barCode: req.body.barCode,
         user: req.user._id,
@@ -325,35 +326,69 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
       }
     }
   }
-    
-  inventory.name = name;
-  inventory.purchasePrice = purchasePrice;
-  inventory.sellingPrice = sellingPrice;
-  inventory.barCode = barCode;
-  inventory.quantity = quantity;
-  inventory.GSTRate = GSTRate;
-  inventory.saleSGST = saleSGST;
-  inventory.saleCGST = saleCGST;
-  inventory.saleIGST = saleIGST;
-  inventory.purchaseSGST = purchaseSGST;
-  inventory.purchaseCGST = purchaseCGST;
-  inventory.purchaseIGST = purchaseIGST;
-  inventory.condition = condition;
-  inventory.baseSellingPrice = baseSellingPrice;
-  inventory.basePurchasePrice = basePurchasePrice;
-  inventory.sellerName = sellerName;
-  inventory.available = available;
-  inventory.expiryDate = expiryDate;
-  inventory.hsn = hsn;
-  inventory.GSTincluded = GSTincluded;
 
+  // Update properties only if they are provided in the request
+  const fieldsToUpdate = {
+    name,
+    purchasePrice,
+    sellingPrice,
+    barCode,
+    quantity,
+    GSTRate,
+    saleSGST,
+    saleCGST,
+    saleIGST,
+    purchaseSGST,
+    purchaseCGST,
+    purchaseIGST,
+    condition,
+    baseSellingPrice,
+    basePurchasePrice,
+    sellerName,
+    available,
+    expiryDate,
+    hsn,
+    GSTincluded,
+  };
+
+  Object.keys(fieldsToUpdate).forEach(key => {
+    if (fieldsToUpdate[key] !== undefined) {
+      inventory[key] = fieldsToUpdate[key];
+    }
+  });
+
+  // Handle subProducts update
+  if (subProducts && Array.isArray(subProducts)) {
+    subProducts.forEach((subProduct) => {
+      const { inventoryId, quantity: subProductQuantity } = subProduct;
+
+      const existingSubProductIndex = inventory.subProducts.findIndex(
+        (sp) => sp.inventoryId.toString() === inventoryId
+      );
+
+      if (existingSubProductIndex !== -1) {
+        // Update existing subProduct
+        inventory.subProducts[existingSubProductIndex].quantity = subProductQuantity;
+      } else {
+        // Add new subProduct
+        inventory.subProducts.push({
+          inventoryId,
+          quantity: subProductQuantity,
+        });
+      }
+    });
+  }
+
+  // Save the updated inventory
   inventory = await inventory.save();
-    
+
   res.status(200).json({
     success: true,
     inventory,
   });
 });
+
+
 
 // Delete Inventory
 exports.deleteInventory = catchAsyncErrors(async (req, res, next) => {
@@ -506,5 +541,3 @@ exports.getExpiringItemsForUser = async (req, res, next) => {
     });
   }
 };
-
-
