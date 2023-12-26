@@ -46,12 +46,16 @@ const calcTotalAmount = (orderItems) => {
 //Update Estimate
 exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
-
+    
     const updatedEstimate = await Estimate.findByIdAndUpdate(
         id,
         req.body,
         { new: true, runValidators: true }
     );
+
+    if (!updatedEstimate) {
+        return next(new ErrorHandler("Estimate not found", 404));
+    }
 
     updatedEstimate.total = calcTotalAmount(updatedEstimate.orderItems);
 
@@ -111,6 +115,9 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
         gst,
         invoiceNum
     });
+
+    // Delete the estimate after creating the sales order
+    await Estimate.findByIdAndDelete(estimateId);
 
     res.status(201).json({
         success: true,
