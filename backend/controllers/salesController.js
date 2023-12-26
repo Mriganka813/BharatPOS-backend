@@ -7,7 +7,7 @@ const moment = require('moment-timezone');
 
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, discount, modeOfPayment, party, invoiceNum, reciverName, gst, businessName } = req.body;
+  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress } = req.body;
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
 
@@ -46,6 +46,7 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
           invoiceNum,
           reciverName,
           businessName,
+          businessAddress,
           gst
       });
 
