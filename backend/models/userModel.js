@@ -129,6 +129,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false
     },
+    numSales:{
+      type: Number,
+      default: 0,
+    },
+    numPurchases:{
+      type: Number,
+      default: 0,
+    },
     resetPasswordToken: String,
     resetPasswordExpire: Date,
   },

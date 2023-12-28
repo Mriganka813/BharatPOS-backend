@@ -4,17 +4,19 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
 const moment = require('moment-timezone');
+const User = require("../models/userModel");
+
 // Create new Order
 exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, modeOfPayment, party,invoiceNum } = req.body;
+  const { orderItems, modeOfPayment, party, invoiceNum } = req.body;
 
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
   for (const item of orderItems) {
     if (item.quantity !== null) {
-        inventoryController.incrementQuantity(item.product, item.quantity);
+      inventoryController.incrementQuantity(item.product, item.quantity);
     }
-}
+  }
 
   const total = await calcTotalAmount(orderItems);
   const purchaseOrder = await PurchaseOrder.create({
@@ -24,8 +26,12 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
     total,
     user: req.user._id,
     invoiceNum,
-    createdAt:currentDateTimeInIndia
+    createdAt: currentDateTimeInIndia
   });
+
+  // Increment numSales in User model
+  await User.findByIdAndUpdate(req.user._id, { $inc: { numPurchases: 1 } });
+
   res.status(201).json({
     success: true,
     purchaseOrder,
@@ -122,7 +128,7 @@ async function updateStock(id, quantity) {
   const inventory = await Inventory.findById(id);
 
   if (inventory.Stock !== null) {
-      inventory.Stock -= quantity;
+    inventory.Stock -= quantity;
   }
 
   await inventory.save({ validateBeforeSave: false });
@@ -155,7 +161,13 @@ exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
   const data = await PurchaseOrder.aggregate([
     {
-      $match: { user: user, modeOfPayment: "Credit" },
+      $match: {
+        user: user,
+        $or: [
+          { modeOfPayment: { $elemMatch: { mode: "Credit" } } },
+          { modeOfPayment: "Credit" }
+        ]
+      },
     },
   ]);
   if (!data) {
@@ -194,7 +206,10 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   const data = await PurchaseOrder.find({
     party: id,
-    modeOfPayment: { $in: ["Credit", "Settle"] },
+    $or: [
+      { modeOfPayment: { $elemMatch: { mode: { $in: ["Credit", "Settle"] } } } },
+      { modeOfPayment: { $in: ["Credit", "Settle"] } }
+    ]
   }).sort({ createdAt: -1 });
   if (!data) {
     return next(new ErrorHandler("Order not found with this Id", 404));
@@ -206,15 +221,54 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
 });
 
 exports.updatePurchaseOrders = catchAsyncErrors(async (req, res, next) => {
-  const data = await PurchaseOrder.findByIdAndUpdate( {_id : req.params.id} , req.body).clone()
-  .then(() => {
-    PurchaseOrder.findById(req.params.id).then((data) => {
+  const data = await PurchaseOrder.findByIdAndUpdate({ _id: req.params.id }, req.body).clone()
+    .then(() => {
+      PurchaseOrder.findById(req.params.id).then((data) => {
+        res.status(200).json({
+          success: true,
+          data,
+        });
+      });
+    }).catch(err => {
+      ErrorHandler(err);
+    });
+});
+
+
+//Get number of purchase
+exports.getNumberofPurchases = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 404));
+    }
+    const numPurchases = user.numPurchases;
+
     res.status(200).json({
       success: true,
-      data,
+      numPurchases,
     });
-  });
-  }).catch(err => {
-    ErrorHandler(err);
-  });
+  } catch (err) {
+    return next(new ErrorHandler("Error fetching number of sales", 500));
+  }
+});
+
+//Reset number of purchases
+exports.resetPurchasesCount = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+  const { numPurchases = 0 } = req.body;
+
+  try {
+    await User.findByIdAndUpdate(userId, { $set: { numPurchases } }, { upsert: true });
+
+    res.status(200).json({
+      success: true,
+      message: "Purchases count reset successfully",
+    });
+  } catch (err) {
+    return next(new ErrorHandler("Error resetting purchases count", 500));
+  }
 });

@@ -6,7 +6,9 @@ const SalesModel = require("../models/salesModel");
 const InventoryModel = require("../models/inventoryModel");
 const PartyModel = require("../models/partyModel");
 const User = require("../models/userModel");
+const Estimate = require("../models/estimateModel");
 const SalesReturnModel = require("../models/SalesReturnModel")
+
 // to get report of user sales , purchase and expense between starting date and end date
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
@@ -82,14 +84,14 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       "party",
       { path: "user", select: "taxFile" },
     ]);
-  
+
     console.log(sales);
     res.status(200).json({
       success: true,
       sales,
     });
   }
-  
+
   if (type === "report") {
     // return item names , stock quantity and stock value
     const inventories = await InventoryModel.find({
@@ -101,5 +103,17 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       inventories,
     });
   }
+
+  if (type === "estimate") {
+
+    const estimates = await Estimate.find({ user: req.user._id });
+
+    res.status(200).json({
+      success: true,
+      count: estimates.length,
+      estimates,
+    });
+  }
+
 });
 
