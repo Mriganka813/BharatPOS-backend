@@ -19,9 +19,15 @@ exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
   }
 
   const total = await calcTotalAmount(orderItems);
+
+  // Convert modeOfPayment to an array if it is a string
+  const paymentArray = typeof modeOfPayment === 'string'
+    ? [{ mode: modeOfPayment, amount: total }]
+    : modeOfPayment;
+
   const purchaseOrder = await PurchaseOrder.create({
     orderItems,
-    modeOfPayment,
+    modeOfPayment: paymentArray,
     party,
     total,
     user: req.user._id,

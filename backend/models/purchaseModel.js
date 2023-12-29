@@ -153,6 +153,7 @@ const purchaseSchema = new mongoose.Schema({
     type: Number,
     required: true,
   },
+  
   modeOfPayment: [paymentModeSchema], // Array of payment modes
   
   party: {

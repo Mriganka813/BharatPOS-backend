@@ -37,10 +37,16 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   try {
     const total = calcTotalAmount(orderItems);
 
+    // Convert modeOfPayment to an array if it is a string
+    const paymentArray = typeof modeOfPayment === 'string'
+      ? [{ mode: modeOfPayment, amount: total }]
+      : modeOfPayment;
+
+
     const salesOrder = await SalesOrder.create({
       orderItems,
       party,
-      modeOfPayment,
+      modeOfPayment: paymentArray,
       total,
       user: req.user._id,
       createdAt: currentDateTimeInIndia,

@@ -63,7 +63,7 @@ exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
 //Update Estimate
 exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
     const { id } = req.params;
-    
+
 
     const updatedEstimate = await Estimate.findByIdAndUpdate(
         id,
@@ -120,10 +120,15 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
         }
     }
 
+    // Convert modeOfPayment to an array if it is a string
+    const paymentArray = typeof modeOfPayment === 'string'
+        ? [{ mode: modeOfPayment, amount: total }]
+        : modeOfPayment;
+
     const salesOrder = await SalesOrder.create({
         orderItems,
         party,
-        modeOfPayment,
+        modeOfPayment: paymentArray,
         total,
         user: req.user._id,
         createdAt: moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss'),

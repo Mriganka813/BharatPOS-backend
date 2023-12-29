@@ -23,7 +23,7 @@ exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
 // Create Inventory
 exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   const { barCode, quantity } = req.body;
-  
+
   const userDetail = req.user._id;
 
   // Check if quantity is undefined
@@ -105,11 +105,11 @@ exports.getAllInventoriesAndSearch = catchAsyncErrors(async (req, res, next) => 
   const inventoriesCount = await Inventory.countDocuments();
   const key = req.query.keyword
     ? {
-        name: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
+      name: {
+        $regex: req.query.keyword,
+        $options: "i",
+      },
+    }
     : {};
 
   const InventoriesRes = await Inventory.find({ ...key });
@@ -200,7 +200,7 @@ exports.getInventoryForUser = catchAsyncErrors(async (req, res) => {
 exports.getInventoryForUser0 = catchAsyncErrors(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1; // Current page number
   const limit = parseInt(req.query.limit) || 20; // Number of results per page
-  
+
   const startIndex = (page - 1) * limit;
 
   const query = Inventory.find({ user: req.user._id });
@@ -208,12 +208,12 @@ exports.getInventoryForUser0 = catchAsyncErrors(async (req, res, next) => {
   console.log(req.query);
   // Apply search filters if required
   const ApiFeature = new ApiFeatures(query, req.query).search();
- 
+
   // Apply pagination
   ApiFeature.query = ApiFeature.query.skip(startIndex).limit(limit);
 
   const inventories = await ApiFeature.query;
-  
+
   res.status(200).json({
     success: true,
     page,
@@ -360,7 +360,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
   // Handle subProducts update
   if (subProducts && Array.isArray(subProducts)) {
     subProducts.forEach((subProduct) => {
-      const { inventoryId, quantity: subProductQuantity } = subProduct;
+      const { name: subProductName, inventoryId, quantity: subProductQuantity } = subProduct;
 
       const existingSubProductIndex = inventory.subProducts.findIndex(
         (sp) => sp.inventoryId.toString() === inventoryId
@@ -368,10 +368,16 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
 
       if (existingSubProductIndex !== -1) {
         // Update existing subProduct
-        inventory.subProducts[existingSubProductIndex].quantity = subProductQuantity;
+        if (subProductQuantity) {
+          inventory.subProducts[existingSubProductIndex].quantity = subProductQuantity;
+        }
+        if (subProductName) {
+          inventory.subProducts[existingSubProductIndex].name = subProductName;
+        }
       } else {
         // Add new subProduct
         inventory.subProducts.push({
+          name: subProductName,
           inventoryId,
           quantity: subProductQuantity,
         });
@@ -514,8 +520,8 @@ exports.getExpiringItemsForUser = async (req, res, next) => {
         $lte: expiryDateRange,
       },
     })
-    .skip(startIndex)
-    .limit(limit);
+      .skip(startIndex)
+      .limit(limit);
 
     // If no items found, send a message to the user
     if (!expiringItems.length) {
