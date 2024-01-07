@@ -6,6 +6,12 @@ const inventoryController = require("./inventoryController");
 const User = require("../models/userModel");
 const moment = require('moment-timezone');
 
+function concatenateValues(obj) {
+  const arrNew = Object.values(JSON.parse((JSON.stringify(obj))));
+  const word = arrNew.slice(0, -1).join('');
+  return word;
+}
+
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress } = req.body;
@@ -79,10 +85,14 @@ const calcTotalAmount = (orderItems) => {
 
 // get Single sales Order
 exports.getSingleSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const salesOrder = await SalesOrder.findById(req.params.id).populate(
-    "user",
-    "name email"
-  );
+  const { invoiceNum } = req.params;
+  const salesOrder = await SalesOrder.findOne({ invoiceNum })
+    .populate("user", "name email")
+    .populate({
+      path: 'orderItems.product',
+      model: 'inventory',
+    })
+    .exec();;
 
   if (!salesOrder) {
     return next(new ErrorHandler("Order not found with this Id", 404));
@@ -174,6 +184,15 @@ exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
       },
     },
   ]);
+
+  data.map((value, idx) => {
+    if (!Array.isArray(value.modeOfPayment)) {
+      const mode = value.modeOfPayment;
+      const amount = value.total;
+      value.modeOfPayment = { mode, amount };
+    }
+  })
+
   if (!data) {
     return next(new ErrorHandler("Orders not found", 404));
   }
@@ -182,12 +201,21 @@ exports.getCreditSaleOrders = catchAsyncErrors(async (req, res, next) => {
     data,
   });
 });
+
 exports.addCreditSettleTransaction = catchAsyncErrors(
   async (req, res, next) => {
     const partyId = req.params.id;
     const indiaTime = moment.tz('Asia/Kolkata');
     const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
-    const { amount, modeOfPayment } = req.body;
+    const { amount } = req.body;
+    let modeOfPayment = req.body.modeOfPayment;
+
+    if (!Array.isArray(modeOfPayment)) {
+      const mode = modeOfPayment;
+
+      modeOfPayment = [{ mode, amount }]
+    }
+
     const order = {
       party: partyId,
       total: amount,
@@ -207,23 +235,32 @@ exports.addCreditSettleTransaction = catchAsyncErrors(
 exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   const data = await SalesOrder.find({
-    party: id,
-    $or: [
-      { modeOfPayment: { $elemMatch: { mode: { $in: ["Credit", "Settle"] } } } },
-      { modeOfPayment: { $in: ["Credit", "Settle"] } }
-    ]
-  }).sort({ createdAt: -1 });
+    party: id
+  }).populate('party');
+
+  data.map((value, idx) => {
+    if (!value.modeOfPayment[0].mode) {
+      const mode = concatenateValues(value.modeOfPayment[0]);
+      const amount = value.total;
+      value.modeOfPayment[0] = { mode, amount };
+    }
+  })
+
+  const elementsWithCredit = data.filter(item => {
+    return item.modeOfPayment.some(payment => ["Credit", "Settle"].includes(payment.mode));
+  });
+
 
   // Print the retrieved data for debugging
-  console.log("Retrieved Sales Order Data:", data);
+  console.log("Retrieved Sales Order Data:", elementsWithCredit);
 
-  if (!data) {
+  if (!elementsWithCredit) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
 
   res.status(200).json({
     success: true,
-    data,
+    data: elementsWithCredit,
   });
 });
 
@@ -246,11 +283,14 @@ exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
       ErrorHandler(err);
     });
 });
+
+
 const SalesReturn = require("../models/SalesReturnModel"); // Import the SalesReturn model
 
 exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
   console.log('Sales Return');
-  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName } = req.body;
+  // const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName } = req.body;
+  const { orderItems, party, invoiceNum, reciverName, gst, businessName } = req.body;
 
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
@@ -260,7 +300,7 @@ exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
     if (!product) {
       return next(new ErrorHandler("Product not found", 404));
     }
-
+    
     // Increase main product quantity
     product.quantity += item.quantity;
 
@@ -284,7 +324,7 @@ exports.salesReturn = catchAsyncErrors(async (req, res, next) => {
     const salesReturn = await SalesReturn.create({
       orderItems,
       party,
-      modeOfPayment,
+      // modeOfPayment,
       total,
       user: req.user._id,
       createdAt: currentDateTimeInIndia,

@@ -4,10 +4,12 @@ const Inventory = require("../models/inventoryModel");
 const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const moment = require('moment-timezone');
+const User = require("../models/userModel");
+
 
 //Create new Estimate 
 exports.createEstimate = catchAsyncErrors(async (req, res, next) => {
-    const { orderItems, reciverName, gst, businessName, businessAddress } = req.body;
+    const { orderItems, reciverName, gst, businessName, businessAddress, estimateNum } = req.body;
 
     for (const item of orderItems) {
         const product = await Inventory.findById(item.product);
@@ -22,12 +24,16 @@ exports.createEstimate = catchAsyncErrors(async (req, res, next) => {
         orderItems,
         total,
         user: req.user._id,
+        estimateNum,
         createdAt: moment().tz('Asia/Kolkata').format('YYYY-MM-DD HH:mm:ss'),
         reciverName,
         businessName,
         businessAddress,
         gst
     });
+
+    // Increment numSales in User model
+    await User.findByIdAndUpdate(req.user._id, { $inc: { numEstimates: 1 } });
 
     res.status(201).json({
         success: true,
@@ -43,12 +49,17 @@ const calcTotalAmount = (orderItems) => {
     return total;
 };
 
-
-//Get single Estimate
+// Get single Estimate with product details
 exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
-    const { id } = req.params;
+    const user = req.user._id;
+    const { estimateNum } = req.params;
 
-    const estimate = await Estimate.findById(id);
+    const estimate = await Estimate.findOne({ user, estimateNum })
+        .populate({
+            path: 'orderItems.product',
+            model: 'inventory',
+        })
+        .exec();
 
     if (!estimate) {
         return next(new ErrorHandler("Estimate not found", 404));
@@ -60,10 +71,11 @@ exports.getEstimate = catchAsyncErrors(async (req, res, next) => {
     });
 });
 
+
 //Update Estimate
 exports.updateEstimate = catchAsyncErrors(async (req, res, next) => {
+    const user = req.user._id;
     const { id } = req.params;
-
 
     const updatedEstimate = await Estimate.findByIdAndUpdate(
         id,
@@ -139,6 +151,9 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
         invoiceNum
     });
 
+     // Increment numSales in User model
+    await User.findByIdAndUpdate(req.user._id, { $inc: { numSales: 1 } });
+
     // Delete the estimate after creating the sales order
     await Estimate.findByIdAndDelete(estimateId);
 
@@ -149,3 +164,42 @@ exports.convertEstimateToSalesOrder = catchAsyncErrors(async (req, res, next) =>
 
 });
 
+//Get number of estimates
+exports.getNumberofEstimates = catchAsyncErrors(async (req, res, next) => {
+    const userId = req.user._id;
+
+    try {
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return next(new ErrorHandler("User not found", 400));
+        }
+
+        const numEstimates = user.numEstimates;
+
+        res.status(200).json({
+            success: true,
+            numEstimates,
+        });
+    } catch (err) {
+        return next(new ErrorHandler("Error fetching number of sales", 500));
+    }
+});
+
+
+//Reset number of estimates
+exports.resetEstimatesCount = catchAsyncErrors(async (req, res, next) => {
+    const userId = req.user._id;
+    const { numEstimates = 0 } = req.body;
+
+    try {
+        await User.findByIdAndUpdate(userId, { $set: { numEstimates } }, { upsert: true });
+
+        res.status(200).json({
+            success: true,
+            message: "Sales count reset successfully",
+        });
+    } catch (err) {
+        return next(new ErrorHandler("Error resetting sales count", 500));
+    }
+});

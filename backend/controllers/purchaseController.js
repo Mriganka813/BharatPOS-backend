@@ -6,6 +6,14 @@ const inventoryController = require("./inventoryController");
 const moment = require('moment-timezone');
 const User = require("../models/userModel");
 
+function concatenateValues(obj) {
+
+  const arrNew = Object.values(JSON.parse((JSON.stringify(obj))));
+  const word = arrNew.slice(0, -1).join('');
+
+  return word;
+}
+
 // Create new Order
 exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
   const { orderItems, modeOfPayment, party, invoiceNum } = req.body;
@@ -176,6 +184,15 @@ exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
       },
     },
   ]);
+
+  data.map((value, idx) => {
+    if (!Array.isArray(value.modeOfPayment)) {
+      const mode = value.modeOfPayment;
+      const amount = value.total;
+      value.modeOfPayment = { mode, amount };
+    }
+  })
+
   if (!data) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
@@ -191,8 +208,16 @@ exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
  */
 exports.addCreditHistoryTransaction = catchAsyncErrors(
   async (req, res, next) => {
-    const { amount, modeOfPayment } = req.body;
     const id = req.params.id;
+    const { amount } = req.body;
+    let modeOfPayment = req.body.modeOfPayment;
+
+    if(!Array.isArray(modeOfPayment)){
+      const mode = modeOfPayment;
+      
+      modeOfPayment = [{mode, amount}]
+    }
+
     const order = {
       party: id,
       total: amount,
@@ -211,18 +236,27 @@ exports.addCreditHistoryTransaction = catchAsyncErrors(
 exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   const data = await PurchaseOrder.find({
-    party: id,
-    $or: [
-      { modeOfPayment: { $elemMatch: { mode: { $in: ["Credit", "Settle"] } } } },
-      { modeOfPayment: { $in: ["Credit", "Settle"] } }
-    ]
-  }).sort({ createdAt: -1 });
-  if (!data) {
+    party: id
+  }).populate('party');
+
+  data.map((value, idx) => {
+    if (!value.modeOfPayment[0].mode) {
+      const mode = concatenateValues(value.modeOfPayment[0]);
+      const amount = value.total;
+      value.modeOfPayment[0] = { mode, amount };
+    }
+  })
+
+  const elementsWithCredit = data.filter(item => {
+    return item.modeOfPayment.some(payment => ["Credit", "Settle"].includes(payment.mode));
+  });
+
+  if (!elementsWithCredit) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
   res.status(200).json({
     success: true,
-    data,
+    data: elementsWithCredit,
   });
 });
 
