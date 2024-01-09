@@ -23,17 +23,17 @@ router.route("/purchaseOrder/new").post(isAuthenticatedUser, newPurchaseOrder);
 
 router
   .route("/purchaseOrder/:id")
-  .get(isAuthenticatedUser,  getSinglePurchaseOrder);
+  .get(isAuthenticatedUser, getSinglePurchaseOrder);
 
 router
   .route("/purchase/credit-history/:id")
-  .get(isAuthenticatedUser,  cntlr.partyCreditHistory)
-  .post(isAuthenticatedUser,  cntlr.addCreditHistoryTransaction);
+  .get(isAuthenticatedUser, cntlr.partyCreditHistory)
+  .post(isAuthenticatedUser, cntlr.addCreditHistoryTransaction);
 
-router.route("/purchaseOrders/me").get(isAuthenticatedUser,  myPurchaseOrders);
+router.route("/purchaseOrders/me").get(isAuthenticatedUser, myPurchaseOrders);
 router
   .route("/purchaseOrders/me/credit")
-  .get(isAuthenticatedUser,  getCreditPurchaseOrders);
+  .get(isAuthenticatedUser, getCreditPurchaseOrders);
 
 router
   .route("/admin/purchaseOrders")
@@ -41,15 +41,19 @@ router
 
 router
   .route("/purchaseOrder/:id")
-  .delete(isAuthenticatedUser,  deletePurchaseOrder);
+  .delete(isAuthenticatedUser, deletePurchaseOrder);
 
 router
   .route("/upd/purchaseOrder/:id")
-  .put(isAuthenticatedUser,  updatePurchaseOrders);
+  .put(isAuthenticatedUser, updatePurchaseOrders);
 
 router
   .route("/admin/purchaseOrder/:id")
   .put(isAuthenticatedAdmin, authorizeRoles("admin"), updatePurchaseOrder)
   .delete(isAuthenticatedAdmin, authorizeRoles("admin"), deletePurchaseOrder);
+
+router.route("/purchasesNum")
+  .get(isAuthenticatedUser, cntlr.getNumberofPurchases)
+  .put(isAuthenticatedUser, cntlr.resetPurchasesCount)
 
 module.exports = router;

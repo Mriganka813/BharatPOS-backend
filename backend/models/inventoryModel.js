@@ -1,6 +1,10 @@
 const mongoose = require("mongoose");
 
 const subProductSchema = new mongoose.Schema({
+  name:{
+    type: String,
+    require: true
+  },
   inventoryId: {
     type: mongoose.Schema.ObjectId,
     required: true,

@@ -4,28 +4,48 @@ const ErrorHandler = require("../utils/errorhandler");
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
 const inventoryController = require("./inventoryController");
 const moment = require('moment-timezone');
+const User = require("../models/userModel");
+
+function concatenateValues(obj) {
+
+  const arrNew = Object.values(JSON.parse((JSON.stringify(obj))));
+  const word = arrNew.slice(0, -1).join('');
+
+  return word;
+}
+
 // Create new Order
 exports.newPurchaseOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, modeOfPayment, party,invoiceNum } = req.body;
+  const { orderItems, modeOfPayment, party, invoiceNum } = req.body;
 
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
   for (const item of orderItems) {
     if (item.quantity !== null) {
-        inventoryController.incrementQuantity(item.product, item.quantity);
+      inventoryController.incrementQuantity(item.product, item.quantity);
     }
-}
+  }
 
   const total = await calcTotalAmount(orderItems);
+
+  // Convert modeOfPayment to an array if it is a string
+  const paymentArray = typeof modeOfPayment === 'string'
+    ? [{ mode: modeOfPayment, amount: total }]
+    : modeOfPayment;
+
   const purchaseOrder = await PurchaseOrder.create({
     orderItems,
-    modeOfPayment,
+    modeOfPayment: paymentArray,
     party,
     total,
     user: req.user._id,
     invoiceNum,
-    createdAt:currentDateTimeInIndia
+    createdAt: currentDateTimeInIndia
   });
+
+  // Increment numSales in User model
+  await User.findByIdAndUpdate(req.user._id, { $inc: { numPurchases: 1 } });
+
   res.status(201).json({
     success: true,
     purchaseOrder,
@@ -122,7 +142,7 @@ async function updateStock(id, quantity) {
   const inventory = await Inventory.findById(id);
 
   if (inventory.Stock !== null) {
-      inventory.Stock -= quantity;
+    inventory.Stock -= quantity;
   }
 
   await inventory.save({ validateBeforeSave: false });
@@ -155,9 +175,24 @@ exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
   const user = req.user._id;
   const data = await PurchaseOrder.aggregate([
     {
-      $match: { user: user, modeOfPayment: "Credit" },
+      $match: {
+        user: user,
+        $or: [
+          { modeOfPayment: { $elemMatch: { mode: "Credit" } } },
+          { modeOfPayment: "Credit" }
+        ]
+      },
     },
   ]);
+
+  data.map((value, idx) => {
+    if (!Array.isArray(value.modeOfPayment)) {
+      const mode = value.modeOfPayment;
+      const amount = value.total;
+      value.modeOfPayment = { mode, amount };
+    }
+  })
+
   if (!data) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
@@ -173,8 +208,16 @@ exports.getCreditPurchaseOrders = catchAsyncErrors(async (req, res, next) => {
  */
 exports.addCreditHistoryTransaction = catchAsyncErrors(
   async (req, res, next) => {
-    const { amount, modeOfPayment } = req.body;
     const id = req.params.id;
+    const { amount } = req.body;
+    let modeOfPayment = req.body.modeOfPayment;
+
+    if(!Array.isArray(modeOfPayment)){
+      const mode = modeOfPayment;
+      
+      modeOfPayment = [{mode, amount}]
+    }
+
     const order = {
       party: id,
       total: amount,
@@ -193,28 +236,79 @@ exports.addCreditHistoryTransaction = catchAsyncErrors(
 exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
   const data = await PurchaseOrder.find({
-    party: id,
-    modeOfPayment: { $in: ["Credit", "Settle"] },
-  }).sort({ createdAt: -1 });
-  if (!data) {
+    party: id
+  }).populate('party');
+
+  data.map((value, idx) => {
+    if (!value.modeOfPayment[0].mode) {
+      const mode = concatenateValues(value.modeOfPayment[0]);
+      const amount = value.total;
+      value.modeOfPayment[0] = { mode, amount };
+    }
+  })
+
+  const elementsWithCredit = data.filter(item => {
+    return item.modeOfPayment.some(payment => ["Credit", "Settle"].includes(payment.mode));
+  });
+
+  if (!elementsWithCredit) {
     return next(new ErrorHandler("Order not found with this Id", 404));
   }
   res.status(200).json({
     success: true,
-    data,
+    data: elementsWithCredit,
   });
 });
 
 exports.updatePurchaseOrders = catchAsyncErrors(async (req, res, next) => {
-  const data = await PurchaseOrder.findByIdAndUpdate( {_id : req.params.id} , req.body).clone()
-  .then(() => {
-    PurchaseOrder.findById(req.params.id).then((data) => {
+  const data = await PurchaseOrder.findByIdAndUpdate({ _id: req.params.id }, req.body).clone()
+    .then(() => {
+      PurchaseOrder.findById(req.params.id).then((data) => {
+        res.status(200).json({
+          success: true,
+          data,
+        });
+      });
+    }).catch(err => {
+      ErrorHandler(err);
+    });
+});
+
+
+//Get number of purchase
+exports.getNumberofPurchases = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+
+  try {
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return next(new ErrorHandler("User not found", 404));
+    }
+    const numPurchases = user.numPurchases;
+
     res.status(200).json({
       success: true,
-      data,
+      numPurchases,
     });
-  });
-  }).catch(err => {
-    ErrorHandler(err);
-  });
+  } catch (err) {
+    return next(new ErrorHandler("Error fetching number of sales", 500));
+  }
+});
+
+//Reset number of purchases
+exports.resetPurchasesCount = catchAsyncErrors(async (req, res, next) => {
+  const userId = req.user._id;
+  const { numPurchases = 0 } = req.body;
+
+  try {
+    await User.findByIdAndUpdate(userId, { $set: { numPurchases } }, { upsert: true });
+
+    res.status(200).json({
+      success: true,
+      message: "Purchases count reset successfully",
+    });
+  } catch (err) {
+    return next(new ErrorHandler("Error resetting purchases count", 500));
+  }
 });

@@ -1,6 +1,6 @@
 const mongoose = require("mongoose");
 
-const salesReturnSchema = new mongoose.Schema({
+const estimateSchema = new mongoose.Schema({
   orderItems: [
     {
       price: {
@@ -13,55 +13,65 @@ const salesReturnSchema = new mongoose.Schema({
       },
       image: {
         type: String,
+        // required: true,
       },
       product: {
         type: mongoose.Schema.ObjectId,
         ref: "Product",
         required: true,
       },
-      // Add any other fields you need for each item
+      saleSGST:{
+        type:Number
+      },
+      saleCGST:{ 
+        type:Number
+      },
+      baseSellingPrice:{
+        type: Number
+      },
+      saleIGST:{
+        type: Number
+      },
+      hsn:{
+        type:String
+      },
+      discountAmt:{
+        type:Number
+      },
+      originalbaseSellingPrice:{
+        type: Number
+      }
     },
   ],
-  // modeOfPayment: {
-  //   type: String,
-  //   enum: ["Cash", "Credit", "Bank Transfer", "Settle","UPI"],
-  //   required: true,
-  // },
   total: {
     type: Number,
     required: true,
-  },
-  party: {
-    type: mongoose.Schema.ObjectId,
-    ref: "Party",
-  },
-  date: {
-    type: Date,
-    default: Date.now
   },
   user: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
     required: true,
   },
-  invoiceNum: {
-    type: String
+  estimateNum:{
+    type: Number,
+    required: true
   },
   createdAt: {
     type: String,
   },
-  reciverName: {
+  reciverName:{
     type: String
   },
-  businessName: {
+  businessName:{
     type: String
   },
-  businessAddress: {
+  businessAddress:{
     type: String
   },
-  gst: {
+  gst:{
     type: String
   }
+
 });
 
-module.exports = mongoose.model("SalesReturn", salesReturnSchema);
+module.exports = mongoose.model("estimateModel", estimateSchema);
