@@ -314,7 +314,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     }
   }
 
-  if (barCode != inventory.barCode) {
+   if (inventory.barCode && barCode != inventory.barCode) {
     if (barCode !== undefined && barCode !== "" && barCode.length !== 0) {
       const existingInventory = await Inventory.findOne({
         barCode: req.body.barCode,
