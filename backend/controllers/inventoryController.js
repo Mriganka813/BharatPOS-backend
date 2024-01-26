@@ -62,7 +62,7 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
 
   req.body.user = userDetail;
 
-  if (barCode !== undefined && barCode !== "" && barCode.length !== 0) {
+  if (barCode !== undefined && barCode !== "" && barCode !== null) {
     const existingInventory = await Inventory.findOne({
       barCode: barCode,
       user: req.user._id,
