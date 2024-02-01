@@ -55,11 +55,6 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
     req.body.quantity = 99999;
   }
 
-  if (req.files?.image) {
-    const result = await uploadImage(req.files.image);
-    req.body.image = result.url;
-  }
-
   req.body.user = userDetail;
 
   if (barCode !== undefined && barCode !== "" && barCode !== null) {
@@ -88,6 +83,41 @@ exports.createInventory = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//Uploading Image
+exports.addInventoryImage = catchAsyncErrors(async (req, res, next) => {
+  const { inventoryId } = req.body;
+  if (!req.files || !req.files.image) {
+    return res.status(400).json({
+      success: false,
+      msg: "No image found",
+    });
+  }
+
+  if (req.files?.image) {
+    const result = await uploadImage(req.files.image);
+    req.body.image = result.url;
+  }
+  else {
+    return res.status(400).json({
+      success: false,
+      msg: "No image found",
+    });
+  }
+
+  const updatedInventory = await Inventory.findByIdAndUpdate(inventoryId, { image: req.body.image }, { new: true, runValidators: true });
+
+  if (!updatedInventory) {
+    return res.status(400).json({
+      success: false,
+      msg: "Product with this ID not found",
+    });
+  }
+
+  res.status(201).json({
+    success: true,
+    updatedInventory
+  });
+})
 
 // Get All Inventory count and search
 exports.getAllInventoriesAndSearch1 = catchAsyncErrors(async (req, res, next) => {
@@ -304,17 +334,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("Inventory not found", 404));
   }
 
-  if (req.files?.image) {
-    try {
-      const result = await uploadImage(req.files.image); // Using uploadImage function
-      req.body.image = result.url;
-    } catch (error) {
-      console.log("Error uploading image:", error);
-      return next(new ErrorHandler("Error uploading image", 500));
-    }
-  }
-
-   if (inventory.barCode && barCode != inventory.barCode) {
+  if (inventory.barCode && barCode != inventory.barCode) {
     if (barCode !== undefined && barCode !== "" && barCode.length !== 0) {
       const existingInventory = await Inventory.findOne({
         barCode: req.body.barCode,
