@@ -8,6 +8,7 @@ const upload = require("../services/upload");
 const ApiFeatures = require("../utils/apiFeatures");
 const { uploadImage } = require("../services/upload");
 const User = require("../models/userModel");
+const processModel = require("../models/processModel");
 
 // Find Inventory by Barcode
 exports.findInventoryByBarcode = catchAsyncErrors(async (req, res, next) => {
@@ -313,6 +314,8 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     expiryDate,
     hsn,
     mrp,
+    batchNumber,
+    unit
   } = req.body;
 
   if (quantity < 1) {
@@ -355,6 +358,7 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     sellingPrice,
     barCode,
     quantity,
+    subProducts,
     GSTRate,
     saleSGST,
     saleCGST,
@@ -370,7 +374,9 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
     expiryDate,
     hsn,
     GSTincluded,
+    batchNumber,
     mrp,
+    unit
   };
 
   Object.keys(fieldsToUpdate).forEach(key => {
@@ -378,34 +384,6 @@ exports.updateInventory = catchAsyncErrors(async (req, res, next) => {
       inventory[key] = fieldsToUpdate[key];
     }
   });
-
-  // Handle subProducts update
-  if (subProducts && Array.isArray(subProducts)) {
-    subProducts.forEach((subProduct) => {
-      const { name: subProductName, inventoryId, quantity: subProductQuantity } = subProduct;
-
-      const existingSubProductIndex = inventory.subProducts.findIndex(
-        (sp) => sp.inventoryId.toString() === inventoryId
-      );
-
-      if (existingSubProductIndex !== -1) {
-        // Update existing subProduct
-        if (subProductQuantity) {
-          inventory.subProducts[existingSubProductIndex].quantity = subProductQuantity;
-        }
-        if (subProductName) {
-          inventory.subProducts[existingSubProductIndex].name = subProductName;
-        }
-      } else {
-        // Add new subProduct
-        inventory.subProducts.push({
-          name: subProductName,
-          inventoryId,
-          quantity: subProductQuantity,
-        });
-      }
-    });
-  }
 
   // Save the updated inventory
   inventory = await inventory.save();
@@ -460,7 +438,7 @@ exports.bulkUpload = catchAsyncErrors(async (req, res, next) => {
 
     res.status(200).json({
       success: true,
-      inventory,
+      inventoryData,
       message: "Data uploaded successfully",
     });
   } catch (err) {
@@ -569,3 +547,68 @@ exports.getExpiringItemsForUser = async (req, res, next) => {
     });
   }
 };
+
+exports.processInventory = async (req, res, next) => {
+  const { inventoryId, quantity } = req.body;
+
+  if (!inventoryId || !quantity) {
+    return res.status(404).json({
+      status: "error",
+      message: "Inventory Id and Quantity are mandatory",
+    });
+  }
+
+  try {
+    const inventory = await Inventory.findById(inventoryId);
+
+    if (!inventory) {
+      return res.status(404).json({
+        status: "error",
+        message: "Product not found",
+      });
+    }
+
+    if (inventory.subProducts && inventory.subProducts.length > 0) {
+      inventory.subProducts.forEach(async (subProduct) => {
+
+        const subInventory = await Inventory.findById(subProduct.inventoryId)
+
+        if (!subInventory) {
+          throw new Error(`No product named: ${subProduct.name} found`);
+        }
+
+        if (quantity * subProduct.quantity > subInventory.quantity) {
+          throw new Error(`Insufficient quantity for ${subProduct.name}`);
+        }
+
+        subInventory.quantity -= quantity * subProduct.quantity;
+        await subInventory.save();
+      })
+    }
+
+    inventory.quantity += quantity;
+
+    await inventory.save();
+
+    const processEntry = new processModel({
+      inventory: inventoryId,
+      subProducts: inventory.subProducts,
+    });
+
+    await processEntry.save();
+
+    return res.status(200).json({
+      status: "success",
+      message: "Inventory quantity and subProducts updated successfully",
+      updatedInventory: inventory,
+    });
+
+  } catch (error) {
+    return res.status(500).json({
+      status: "error",
+      message: error.message || "Internal Server Error",
+      error: error.message,
+    });
+  }
+};
+
