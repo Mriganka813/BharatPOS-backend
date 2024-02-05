@@ -3,11 +3,11 @@ const mongoose = require("mongoose");
 const subProductSchema = new mongoose.Schema({
   name:{
     type: String,
-    require: true
+    required: true
   },
   inventoryId: {
     type: mongoose.Schema.ObjectId,
-    required: true,
+    required: true, 
   },
   quantity: {
     type: Number,
@@ -159,8 +159,13 @@ const inventorySchema = mongoose.Schema(
     },
     hsn: {
       type: String,
-
     },
+
+    //Added unit
+    unit:{
+      type: String,
+      required: false
+    }
   },
   { timestamps: true }
 );
