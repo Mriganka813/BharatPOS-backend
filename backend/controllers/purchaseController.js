@@ -260,19 +260,36 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+// exports.updatePurchaseOrders = catchAsyncErrors(async (req, res, next) => {
+//   const data = await PurchaseOrder.findByIdAndUpdate({ _id: req.params.id }, req.body).clone()
+//     .then(() => {
+//       PurchaseOrder.findById(req.params.id).then((data) => {
+//         res.status(200).json({
+//           success: true,
+//           data,
+//         });
+//       });
+//     }).catch(err => {
+//       ErrorHandler(err);
+//     });
+// });
+
 exports.updatePurchaseOrders = catchAsyncErrors(async (req, res, next) => {
-  const data = await PurchaseOrder.findByIdAndUpdate({ _id: req.params.id }, req.body).clone()
-    .then(() => {
-      PurchaseOrder.findById(req.params.id).then((data) => {
-        res.status(200).json({
-          success: true,
-          data,
-        });
-      });
-    }).catch(err => {
-      ErrorHandler(err);
-    });
+  const { total } = req.body;
+
+  const purchaseOrder = await PurchaseOrder.findById(req.params.id)
+
+  purchaseOrder.modeOfPayment[0].amount = total;
+  purchaseOrder.total = total;
+
+  const updatedPurchaseOrder = await purchaseOrder.save();
+
+  res.status(200).json({
+    success: true,
+    data: updatedPurchaseOrder,
+  });
 });
+
 
 
 //Get number of purchase

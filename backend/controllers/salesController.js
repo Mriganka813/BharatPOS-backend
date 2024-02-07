@@ -305,23 +305,21 @@ exports.partyCreditHistory = catchAsyncErrors(async (req, res, next) => {
 
 
 exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const data = await SalesOrder.findByIdAndUpdate(
-    { _id: req.params.id },
-    req.body
-  )
-    .clone()
-    .then(() => {
-      SalesOrder.findById(req.params.id).then((data) => {
-        res.status(200).json({
-          success: true,
-          data,
-        });
-      });
-    })
-    .catch((err) => {
-      ErrorHandler(err);
-    });
+  const { total } = req.body;
+
+  const salesOrder = await SalesOrder.findById(req.params.id);
+
+  salesOrder.modeOfPayment[0].amount = total;
+  salesOrder.total = total;
+
+  const updatedSalesOrder = await salesOrder.save();
+
+  res.status(200).json({
+    success: true,
+    data: updatedSalesOrder,
+  });
 });
+
 
 
 const SalesReturn = require("../models/SalesReturnModel"); // Import the SalesReturn model
