@@ -1,4 +1,5 @@
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
+const moment = require("moment-timezone"); // Import moment-timezone library
 const SalesOrder = require("../models/salesModel");
 const PurchaseModel = require("../models/purchaseModel");
 const ExpenseModel = require("../models/expenseModel");
@@ -7,21 +8,23 @@ const InventoryModel = require("../models/inventoryModel");
 const PartyModel = require("../models/partyModel");
 const User = require("../models/userModel");
 const Estimate = require("../models/estimateModel");
-const SalesReturnModel = require("../models/SalesReturnModel")
+const SalesReturnModel = require("../models/SalesReturnModel");
 
 function concatenateValues(obj) {
-
-  const arrNew = Object.values(JSON.parse((JSON.stringify(obj))));
+  const arrNew = Object.values(JSON.parse(JSON.stringify(obj)));
   const word = arrNew.slice(0, -1).join('');
-
   return word;
 }
 
-// to get report of user sales , purchase and expense between starting date and end date
+// to get report of user sales, purchase, and expense between starting date and end date
 exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
 
   const user = req.user._id;
+  
+  // Get current date and time in Indian Standard Time (IST)
+  const currentIST = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
+
   if (!type) {
     res.status(404).json({
       success: false,
@@ -30,7 +33,6 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   }
 
   if (type === "sale") {
-
     const sales = await SalesModel.find({
       createdAt: { $gte: start_date, $lte: end_date },
       user: user,
@@ -49,16 +51,15 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
         const amount = value.total;
         value.modeOfPayment[0] = { mode, amount };
       }
-    })
+    });
 
     res.status(200).json({
       success: true,
       sales,
+      currentIST // Include current date and time in IST
     });
 
   }
-
-
 
   if (type === "purchase") {
     const purchase = await PurchaseModel.find({
@@ -79,11 +80,12 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
         const amount = value.total;
         value.modeOfPayment[0] = { mode, amount };
       }
-    })
+    });
 
     res.status(200).json({
       success: true,
       purchase,
+      currentIST // Include current date and time in IST
     });
   }
 
@@ -97,8 +99,10 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       expense,
+      currentIST // Include current date and time in IST
     });
   }
+
   if (type === "saleReturn") {
     const sales = await SalesReturnModel.find({
       createdAt: { $gte: start_date, $lte: end_date },
@@ -112,15 +116,15 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       { path: "user", select: "taxFile" },
     ]).select("-modeOfPayment");
 
-    console.log(sales);
     res.status(200).json({
       success: true,
       sales,
+      currentIST // Include current date and time in IST
     });
   }
 
   if (type === "report") {
-    // return item names , stock quantity and stock value
+    // return item names, stock quantity, and stock value
     const inventories = await InventoryModel.find({
       user: user,
     });
@@ -128,23 +132,22 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       inventories,
+      currentIST // Include current date and time in IST
     });
   }
 
   if (type === "estimate") {
-
     const estimates = await Estimate.find({ user: req.user._id }).populate({
       path: 'orderItems.product',
       model: 'inventory',
-    })
-      .exec();;
+    }).exec();
 
     res.status(200).json({
       success: true,
       count: estimates.length,
       estimates,
+      currentIST // Include current date and time in IST
     });
   }
 
 });
-
