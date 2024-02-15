@@ -1,5 +1,4 @@
 const catchAsyncErrors = require("../middleware/catchAsyncErrors");
-const moment = require("moment-timezone"); // Import moment-timezone library
 const SalesOrder = require("../models/salesModel");
 const PurchaseModel = require("../models/purchaseModel");
 const ExpenseModel = require("../models/expenseModel");
@@ -21,9 +20,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
   const { start_date, end_date, type } = req.query;
 
   const user = req.user._id;
-  
-  // Get current date and time in Indian Standard Time (IST)
-  const currentIST = moment().tz("Asia/Kolkata").format("YYYY-MM-DD HH:mm:ss");
+
 
   if (!type) {
     res.status(404).json({
@@ -56,7 +53,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       sales,
-      currentIST // Include current date and time in IST
+      
     });
 
   }
@@ -85,7 +82,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       purchase,
-      currentIST // Include current date and time in IST
+      
     });
   }
 
@@ -99,7 +96,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       expense,
-      currentIST // Include current date and time in IST
+      
     });
   }
 
@@ -119,7 +116,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       sales,
-      currentIST // Include current date and time in IST
+      
     });
   }
 
@@ -132,7 +129,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       inventories,
-      currentIST // Include current date and time in IST
+      
     });
   }
 
@@ -146,7 +143,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       success: true,
       count: estimates.length,
       estimates,
-      currentIST // Include current date and time in IST
+      
     });
   }
 
