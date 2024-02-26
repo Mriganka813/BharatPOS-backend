@@ -14,7 +14,7 @@ function concatenateValues(obj) {
 
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress } = req.body;
+  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress, kotId  } = req.body;
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
 
@@ -56,7 +56,6 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
 
   }
 
-
   try {
     const total = calcTotalAmount(orderItems);
 
@@ -77,7 +76,8 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
       reciverName,
       businessName,
       businessAddress,
-      gst
+      gst,
+      kotId 
     });
 
     // Increment numSales in User model
