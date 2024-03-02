@@ -120,7 +120,7 @@ const billingOrderSchema = mongoose.Schema({
         type: [itemDetails]
     },
     tableNo: {
-        type: String
+        type: Number
     },
     user: {
         type: mongoose.Schema.Types.ObjectId,
