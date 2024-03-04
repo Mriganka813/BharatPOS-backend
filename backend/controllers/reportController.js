@@ -21,7 +21,6 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
 
   const user = req.user._id;
 
-
   if (!type) {
     res.status(404).json({
       success: false,
@@ -34,10 +33,8 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       createdAt: { $gte: start_date, $lte: end_date },
       user: user,
     }).populate([
-      {
-        path: "orderItems",
-        populate: { path: "product", model: InventoryModel },
-      },
+      { path: "orderItems.product", model: 'inventory' },
+      { path: "orderItems.membership", select: "plan validity sellingPrice basePrice GSTincluded GSTRate CGST SGST IGST membershipType" },
       "party",
       { path: "user", select: "taxFile" },
     ]);
@@ -53,7 +50,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       sales,
-      
+
     });
 
   }
@@ -82,7 +79,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       purchase,
-      
+
     });
   }
 
@@ -96,7 +93,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       expense,
-      
+
     });
   }
 
@@ -116,7 +113,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       sales,
-      
+
     });
   }
 
@@ -129,7 +126,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
     res.status(200).json({
       success: true,
       inventories,
-      
+
     });
   }
 
@@ -143,7 +140,7 @@ exports.getReportofUser = catchAsyncErrors(async (req, res, next) => {
       success: true,
       count: estimates.length,
       estimates,
-      
+
     });
   }
 
