@@ -340,15 +340,15 @@ app.put("/add-sub-status", async (req, res, next) => {
 });
 
 //--Razorpay Webhook---------------
-app.post("/verification/razor", async (req, res, next) => {
-  const SECRET = "secretSarthak_123456789";
-  const subs_id = req.body.payload.subscription.entity.id;
-  const subs_status = req.body.payload.subscription.entity.status;
-  const User = await userModel.findOne({ subscription_id: subs_id });
-  User.subscription_status = subs_status;
-  await User.save();
-  res.json({ status: 'ok' });
-})
+// app.post("/verification/razor", async (req, res, next) => {
+//   const SECRET = "secretSarthak_123456789";
+//   const subs_id = req.body.payload.subscription.entity.id;
+//   const subs_status = req.body.payload.subscription.entity.status;
+//   const User = await userModel.findOne({ subscription_id: subs_id });
+//   User.subscription_status = subs_status;
+//   await User.save();
+//   res.json({ status: 'ok' });
+// })
 
 app.get("*", (req, res) => {
   // res.send("connected");
@@ -367,39 +367,39 @@ function currentDate() {
   return currentDateTimeInIndia;
 }
 
-schedule.scheduleJob('0 0 * * 0', async () => {
+// schedule.scheduleJob('0 0 * * 0', async () => {
 
-  const allActiveMemberships = await activeMemberships.find()
-    .populate('user', 'name email')
-    .populate('party', 'name address phoneNumber type guardianName createdAt')
-    .populate('membership', 'plan validity sellingPrice GSTincluded GSTRate CGST SGST IGST membershipType');
+//   const allActiveMemberships = await activeMemberships.find()
+//     .populate('user', 'name email')
+//     .populate('party', 'name address phoneNumber type guardianName createdAt')
+//     .populate('membership', 'plan validity sellingPrice GSTincluded GSTRate CGST SGST IGST membershipType');
 
-  const currentDateTimeInIndia = currentDate();
+//   const currentDateTimeInIndia = currentDate();
 
-  for (const membership of allActiveMemberships) {
-    if (membership.activeStatus && moment(currentDateTimeInIndia) - moment(membership.checkedAt) > 7) {
+//   for (const membership of allActiveMemberships) {
+//     if (membership.activeStatus && moment(currentDateTimeInIndia) - moment(membership.checkedAt) > 7) {
 
-      console.log(membership.validity)
-      console.log(moment(currentDateTimeInIndia).diff(moment(membership.createdAt), 'days'))
-      if (moment(currentDateTimeInIndia).diff(moment(membership.createdAt), 'days') > membership.validity) {
-        membership.activeStatus = false;
-      }
+//       console.log(membership.validity)
+//       console.log(moment(currentDateTimeInIndia).diff(moment(membership.createdAt), 'days'))
+//       if (moment(currentDateTimeInIndia).diff(moment(membership.createdAt), 'days') > membership.validity) {
+//         membership.activeStatus = false;
+//       }
 
-      const validityDays = membership.membership.validity;
-      const lastUpdated = moment(membership.updatedAt);
-      const todayDate = moment(currentDateTimeInIndia);
+//       const validityDays = membership.membership.validity;
+//       const lastUpdated = moment(membership.updatedAt);
+//       const todayDate = moment(currentDateTimeInIndia);
 
-      if (todayDate.diff(lastUpdated, 'days') > validityDays) {
-        membership.due = membership.due + membership.membership.sellingPrice;
-        membership.updatedAt = moment(currentDateTimeInIndia);
-      }
+//       if (todayDate.diff(lastUpdated, 'days') > validityDays) {
+//         membership.due = membership.due + membership.membership.sellingPrice;
+//         membership.updatedAt = moment(currentDateTimeInIndia);
+//       }
 
-      membership.checkedAt = moment(currentDateTimeInIndia);
-      await membership.save();
+//       membership.checkedAt = moment(currentDateTimeInIndia);
+//       await membership.save();
 
-    }
-  }
-})
+//     }
+//   }
+// })
 
 //-----------------------------------------------------
 
