@@ -46,14 +46,25 @@ exports.sellMembership = catchAsyncErrors(async (req, res, next) => {
         return next(new ErrorHandler("A plan with the provided party and membership already exists", 400));
     }
 
+    const existingMembership = await MemberShip.findById(membership);
+    const subscription_type = existingMembership.subscription_type;
+
     req.body.createdAt = currentDate();
     req.body.updatedAt = currentDate();
     req.body.checkedAt = currentDate();
     req.body.lastPaid = currentDate();
     req.body.user = req.user._id;
-    req.body.due = 0;
     req.body.activeStatus = true;
     req.body.validity = validity;
+
+    if (subscription_type === 'postpaid') {
+        req.body.due = 0;
+    } else if (subscription_type === 'prepaid') {
+        req.body.due = existingMembership.sellingPrice - req.body.total;
+        await Sales.create(req.body);
+        // Increment numSales in User model
+        await User.findByIdAndUpdate(req.user._id, { $inc: { numSales: 1 } });
+    }
 
     const newPlan = await ActiveMembership.create(req.body);
 
@@ -135,11 +146,7 @@ exports.payDue = catchAsyncErrors(async (req, res, next) => {
     }
 
     activeMember.lastPaid = paymentDate;
-    if (activeMember.due - req.body.total < 0) {
-        activeMember.due = 0;
-    } else {
-        activeMember.due = activeMember.due - req.body.total;
-    }
+    activeMember.due = activeMember.due - req.body.total;
 
     const savedActiveMember = await activeMember.save();
 

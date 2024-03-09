@@ -3,7 +3,6 @@ const instance = require("../utils/razorpay");
 const Payment = require("../models/paymentModel");
 const User = require("../models/userModel");
 const CryptoJS = require('crypto-js');
-const ErrorHandler = require("../utils/errorhandler");
 
 // Create a subscription
 exports.createSubscription = catchAsyncErrors(async (req, res, next) => {
@@ -43,9 +42,7 @@ exports.paymentVerification = catchAsyncErrors(async (req, res, next) => {
 
     try {
         const { razorpay_payment_id, razorpay_signature, razorpay_subscription_id, userData } = req.body;
-        // console.log(req.body);
         const user = await User.create(userData);
-        // console.log("user : ", user);
         const generated_signature = generateSignature(razorpay_payment_id, razorpay_subscription_id, process.env.RAZORPAY_SUBSCRIPTION_SECRET_KEY);
         const isAuthentic = generated_signature === razorpay_signature;
 
