@@ -234,6 +234,8 @@ const gymSchool = require('./routes/membershipRoute');
 const attendance = require('./routes/attendanceRoute');
 const activeMemberships = require("./models/activeMemberships");
 
+//----Import version routes--------------
+const version = require('./routes/versionRoute');
 
 const corsConfig = {
   origin: "http://localhost:5500",
@@ -315,6 +317,8 @@ app.use("/api/v1/subscription", subscription);
 //----Gym and School---
 app.use("/api/v1/membership", gymSchool);
 app.use("/api/v1/attendance", attendance);
+//----Version control------
+app.use("/api/v1/version", version);
 
 //Getting current date route
 app.get('/api/v1/current-date', (req, res) => {
