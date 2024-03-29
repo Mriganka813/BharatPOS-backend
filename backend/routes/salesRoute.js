@@ -73,6 +73,8 @@ router.route("/salesNum")
   .get(isAuthenticatedUser, cntlr.getNumberofSales)
   .put(isAuthenticatedUser, cntlr.resetSalesCount)
 
+router.route("/sale/:invoiceNum").delete(isAuthenticatedUser, cntlr.deleteUsingInvoiceNum);
+
 
 module.exports = router;
 
