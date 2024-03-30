@@ -839,13 +839,13 @@ exports.addAddress = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
-  try {
-    return res.render("deletePage");
-  } catch (err) {
-    console.log(err);
-  }
-});
+// exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
+//   try {
+//     return res.render("deletePage");
+//   } catch (err) {
+//     console.log(err);
+//   }
+// });
 
 //  const Consumer = require('../models/Consumer'); // Import the Consumer model
 

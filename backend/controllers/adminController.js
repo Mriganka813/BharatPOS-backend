@@ -9,6 +9,18 @@ const ExpenseModel = require("../models/expenseModel");
 const SalesModel = require("../models/salesModel");
 const InventoryModel = require("../models/inventoryModel");
 const PartyModel = require("../models/partyModel");
+const expenseModel = require("../models/expenseModel");
+const inventoryModel = require("../models/inventoryModel");
+const partyModel = require("../models/partyModel");
+const purchaseModel = require("../models/purchaseModel");
+const salesModel = require("../models/salesModel");
+const billingOrderModel = require("../models/billingOrderModel");
+const activeMemberships = require("../models/activeMemberships");
+const estimateModel = require("../models/estimateModel");
+const kotModel = require("../models/kotModel");
+const membershipPlans = require("../models/membershipPlans");
+const SalesReturnModel = require("../models/SalesReturnModel");
+const userModel = require("../models/userModel");
 
 // creating admin
 exports.createAdmin = catchAsyncErrors(async (req, res, next) => {
@@ -112,30 +124,30 @@ exports.updateUserRole = catchAsyncErrors(async (req, res, next) => {
 });
 
 // / Delete User
-exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
-  const { securityKey } = req.query;
-  if (!securityKey) {
-    return next(new ErrorHandler("Please enter security key", 400));
-  }
-  if (securityKey !== process.env.SECURITY_KEY) {
-    return next(new ErrorHandler("Invalid security key", 400));
-  }
-  if (securityKey === process.env.SECURITY_KEY) {
-    const user = await User.find({
-      email: req.query.email,
-    });
-    if (!user) {
-      return next(
-        new ErrorHandler(`User does not exist with Id: ${req.params.id}`, 400)
-      );
-    }
-    await user[0].remove();
-    res.status(200).json({
-      success: true,
-      message: "User Deleted Successfully",
-    });
-  }
-});
+// exports.deleteUser = catchAsyncErrors(async (req, res, next) => {
+//   const { securityKey } = req.query;
+//   if (!securityKey) {
+//     return next(new ErrorHandler("Please enter security key", 400));
+//   }
+//   if (securityKey !== process.env.SECURITY_KEY) {
+//     return next(new ErrorHandler("Invalid security key", 400));
+//   }
+//   if (securityKey === process.env.SECURITY_KEY) {
+//     const user = await User.find({
+//       email: req.query.email,
+//     });
+//     if (!user) {
+//       return next(
+//         new ErrorHandler(`User does not exist with Id: ${req.params.id}`, 400)
+//       );
+//     }
+//     await user[0].remove();
+//     res.status(200).json({
+//       success: true,
+//       message: "User Deleted Successfully",
+//     });
+//   }
+// });
 
 // get report of users
 exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
@@ -191,3 +203,43 @@ exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
     });
   }
 });
+
+
+//--------------------New User Delete Controller--------------------
+exports.removeUserCompletely = catchAsyncErrors(async (req, res, next) => {
+
+  const user = req.user._id;
+
+  await activeMemberships.deleteMany({ user });
+  await estimateModel.deleteMany({ user });
+  await expenseModel.deleteMany({ user });
+  await billingOrderModel.deleteMany({ user });
+  await kotModel.deleteMany({ user });
+  await partyModel.deleteMany({ user });
+  await salesModel.deleteMany({ user });
+  await inventoryModel.deleteMany({ user });
+  await membershipPlans.deleteMany({ user });
+  await purchaseModel.deleteMany({ user });
+  await SalesReturnModel.deleteMany({ user });
+  // await hotelModel.deleteMany({ owner: user });
+  // await Guest.deleteMany({ hotelId: user });
+  // await Invoice.deleteMany({ hotelId: user });
+  // await Rooms.deleteMany({ owner: user });
+  // await RoomsType.deleteMany({ owner: user });
+  // await incomeModel.deleteMany({ user });
+  // await orderedItem.deleteMany({ seller: user });
+  // await Rating.deleteMany({ sellerId: user });
+
+  res.cookie("token", null, {
+    expires: new Date(Date.now()),
+    httpOnly: true,
+  });
+
+  await userModel.findByIdAndDelete(user);
+
+  res.status(200).json({
+    success: true,
+    message: "User and its data deleted successfully",
+  });
+
+})
