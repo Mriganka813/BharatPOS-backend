@@ -131,19 +131,28 @@ exports.getSellers = catchAsyncErrors(async (req, res, next) => {
 // get all products from a user
 exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   const id = req.params.id;
+  const per_page_data = 20;
+
   if (!id) {
     return next(new ErrorHandler("Please provide id as query param", 400));
   }
-  const seller = await User.findById(id);
+  const seller = await User.findOne({ phoneNumber: id });
+
   if (!seller) {
     return next(new ErrorHandler("User not found", 404));
   }
   const apiFeature = new ApiFeatures(
     Inventory.find({
-      user: id,
+      user: seller._id,
+      available: true
     }),
     req.query
-  ).pagination(10);
+  ).pagination(per_page_data);
+
+  const total_products = await Inventory.countDocuments({ user: seller._id, available: true });
+
+  const total_pages = Math.ceil(total_products / 20);
+
   const products = await apiFeature.query;
   if (!products) {
     return next(new ErrorHandler("No products found", 404));
@@ -151,6 +160,9 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   res.status(200).json({
     success: true,
     data: products,
+    total_products,
+    total_pages,
+    sellerName: seller.businessName
   });
 });
 
@@ -158,11 +170,11 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
 exports.getSellersByName = catchAsyncErrors(async (req, res, next) => {
   const key = req.query.keyword
     ? {
-        businessName: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
+      businessName: {
+        $regex: req.query.keyword,
+        $options: "i",
+      },
+    }
     : {};
   const apiFeature = new ApiFeatures(User.find(key), req.query).pagination(10);
   const sellers = await apiFeature.query;
@@ -176,11 +188,11 @@ exports.getSellersByName = catchAsyncErrors(async (req, res, next) => {
 exports.getProductNamesandSearch = catchAsyncErrors(async (req, res, next) => {
   const key = req.query.keyword
     ? {
-        name: {
-          $regex: req.query.keyword,
-          $options: "i",
-        },
-      }
+      name: {
+        $regex: req.query.keyword,
+        $options: "i",
+      },
+    }
     : {};
   const products = await Inventory.find(key).select("name");
   res.status(200).json({
@@ -328,14 +340,14 @@ exports.addToCart = async (req, res, next) => {
     const sellerId = product.user;
     const seller = await User.findById(sellerId);
     console.log(seller.discount);
-    
-    let discountPer=0
-    let originalPrice=product.sellingPrice
+
+    let discountPer = 0
+    let originalPrice = product.sellingPrice
     let price = product.sellingPrice
-    if(seller.discount || seller.discount>0){
-      
-      discountPer=seller.discount
-       price = product.sellingPrice -(product.sellingPrice * seller.discount /100);
+    if (seller.discount || seller.discount > 0) {
+
+      discountPer = seller.discount
+      price = product.sellingPrice - (product.sellingPrice * seller.discount / 100);
     }
 
 
@@ -394,7 +406,7 @@ exports.addToCart = async (req, res, next) => {
       cart: consumer.cart,
       discountPer,
       originalPrice
-       // Return the updated cart
+      // Return the updated cart
     });
   } catch (err) {
     console.log(err);
@@ -552,8 +564,8 @@ exports.searchProduct = catchAsyncErrors(async (req, res, next) => {
         $in: sid,
       },
     })
-    .skip(startIndex)
-    .limit(limit);
+      .skip(startIndex)
+      .limit(limit);
 
     if (productData.length > 0) {
       res.status(200).send({
@@ -724,7 +736,7 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
   const sellerid = user.cart.sellerId;
   const seller = await User.findById(sellerid)
   console.log(seller);
-  const sellerUpi=seller.upi_id 
+  const sellerUpi = seller.upi_id
   // const address= user.addresses
 
   const orderedItems = user.cart.product.map((item) => {
@@ -753,7 +765,7 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     longitude: req.body.longitude,
   };
 
-  
+
 
   const newOrder = new OrderedItem({
     items: orderedItems,
@@ -761,16 +773,16 @@ exports.placeOrder = catchAsyncErrors(async (req, res, next) => {
     consumerName: user.name,
     seller: sellerid,
     addresses: address,
-    sellerNum:seller.phoneNumber,
+    sellerNum: seller.phoneNumber,
     sellerUpi,
-    
-    
+
+
   });
   user.cart = [];
   await user.save();
   await newOrder.save();
 
-  res.send({orderedItems});
+  res.send({ orderedItems });
 });
 exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
   try {
@@ -781,12 +793,12 @@ exports.recentOrders = catchAsyncErrors(async (req, res, next) => {
     // const sellerNumber=seller.phoneNumber
     // const sellerUpi = seller.sellerUpi || "demoUpi@magicstep"
     // console.log(seller);
-     
+
     res.send({
       recentOrders,
       // sellerNumber,
       // sellerUpi
-      
+
     });
   } catch (err) {
     console.log(err);
@@ -839,13 +851,13 @@ exports.addAddress = catchAsyncErrors(async (req, res, next) => {
   }
 });
 
-// exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
-//   try {
-//     return res.render("deletePage");
-//   } catch (err) {
-//     console.log(err);
-//   }
-// });
+exports.deleteAccountPage = catchAsyncErrors(async (req, res, next) => {
+  try {
+    return res.render("deletePage");
+  } catch (err) {
+    console.log(err);
+  }
+});
 
 //  const Consumer = require('../models/Consumer'); // Import the Consumer model
 
