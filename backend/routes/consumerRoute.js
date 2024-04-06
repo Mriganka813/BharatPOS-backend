@@ -74,9 +74,12 @@ router
 
 router.route("/sellers").get(isAuthenticatedConsumer, getSellers);
 
-router
-  .route("/sellerProduct/:id")
-  .get(isAuthenticatedConsumer, getProductsOfUser);
+// router
+//   .route("/sellerProduct/:id")
+//   .get(isAuthenticatedConsumer, getProductsOfUser);
+
+//QR routes
+router.route("/sellerProduct/:id").get(getProductsOfUser);
 
 router.route("/sellers/search").get(isAuthenticatedConsumer, getSellersByName);
 
