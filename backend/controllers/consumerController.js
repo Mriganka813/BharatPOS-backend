@@ -141,16 +141,30 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   if (!seller) {
     return next(new ErrorHandler("User not found", 404));
   }
+
+  let category = req.query.category;
+  if (category) {
+    category = category.toLowerCase();
+  }
+
   const apiFeature = new ApiFeatures(
     Inventory.find({
       user: seller._id,
       available: true
     }),
     req.query
-  ).pagination(per_page_data);
+  ).search().filter().pagination(per_page_data);
 
-  const total_products = await Inventory.countDocuments({ user: seller._id, available: true });
+  let countQuery = {
+    user: seller._id,
+    available: true
+  };
 
+  if (category) {
+    countQuery.category = { $regex: `^${category}$`, $options: 'i' };
+  }
+
+  const total_products = await Inventory.countDocuments(countQuery);
   const total_pages = Math.ceil(total_products / 20);
 
   const products = await apiFeature.query;
@@ -166,6 +180,36 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
     shopLocality: seller.address.locality
   });
 });
+
+exports.getUniqueCategoriesOfUser = catchAsyncErrors(async (req, res, next) => {
+  const phoneNumber = req.params.phoneNumber;
+
+  if (!phoneNumber) {
+    return next(new ErrorHandler("Please provide phone number as query param", 400));
+  }
+
+  const user = await User.findOne({ phoneNumber });
+  if (!user) {
+    return next(new ErrorHandler("User not found", 404));
+  }
+
+  let query = {
+    user: user._id,
+    available: true
+  };
+
+  const uniqueCategories = await Inventory.distinct("category", query);
+
+  if (!uniqueCategories || uniqueCategories.length === 0) {
+    return next(new ErrorHandler("No categories found", 404));
+  }
+
+  res.status(200).json({
+    success: true,
+    categories: uniqueCategories
+  });
+});
+
 
 // get all sellers and search by name :
 exports.getSellersByName = catchAsyncErrors(async (req, res, next) => {

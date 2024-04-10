@@ -7,18 +7,16 @@ class ApiFeatures {
   search() {
     const keyword = this.queryStr.keyword
       ? {
-          name: {
-            $regex: this.queryStr.keyword,
-            $options: "i",
-          },
-        }
+        name: {
+          $regex: this.queryStr.keyword,
+          $options: "i",
+        },
+      }
       : {};
 
     this.query = this.query.find({
       ...keyword,
     });
-    console.log(keyword);
-    // console.log(this.query);
 
     return this;
   }
@@ -35,16 +33,18 @@ class ApiFeatures {
 
     this.query = this.query.find(JSON.parse(queryStr));
 
+    if (this.queryStr.category) {
+      this.query = this.query.where('category', new RegExp('^' + this.queryStr.category, 'i'));
+    }
+
     return this;
   }
 
+
   pagination(resultPerPage) {
     const currentPage = Number(this.queryStr.page) || 1;
-
     const skip = resultPerPage * (currentPage - 1);
-
     this.query = this.query.limit(resultPerPage).skip(skip);
-
     return this;
   }
 }

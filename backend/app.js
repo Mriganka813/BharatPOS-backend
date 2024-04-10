@@ -30,7 +30,7 @@ const corsOptions = {
   origin: "*", // Allow requests from any origin
   credentials: true,
   methods: "GET,PUT,POST,DELETE,OPTIONS",
-  allowedHeaders: "Content-Type, Authorization, Content-Length, X-Requested-With",
+  allowedHeaders: "Content-Type, Authorization, Authorization_subuser, Content-Length, X-Requested-With",
 };
 app.use(cors(corsOptions));
 
@@ -229,14 +229,16 @@ const estimate = require("./routes/estimateRoute");
 const kot = require("./routes/kotRoute");
 const subscription = require('./routes/subscriptionRoute');
 const userModel = require("./models/userModel");
-//---Import Gym and School routes
+//---Import Gym and School routes-------------
 const gymSchool = require('./routes/membershipRoute');
 const attendance = require('./routes/attendanceRoute');
 const activeMemberships = require("./models/activeMemberships");
 //----Import version routes--------------
 const version = require('./routes/versionRoute');
-//----Import QR order routes------------
-const qrorder = require('./routes/qrOrderRoute');
+//----Import sub User routes-------------
+const subUser = require('./routes/subUserRoute.js')
+//----QR order routes--------------------
+const qrOrder = require('./routes/qrOrderRoute.js')
 
 const corsConfig = {
   origin: "http://localhost:5500",
@@ -250,7 +252,7 @@ app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Methods", "GET,PUT,POST,DELETE,OPTIONS");
   res.header(
     "Access-Control-Allow-Headers",
-    "Content-Type, Authorization, Content-Length, X-Requested-With"
+    "Content-Type, Authorization, Authorization_subuser, Content-Length, X-Requested-With"
   );
   next();
 });
@@ -320,8 +322,10 @@ app.use("/api/v1/membership", gymSchool);
 app.use("/api/v1/attendance", attendance);
 //----Version control------
 app.use("/api/v1/version", version);
+//----Sub User-------------
+app.use("/api/v1", subUser);
 //----QR Order-------------
-app.use("/api/v1", qrorder)
+app.use("/api/v1", qrOrder)
 
 //Getting current date route
 app.get('/api/v1/current-date', (req, res) => {

@@ -33,7 +33,8 @@ const {
   removeItem,
   rating,
   addAddress,
-  // deleteAccountPage,
+  //deleteAccountPage,
+  getUniqueCategoriesOfUser,
 } = require("../controllers/consumerController");
 const {
   getAllInventoriesAndSearch,
@@ -41,6 +42,7 @@ const {
   getAllInventorieswithSearch,
 } = require("../controllers/inventoryController");
 const { isAuthenticatedConsumer } = require("../middleware/auth");
+const { getAllProductsFromSeller } = require('../controllers/consumerController');
 
 const router = express.Router();
 
@@ -73,13 +75,6 @@ router
   .get(isAuthenticatedConsumer, getSellersAndSearch);
 
 router.route("/sellers").get(isAuthenticatedConsumer, getSellers);
-
-// router
-//   .route("/sellerProduct/:id")
-//   .get(isAuthenticatedConsumer, getProductsOfUser);
-
-//QR routes
-router.route("/sellerProduct/:id").get(getProductsOfUser);
 
 router.route("/sellers/search").get(isAuthenticatedConsumer, getSellersByName);
 
@@ -138,12 +133,16 @@ router.route("/orders/history").get(isAuthenticatedConsumer, recentOrders);
 
 router.route("/add/address").post(isAuthenticatedConsumer, addAddress);
 
-// router.route("/delete").get(deleteAccountPage);
-
+//router.route("/delete").get(deleteAccountPage);
 router.route("/rate/:productId").post(isAuthenticatedConsumer, rating);
 
 router.route("/policy").get(policyPage);
-module.exports = router;
-const { getAllProductsFromSeller } = require('../controllers/consumerController');
 
 router.route('/seller/:sellerName/products').get(getAllProductsFromSeller);
+
+//QR routes
+router.route("/sellerProduct/:id").get(getProductsOfUser);
+router.route("/sellerProduct/categories/:phoneNumber").get(getUniqueCategoriesOfUser);
+
+
+module.exports = router;
