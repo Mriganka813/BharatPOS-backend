@@ -75,6 +75,5 @@ router.route("/salesNum")
 
 router.route("/sale/:invoiceNum").delete(isAuthenticatedUser, cntlr.deleteUsingInvoiceNum);
 
-
 module.exports = router;
 

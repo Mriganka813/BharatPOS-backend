@@ -21,6 +21,7 @@ const kotModel = require("../models/kotModel");
 const membershipPlans = require("../models/membershipPlans");
 const SalesReturnModel = require("../models/SalesReturnModel");
 const userModel = require("../models/userModel");
+const subUserModel = require("../models/subUserModel");
 
 // creating admin
 exports.createAdmin = catchAsyncErrors(async (req, res, next) => {
@@ -221,6 +222,7 @@ exports.removeUserCompletely = catchAsyncErrors(async (req, res, next) => {
   await membershipPlans.deleteMany({ user });
   await purchaseModel.deleteMany({ user });
   await SalesReturnModel.deleteMany({ user });
+  await subUserModel.deleteMany({ user });
   // await hotelModel.deleteMany({ owner: user });
   // await Guest.deleteMany({ hotelId: user });
   // await Invoice.deleteMany({ hotelId: user });

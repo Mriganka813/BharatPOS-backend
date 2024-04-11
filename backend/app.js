@@ -127,9 +127,9 @@ app.post(
 );
 
 // Config
-if (process.env.NODE_ENV !== "PRODUCTION") {
-  require("dotenv").config({ path: "backend/config/config.env" });
-}
+//if (process.env.NODE_ENV !== "PRODUCTION") {
+require("dotenv").config({ path: "backend/config/config.env" });
+//}
 cloudinary.v2.config({
   cloud_name: process.env.CLOUDINARY_NAME,
   api_key: process.env.CLOUDINARY_API_KEY,
@@ -351,15 +351,15 @@ app.put("/add-sub-status", async (req, res, next) => {
 });
 
 //--Razorpay Webhook---------------
-// app.post("/verification/razor", async (req, res, next) => {
-//   const SECRET = "secretSarthak_123456789";
-//   const subs_id = req.body.payload.subscription.entity.id;
-//   const subs_status = req.body.payload.subscription.entity.status;
-//   const User = await userModel.findOne({ subscription_id: subs_id });
-//   User.subscription_status = subs_status;
-//   await User.save();
-//   res.json({ status: 'ok' });
-// })
+app.post("/verification/razor", async (req, res, next) => {
+  const SECRET = "secretSarthak_123456789";
+  const subs_id = req.body.payload.subscription.entity.id;
+  const subs_status = req.body.payload.subscription.entity.status;
+  const User = await userModel.findOne({ subscription_id: subs_id });
+  User.subscription_status = subs_status;
+  await User.save();
+  res.json({ status: 'ok' });
+})
 
 app.get("*", (req, res) => {
   // res.send("connected");
