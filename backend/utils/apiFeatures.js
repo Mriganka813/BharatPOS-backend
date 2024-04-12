@@ -34,12 +34,13 @@ class ApiFeatures {
     this.query = this.query.find(JSON.parse(queryStr));
 
     if (this.queryStr.category) {
-      this.query = this.query.where('category', new RegExp('^' + this.queryStr.category, 'i'));
+      const escapedCategory = this.queryStr.category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      const lowercaseCategory = escapedCategory.toLowerCase(); // Convert category string to lowercase
+      this.query = this.query.where('category', new RegExp('^' + lowercaseCategory, 'i')); // Use case-insensitive regex
     }
 
     return this;
   }
-
 
   pagination(resultPerPage) {
     const currentPage = Number(this.queryStr.page) || 1;

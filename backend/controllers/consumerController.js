@@ -144,28 +144,30 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
 
   let category = req.query.category;
   if (category) {
+    category = decodeURIComponent(category);
     category = category.toLowerCase();
   }
 
   const apiFeature = new ApiFeatures(
     Inventory.find({
-      user: seller._id,
-      available: true
+      user: seller._id
     }),
     req.query
   ).search().filter().pagination(per_page_data);
 
   let countQuery = {
-    user: seller._id,
-    available: true
+    user: seller._id
   };
 
   if (category) {
-    countQuery.category = { $regex: `^${category}$`, $options: 'i' };
+    const escapedCategory = category.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    countQuery.category = { $regex: `^${escapedCategory}$`, $options: 'i' };
   }
 
+  // Count documents matching countQuery
   const total_products = await Inventory.countDocuments(countQuery);
-  const total_pages = Math.ceil(total_products / 20);
+
+  const total_pages = Math.ceil(total_products / per_page_data);
 
   const products = await apiFeature.query;
   if (!products) {
@@ -181,6 +183,7 @@ exports.getProductsOfUser = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+
 exports.getUniqueCategoriesOfUser = catchAsyncErrors(async (req, res, next) => {
   const phoneNumber = req.params.phoneNumber;
 
@@ -194,8 +197,7 @@ exports.getUniqueCategoriesOfUser = catchAsyncErrors(async (req, res, next) => {
   }
 
   let query = {
-    user: user._id,
-    available: true
+    user: user._id
   };
 
   const uniqueCategories = await Inventory.distinct("category", query);
