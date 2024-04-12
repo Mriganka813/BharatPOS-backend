@@ -335,6 +335,13 @@ exports.UpdateSalesOrder = catchAsyncErrors(async (req, res, next) => {
   salesOrder.modeOfPayment[0].amount = total;
   salesOrder.total = total;
 
+  salesOrder.userName = req.user.businessName;
+  let subUserName = null;
+  if (req.subUser) {
+    subUserName = req.subUser.name;
+  }
+  salesOrder.subUserName = subUserName;
+
   const updatedSalesOrder = await salesOrder.save();
 
   res.status(200).json({
