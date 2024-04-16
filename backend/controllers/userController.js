@@ -1254,13 +1254,17 @@ const transporter = nodeMailer.createTransport({
 exports.sendEmailOtp = catchAsyncErrors(async (req, res, next) => {
   const { email } = req.body;
   const user = await User.findOne({ email });
-  let subUser;
+  // let subUser;
+
+  // if (!user) {
+  //   subUser = await subUserModel.findOne({ email })
+  // }
+
+  // if (!user && !subUser) {
+  //   return next(new ErrorHandler("User not found", 403));
+  // }
 
   if (!user) {
-    subUser = await subUserModel.findOne({ email })
-  }
-
-  if (!user && !subUser) {
     return next(new ErrorHandler("User not found", 403));
   }
 
@@ -1269,9 +1273,10 @@ exports.sendEmailOtp = catchAsyncErrors(async (req, res, next) => {
   if (user) {
     otp = await user.generateAndStoreOTP()
   }
-  else if (subUser) {
-    otp = await subUser.generateAndStoreOTP()
-  }
+
+  // else if (subUser) {
+  //   otp = await subUser.generateAndStoreOTP()
+  // }
 
   const emailBody = `
     <div>
@@ -1298,24 +1303,30 @@ exports.sendEmailOtp = catchAsyncErrors(async (req, res, next) => {
 
 exports.resetPassword = catchAsyncErrors(async (req, res, next) => {
   const { email, otp, newPassword } = req.body;
-  let user, subUser;
+  // let user, subUser;
+  let user;
 
   user = await User.findOne({ email });
 
-  if (!user) {
-    subUser = await subUserModel.findOne({ email });
-  }
+  // if (!user) {
+  //   subUser = await subUserModel.findOne({ email });
+  // }
 
-  if (!user && !subUser) {
+  // if (!user && !subUser) {
+  //   return next(new ErrorHandler("User not found", 403));
+  // }
+  if (!user) {
     return next(new ErrorHandler("User not found", 403));
   }
 
   let userToUpdate;
   if (user && (user.emailOTP === otp && user.emailOTPExpire > Date.now())) {
     userToUpdate = user;
-  } else if (subUser && (subUser.emailOTP === otp && subUser.emailOTPExpire > Date.now())) {
-    userToUpdate = subUser;
-  } else {
+  }
+  // else if (subUser && (subUser.emailOTP === otp && subUser.emailOTPExpire > Date.now())) {
+  //   userToUpdate = subUser;
+  // }
+  else {
     return res.status(400).json({ error: 'Invalid or expired OTP.' });
   }
 
