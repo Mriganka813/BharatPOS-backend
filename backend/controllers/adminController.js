@@ -209,6 +209,10 @@ exports.getReportofUserAdmin = catchAsyncErrors(async (req, res, next) => {
 //--------------------New User Delete Controller--------------------
 exports.removeUserCompletely = catchAsyncErrors(async (req, res, next) => {
 
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+
   const user = req.user._id;
 
   await activeMemberships.deleteMany({ user });
@@ -232,12 +236,12 @@ exports.removeUserCompletely = catchAsyncErrors(async (req, res, next) => {
   // await orderedItem.deleteMany({ seller: user });
   // await Rating.deleteMany({ sellerId: user });
 
-  await userModel.findByIdAndDelete(user);
-  
   res.cookie("token", null, {
     expires: new Date(Date.now()),
     httpOnly: true,
   });
+
+  await userModel.findByIdAndDelete(user);
 
   res.status(200).json({
     success: true,
