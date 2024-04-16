@@ -453,6 +453,10 @@ exports.resetSalesCount = catchAsyncErrors(async (req, res, next) => {
 
 //----Delete Sales using Invoice number-----------
 exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
+  if (req.cookies.token_subuser) {
+    return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
+  }
+  
   const invoiceNumToDelete = req.params.invoiceNum;
   const userId = req.user._id;
 
