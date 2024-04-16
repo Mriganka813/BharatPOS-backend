@@ -456,7 +456,6 @@ exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
   let token;
   let token_subuser;
 
-  // Check if token exists in cookies
   if (req.cookies.token) {
     token = req.cookies.token;
   }
@@ -505,7 +504,7 @@ exports.refreshJwtToken = catchAsyncErrors(async (req, res, next) => {
       if (!user.subscription_status || user.subscription_status !== 'active') {
         return next(new ErrorHandler("Your subscription is not active", 403));
       }
-      sendToken(user, 200, res); // Sending refreshed user token
+      sendToken(user, 200, res);
     }
   } catch (err) {
     return next(

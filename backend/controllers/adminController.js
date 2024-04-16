@@ -232,12 +232,12 @@ exports.removeUserCompletely = catchAsyncErrors(async (req, res, next) => {
   // await orderedItem.deleteMany({ seller: user });
   // await Rating.deleteMany({ sellerId: user });
 
+  await userModel.findByIdAndDelete(user);
+  
   res.cookie("token", null, {
     expires: new Date(Date.now()),
     httpOnly: true,
   });
-
-  await userModel.findByIdAndDelete(user);
 
   res.status(200).json({
     success: true,
