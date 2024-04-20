@@ -14,7 +14,7 @@ function concatenateValues(obj) {
 
 // Create new sales Order
 exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
-  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress, kotId } = req.body;
+  const { orderItems, modeOfPayment, party, invoiceNum, reciverName, gst, businessName, businessAddress, kotId, subUserName, userName } = req.body;
   const indiaTime = moment.tz('Asia/Kolkata');
   const currentDateTimeInIndia = indiaTime.format('YYYY-MM-DD HH:mm:ss');
 
@@ -64,12 +64,15 @@ exports.newSalesOrder = catchAsyncErrors(async (req, res, next) => {
       ? [{ mode: modeOfPayment, amount: total }]
       : modeOfPayment;
 
+    if (!userName) {
+      userName = req.user.businessName;
+    }
+    // let subUserName;
 
-    const userName = req.user.businessName;
-    let subUserName;
-
-    if (req.subUser) {
-      subUserName = req.subUser.name;
+    if (!subUserName) {
+      if (req.subUser) {
+        subUserName = req.subUser.name;
+      }
     }
 
     const salesOrderData = {
@@ -456,7 +459,7 @@ exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
   if (req.cookies.token_subuser) {
     return next(new ErrorHandler("Access Restricted: Unauthorized User", 403));
   }
-  
+
   const invoiceNumToDelete = req.params.invoiceNum;
   const userId = req.user._id;
 
