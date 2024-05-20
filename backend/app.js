@@ -12,6 +12,7 @@ var busboy = require("connect-busboy");
 const Inventory = require("./models/inventoryModel");
 const schedule = require("node-schedule");
 const moment = require('moment-timezone');
+const instance = require('./utils/razorpay.js')
 
 // const passport = require('passport');
 // const passportLocal = require('./config/passport-local-strategy');
@@ -360,6 +361,20 @@ app.post("/verification/razor", async (req, res, next) => {
   await User.save();
   res.json({ status: 'ok' });
 })
+
+app.post("/api/v1/get-order-id", async (req, res, next) => {
+  const { amount } = req.body;
+  const options = {
+    amount: Number(amount) * 100,
+    currency: "INR"
+  };
+  const savedOrder = await instance.orders.create(options);
+  res.status(201).json({
+    success: true,
+    savedOrder
+  });
+});
+
 
 app.get("*", (req, res) => {
   // res.send("connected");

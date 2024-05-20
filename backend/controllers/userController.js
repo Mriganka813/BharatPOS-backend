@@ -220,7 +220,11 @@ exports.registerUser = catchAsyncErrors(async (req, res, next) => {
 
   const user = await User.create(userData);
 
-  return res.render("signedupsuccess");
+  // return res.render("signedupsuccess");
+  res.status(200).json({
+    success: true,
+    user,
+  });
 });
 
 // register user
