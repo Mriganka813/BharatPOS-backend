@@ -59,8 +59,7 @@ const userSchema = new mongoose.Schema(
     },
     businessType: {
       type: String,
-      required: [true, "Please choose Your Business Type"],
-      // $in: ["business1, business2"],
+      
     },
     image: {
       type: String,
