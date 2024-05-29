@@ -8,6 +8,7 @@ const {
   getCreditSaleOrders,
   UpdateSalesOrder,
   salesReturn,
+  getActiveUsers,
 } = require("../controllers/salesController");
 const cntlr = require("../controllers/salesController");
 const router = express.Router();
@@ -74,6 +75,8 @@ router.route("/salesNum")
   .put(isAuthenticatedUser, cntlr.resetSalesCount)
 
 router.route("/sale/:invoiceNum").delete(isAuthenticatedUser, cntlr.deleteUsingInvoiceNum);
+
+router.get("/active-users/:days", getActiveUsers);
 
 module.exports = router;
 

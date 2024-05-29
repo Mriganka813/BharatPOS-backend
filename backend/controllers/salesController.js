@@ -478,4 +478,67 @@ exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
     console.error(err);
     res.status(500).json({ error: 'Internal server error' });
   }
+
+  //Track active users
+});exports.getActiveUsers = catchAsyncErrors(async (req, res, next) => {
+  const { days } = req.params;
+  const timeSpan = parseInt(days, 10);
+
+  if (isNaN(timeSpan) || timeSpan <= 0) {
+    return next(new ErrorHandler("Invalid time span", 400));
+  }
+
+  const endDate = moment().endOf("day");
+  const startDate = moment().subtract(timeSpan, "days").startOf("day");
+
+  const userLastSaleDates = await salesModel.aggregate([
+    {
+      $match: {
+        date: {
+          $gte: startDate.toDate(),
+          $lte: endDate.toDate(),
+        },
+      },
+    },
+    {
+      $group: {
+        _id: "$user",
+        lastSaleDate: { $max: "$date" },
+      },
+    },
+    {
+      $lookup: {
+        from: "users",
+        localField: "_id",
+        foreignField: "_id",
+        as: "user",
+      },
+    },
+    {
+      $unwind: "$user",
+    },
+    {
+      $project: {
+        _id: 0,
+        userId: "$_id",
+        businessName: "$user.businessName",
+        lastSaleDate: 1,
+      },
+    },
+  ]);
+
+  const uniqueUsersDetails = userLastSaleDates.map((userDetails) => ({
+    businessName: userDetails.businessName,
+    id: userDetails.userId,
+    lastSaleDate: userDetails.lastSaleDate,
+  }));
+
+  uniqueUsersDetails.sort((a, b) => {
+    if (!a.lastSaleDate && !b.lastSaleDate) return 0;
+    if (!a.lastSaleDate) return 1;
+    if (!b.lastSaleDate) return -1;
+    return new Date(b.lastSaleDate) - new Date(a.lastSaleDate);
+  });
+
+  res.json({ users: uniqueUsersDetails });
 });
