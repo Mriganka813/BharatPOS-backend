@@ -491,7 +491,7 @@ exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
   const endDate = moment().endOf("day");
   const startDate = moment().subtract(timeSpan, "days").startOf("day");
 
-  const userLastSaleDates = await salesModel.aggregate([
+  const userLastSaleDates = await SalesOrder.aggregate([
     {
       $match: {
         date: {
@@ -542,3 +542,5 @@ exports.deleteUsingInvoiceNum = catchAsyncErrors(async (req, res, next) => {
 
   res.json({ users: uniqueUsersDetails });
 });
+
+
