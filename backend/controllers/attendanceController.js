@@ -74,11 +74,11 @@ exports.markAttendance = catchAsyncErrors(async (req, res, next) => {
 });
 
 
-//Get attendance details of a party --> Using party id
 exports.getAttendance = catchAsyncErrors(async (req, res, next) => {
-
     const { id } = req.params;
     const userId = req.user._id;
+    const { startDate, endDate } = req.query;
+
     const partyExists = await Party.findOne({ _id: id, user: userId });
     if (!partyExists) {
         return res.status(404).json({
@@ -88,7 +88,6 @@ exports.getAttendance = catchAsyncErrors(async (req, res, next) => {
     }
 
     const foundAttendance = await Attendance.findOne({ party: id });
-
     if (!foundAttendance) {
         return res.status(404).json({
             success: false,
@@ -96,17 +95,45 @@ exports.getAttendance = catchAsyncErrors(async (req, res, next) => {
         });
     }
 
+    const start = startDate ? new Date(startDate) : null;
+    const end = endDate ? new Date(endDate) : null;
+
+    const filterByDateRange = (date) => {
+        const recordDate = new Date(date);
+
+        if (start && end) {
+            return recordDate >= start && recordDate <= end;
+        } else if (start) {
+            return recordDate >= start;
+        } else if (end) {
+            return recordDate <= end;
+        } else {
+            return true;
+        }
+    };
+
+    const filteredPresent = foundAttendance.present.filter(filterByDateRange);
+    const filteredAbsent = foundAttendance.absent.filter(filterByDateRange);
+    const filteredCasualLeaves = foundAttendance.casualLeaves.filter(filterByDateRange);
+    const filteredSickLeaves = foundAttendance.sickLeaves.filter(filterByDateRange);
+
     res.status(200).json({
         success: true,
-        attendanceDetails: foundAttendance,
+        attendanceDetails: {
+            present: filteredPresent,
+            absent: filteredAbsent,
+            casualLeaves: filteredCasualLeaves,
+            sickLeaves: filteredSickLeaves,
+        },
         attendanceTotalDetails: {
-            totalPresent: foundAttendance.present.length,
-            totalAbsent: foundAttendance.absent.length,
-            totalCasualLeaves: foundAttendance.casualLeaves.length,
-            totalSickLeaves: foundAttendance.sickLeaves.length,
+            totalPresent: filteredPresent.length,
+            totalAbsent: filteredAbsent.length,
+            totalCasualLeaves: filteredCasualLeaves.length,
+            totalSickLeaves: filteredSickLeaves.length,
         },
     });
 });
+
 
 //edit attendance
 exports.editAttendance = catchAsyncErrors(async (req, res, next) => {
