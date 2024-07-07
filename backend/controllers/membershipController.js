@@ -135,19 +135,39 @@ exports.getAllMemberships = catchAsyncErrors(async (req, res, next) => {
 
 //Payment made for Membership
 exports.payDue = catchAsyncErrors(async (req, res, next) => {
-    const { party, paymentDate, membership } = req.body;
+    const { party, membership, total } = req.body;
 
     req.body.createdAt = currentDate();
     req.body.user = req.user._id;
 
-    const activeMember = await ActiveMembership.findOne({ party: party, membership: membership });
+    const activeMember = await ActiveMembership.findOne({ party: party, membership: membership }).populate('membership');
 
     if (!activeMember) {
         return next(new ErrorHandler('No user found for this membership plan', 404));
     }
 
-    activeMember.lastPaid = paymentDate;
-    activeMember.due = activeMember.due - req.body.total;
+    const planValidity = activeMember.membership.validity;
+    const validityPrice = activeMember.membership.sellingPrice;
+    let lastPaid = activeMember.lastPaid ? moment(activeMember.lastPaid) : moment();
+
+    if (planValidity < 30) {
+        lastPaid.add(planValidity, 'days');
+    } else {
+        const months = planValidity / 30;
+        const pricePerMonth = validityPrice / months;
+
+        const paidMonths = total / pricePerMonth;
+        const fullMonths = Math.floor(paidMonths);
+
+        const years = Math.floor(fullMonths / 12);
+        const remainingMonths = fullMonths % 12;
+
+        lastPaid.add(years, 'years').add(remainingMonths, 'months');
+    }
+
+    activeMember.lastPaid = lastPaid.toDate();
+    activeMember.due = activeMember.due - total;
+    activeMember.updatedAt = moment(lastPaid);
 
     const savedActiveMember = await activeMember.save();
 
