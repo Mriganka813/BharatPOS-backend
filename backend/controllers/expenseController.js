@@ -25,6 +25,29 @@ exports.getAllExpense = catchAsyncErrors(async (req, res, next) => {
   });
 });
 
+//route for getting expenses with pagination and search functionality
+exports.getAllExpenseAndSearch = catchAsyncErrors(async (req, res, next) => {
+  const page = parseInt(req.query.page) || 1; // Current page number
+  const limit = parseInt(req.query.limit) || 10; // Number of results per page
+  const startIndex = (page - 1) * limit;
+  console.log(req.query);
+  // Use a regular expression for a flexible search
+  const keywordRegex = new RegExp(req.query.keyword, 'i');
+  const expenses = await ExpenseModel.find({ user: req.user._id, header: keywordRegex})
+    .sort("-createdAt")
+    .skip(startIndex)
+    .limit(limit);
+  // Total count of expenses without pagination
+  const totalCount = await ExpenseModel.countDocuments({ user: req.user._id, header: keywordRegex });
+  res.status(200).json({
+    success: true,
+    page,
+    count: expenses.length,
+    totalCount,
+    expenses,
+  });
+})
+
 exports.getSingleExpense = catchAsyncErrors(async (req, res, next) => {
   const expense = await ExpenseModel.findById(req.params.id);
 

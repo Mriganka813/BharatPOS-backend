@@ -5,12 +5,15 @@ const {
   getSingleExpense,
   updateExpense,
   deleteExpense,
+  getAllExpenseAndSearch
 } = require("../controllers/expenseController");
 const { isAuthenticatedUser, isSubscribed } = require("../middleware/auth");
 
 const router = express.Router();
 
 router.route("/add/expense").post(isAuthenticatedUser, addExpense);
+
+router.route("/expense/me").get(isAuthenticatedUser, getAllExpenseAndSearch);
 
 router.route("/expense/all").get(isAuthenticatedUser, getAllExpense);
 
