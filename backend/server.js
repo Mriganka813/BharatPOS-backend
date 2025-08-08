@@ -4,7 +4,7 @@ const connectDatabase = require("./config/database");
 const multer = require("multer");
 const cors = require("cors");
 const moment = require('moment-timezone');
-
+const path = require('path');
 process.on("uncaughtException", (err) => {
   console.log(`Error: ${err.message}`);
   console.log(`Shutting down the server due to uncaught exception`);
