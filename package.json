@@ -35,7 +35,6 @@
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",
     "path": "^0.12.7",
-    "puppeteer": "^21.1.1",
     "razorpay": "^2.8.2",
     "schedule": "^0.5.0",
     "streamifier": "^0.1.1",
